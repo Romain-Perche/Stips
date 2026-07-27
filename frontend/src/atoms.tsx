@@ -4,7 +4,7 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 import { C, F, hatch } from './tokens';
-import type { Membre, TabScreen } from './types';
+import type { Membre, Role, TabScreen } from './types';
 
 /** Micro-label mono en capitales : « NOTE GLOBALE », « DISPONIBILITÉS »… */
 export function Mono({ children, color = C.muted2, size = 10, style }: {
@@ -122,6 +122,30 @@ export function Segmented({ items, active, onChange }: {
           }}>{i}</div>
         );
       })}
+    </div>
+  );
+}
+
+/** Le choix candidat / entreprise : bandeau plein, en haut de l'app,
+    toujours visible. Provisoire tant que le compte entreprise n'est pas
+    distinct du compte candidat (voir « À trancher » dans la description
+    du projet) — remplace l'ancien sélecteur caché dans la barre de dev. */
+export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
+  return (
+    <div style={{ flex: 'none', background: C.ink, padding: '14px 16px 10px' }}>
+      <div style={{ display: 'flex', background: 'rgba(255,255,255,.12)', borderRadius: 14, padding: 4 }}>
+        {(['candidat', 'entreprise'] as const).map(r => {
+          const on = r === role;
+          return (
+            <div key={r} onClick={() => onChange(r)} style={{
+              flex: 1, padding: '15px 0', borderRadius: 11, textAlign: 'center', cursor: 'pointer',
+              background: on ? C.cream : 'transparent',
+              color: on ? C.ink : C.creamMut,
+              font: `600 15px ${F.ui}`, letterSpacing: '.02em',
+            }}>{r === 'candidat' ? 'CANDIDAT' : 'ENTREPRISE'}</div>
+          );
+        })}
+      </div>
     </div>
   );
 }

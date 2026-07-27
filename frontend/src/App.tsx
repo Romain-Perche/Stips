@@ -15,7 +15,7 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useState } from 'react';
-import { TabBar } from './atoms';
+import { TabBar, RoleSwitcher } from './atoms';
 import DevChrome from './DevChrome';
 import ScreenChercher from './screens/ScreenChercher';
 import ScreenStagesCandidat from './screens/ScreenStagesCandidat';
@@ -57,9 +57,13 @@ export default function App() {
 
   return (
     <>
-      <div className="ph">{ecran}</div>
-      <DevChrome role={role} horsNav={horsNav}
-        onRole={changerRole} onHorsNav={setHorsNav} />
+      <div className="ph">
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
+          {horsNav !== 'invitation' && <RoleSwitcher role={role} onChange={changerRole} />}
+          <div style={{ flex: 1, position: 'relative' }}>{ecran}</div>
+        </div>
+      </div>
+      <DevChrome horsNav={horsNav} onHorsNav={setHorsNav} />
     </>
   );
 }

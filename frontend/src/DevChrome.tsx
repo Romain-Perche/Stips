@@ -1,14 +1,16 @@
 /* ══════════════════════════════════════════════════════════════════════
    DevChrome — barre de navigation de développement, HORS du téléphone.
 
-   Ce n'est pas de l'app : c'est un échafaudage pour atteindre les deux
-   points d'entrée qui n'ont pas encore de lien dans le design (la bascule
-   de rôle candidat/entreprise, et l'écran d'invitation qui précède la
-   création de compte). À supprimer quand ces liens existeront dans l'app.
+   Ce n'est pas de l'app : c'est un échafaudage pour atteindre le seul
+   point d'entrée qui n'a pas encore de lien dans le design (l'écran
+   d'invitation qui précède la création de compte). À supprimer quand cet
+   accès existera dans l'app (lien e-mail one-shot).
+
+   La bascule de rôle candidat/entreprise, elle, vit désormais dans l'app
+   elle-même — voir <RoleSwitcher> dans atoms.tsx.
    ══════════════════════════════════════════════════════════════════════ */
 
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import type { Role } from './types';
 
 function Chip({ on, children, ...p }: { on: boolean; children: ReactNode } & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
@@ -16,20 +18,15 @@ function Chip({ on, children, ...p }: { on: boolean; children: ReactNode } & But
   );
 }
 
-export default function DevChrome({ role, horsNav, onRole, onHorsNav }: {
-  role: Role;
+export default function DevChrome({ horsNav, onHorsNav }: {
   horsNav: 'invitation' | null;
-  onRole: (r: Role) => void;
   onHorsNav: (h: 'invitation' | null) => void;
 }) {
   return (
     <div className="chrome">
-      <span className="chrome-label">rôle</span>
-      <Chip on={role === 'candidat' && !horsNav}   onClick={() => onRole('candidat')}>CANDIDAT</Chip>
-      <Chip on={role === 'entreprise' && !horsNav} onClick={() => onRole('entreprise')}>ENTREPRISE</Chip>
-
-      <span className="chrome-label" style={{ marginLeft: 12 }}>entrée</span>
+      <span className="chrome-label">entrée</span>
       <Chip on={horsNav === 'invitation'} onClick={() => onHorsNav('invitation')}>5a2 · INVITATION</Chip>
+      <Chip on={horsNav === null} onClick={() => onHorsNav(null)}>APP</Chip>
     </div>
   );
 }

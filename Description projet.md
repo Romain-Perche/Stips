@@ -190,12 +190,39 @@ Ce qui est volontairement inerte : « Écrire », « Voir », « Publier une off
 « Je viens », les pièces (CV / LinkedIn / reco), l'ouverture d'un fil, « Enregistrer » sur
 « Qui suis-je ? ».
 
+### `mobile/` — le portage React Native (Expo)
+
+Les mêmes écrans, portés en React Native : mêmes noms de fichiers et mêmes données
+(`src/data.ts` est le jumeau de celui du frontend), mais primitives RN
+(`View`/`Text`/`Pressable`) au lieu des `div`/`span`, React Navigation à la place du
+routeur maison, et Reanimated à la place des transitions CSS.
+
+**Expo est volontairement figé sur SDK 54 — ne pas remonter sans vérifier.** Depuis mai
+2026 Apple bloque en review les nouvelles builds d'Expo Go : SDK 54 est la dernière version
+installable directement depuis l'App Store et le Play Store. Les SDK 55+ existent mais
+n'arrivent sur un téléphone que via `eas go` + TestFlight ou un dev build. Remonter la
+version ramène l'erreur « Project is incompatible with this version of Expo Go » pour
+quiconque teste avec l'Expo Go du store. Vérifier l'état courant sur
+<https://expo.dev/changelog> avant tout changement.
+
+Deux pièges du portage web → RN, corrigés, à garder en tête pour les prochains écrans :
+
+- **Pas de `transform-style: preserve-3d` en React Native.** Les enfants ne partagent pas
+  l'espace 3D du parent. La carte flip ne peut donc pas se faire « un conteneur qui tourne
+  + une face contre-tournée » comme sur le web : chaque face porte sa propre rotation
+  (A 0→180°, B 180→360°) et on bascule la visibilité à mi-course, quand les deux sont de
+  profil. Voir `src/screens/ScreenTalents.tsx`.
+- **En RN tout est flex.** Le web pouvait neutraliser `alignItems` avec `display: block` ;
+  en RN il s'applique toujours, et un `alignItems:'flex-end'` laissé sur un conteneur en
+  colonne pousse le contenu à droite au lieu du bas. C'était la cause des titres d'écran
+  décalés.
+
 ### `backend/`
 
 Vide pour l'instant, volontairement : le choix technique (langage, base de données,
 hébergement) est une vraie décision d'architecture, à prendre ensemble avant d'écrire du
 code. `backend/README.md` liste ce qu'il devra couvrir, à partir des écrans déjà dessinés,
-et pointe vers `frontend/src/data.js` comme contrat de données provisoire.
+et pointe vers `frontend/src/data.ts` comme contrat de données provisoire.
 
 ---
 
