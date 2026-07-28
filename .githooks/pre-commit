@@ -1,0 +1,38 @@
+#!/bin/sh
+# Refuse un commit si typecheck ou lint échoue sur un composant touché.
+# Activation (une fois par clone) : git config core.hooksPath .githooks
+# Contournement d'urgence : git commit --no-verify
+
+set -e
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+racine=$(git rev-parse --show-toplevel)
+status=0
+
+verifie() {
+  composant=$1
+  echo "$staged" | grep -q "^$composant/" || return 0
+  [ -f "$racine/$composant/package.json" ] || return 0
+
+  echo "→ $composant : typecheck"
+  if ! (cd "$racine/$composant" && npm run --silent typecheck); then
+    status=1
+  fi
+
+  echo "→ $composant : lint"
+  if ! (cd "$racine/$composant" && npm run --silent lint); then
+    status=1
+  fi
+}
+
+verifie mobile
+verifie frontend
+
+if [ "$status" -ne 0 ]; then
+  echo ""
+  echo "✗ Commit refusé : main doit rester verte."
+  echo "  Corrige les erreurs ci-dessus, ou 'git commit --no-verify' si c'est une urgence."
+  exit 1
+fi
+
+exit 0

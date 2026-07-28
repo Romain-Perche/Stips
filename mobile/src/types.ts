@@ -2,7 +2,7 @@
    TYPES — la forme des données, partagée entre data.ts et les écrans.
    ══════════════════════════════════════════════════════════════════════ */
 
-import type { ComponentType, ReactNode } from 'react';
+import type { ComponentType } from 'react';
 
 export interface Experience {
   titre: string;
