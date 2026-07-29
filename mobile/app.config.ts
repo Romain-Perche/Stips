@@ -68,6 +68,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     variante,
     apiUrl: parVariante.apiUrl,
-    // eas: { projectId: '...' } — rempli par `eas init` (à lancer soi-même)
+    eas: { projectId: '84949835-acaa-4698-b4aa-67af144e7f52' },
   },
+  owner: 'romain1805',
 });
