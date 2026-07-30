@@ -192,10 +192,10 @@ Ce qui est volontairement inerte : « Écrire », « Voir », « Publier une off
 
 ### `mobile/` — le portage React Native (Expo)
 
-Les mêmes écrans, portés en React Native : mêmes noms de fichiers et mêmes données
-(`src/data.ts` est le jumeau de celui du frontend), mais primitives RN
-(`View`/`Text`/`Pressable`) au lieu des `div`/`span`, React Navigation à la place du
-routeur maison, et Reanimated à la place des transitions CSS.
+Les mêmes écrans, portés en React Native : mêmes noms de fichiers et mêmes données (`DATA`
+et les types qui la composent viennent tous deux de `packages/core`, plus de copie
+jumelle), mais primitives RN (`View`/`Text`/`Pressable`) au lieu des `div`/`span`, React
+Navigation à la place du routeur maison, et Reanimated à la place des transitions CSS.
 
 **Expo est volontairement figé sur SDK 54 — ne pas remonter sans vérifier.** Depuis mai
 2026 Apple bloque en review les nouvelles builds d'Expo Go : SDK 54 est la dernière version

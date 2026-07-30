@@ -1,7 +1,8 @@
 # Backend — Le Club
 
-Dossier réservé. Rien n'est implémenté ici : `frontend/` fonctionne aujourd'hui avec des
-données factices (`frontend/src/data.js`), sans aucun appel réseau.
+Dossier réservé. Rien n'est implémenté ici : `frontend/` et `mobile/` fonctionnent
+aujourd'hui avec des données factices (`packages/core/src/data.ts`, partagées entre les
+deux), sans aucun appel réseau.
 
 ## Ce qui manque avant de commencer
 
@@ -20,6 +21,8 @@ D'après les écrans déjà dessinés côté `frontend/` :
 - **Événements** — liste, inscriptions, places restantes.
 - **Forum** — fils, votes, réponses.
 
-Rien de tout ça n'est urgent : `frontend/src/data.js` sert de contrat de données
-provisoire. Quand on construit le backend, cette liste (structure des objets `DATA`) est
-le point de départ le plus fiable de ce qu'une API doit renvoyer.
+Rien de tout ça n'est urgent : `packages/core/src/data.ts` sert de contrat de données
+provisoire. Quand on construit le backend, cette liste (structure des objets `DATA`, et les
+types qui l'accompagnent dans `packages/core/src/types.ts`) est le point de départ le plus
+fiable de ce qu'une API doit renvoyer. C'est aussi l'endroit naturel pour un futur
+`packages/api` (client HTTP + schémas de validation) une fois la stack choisie — pas avant.

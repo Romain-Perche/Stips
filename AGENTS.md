@@ -4,6 +4,13 @@ Trois composants dans un seul repo : `backend/` (rien d'implémenté encore), `f
 (Vite + React, données factices), `mobile/` (Expo SDK 54). Chacun a son propre cycle de
 version. Voir aussi `mobile/AGENTS.md` pour les contraintes Expo.
 
+Le repo est un workspace npm (`workspaces` dans le `package.json` racine) : une seule
+installation, à la racine (`npm install`), pas une par composant. `packages/core`
+(`@leclub/core`) porte ce qui est réellement identique entre `frontend/` et `mobile/` —
+les types de données, `DATA`, la palette — pour que ça ne puisse plus diverger en silence.
+Ce qui reste propre à chaque plateforme (polices, composants RN vs DOM) reste dans son
+composant ; ne pas chercher à tout faire monter dans `core`.
+
 ## Branches
 
 - **`main` est la seule branche longue.** Elle doit toujours passer `typecheck` et `lint`
@@ -24,7 +31,7 @@ de build EAS, pas une branche longue.
 
 - Un tag **annoté** par release, préfixé par composant : `mobile-v0.3.0`, `web-v0.5.0`,
   `api-v1.2.0`. Toujours `git tag -a`, jamais un tag léger.
-- Le tag `mobile-vX.Y.Z` doit correspondre au champ `version` de `mobile/app.json`.
+- Le tag `mobile-vX.Y.Z` doit correspondre au champ `version` de `mobile/app.config.ts`.
 - **Un tag poussé est immuable.** Jamais de `git tag -f` ni de force-push de tag : si un
   tag a été fetché par quelqu'un d'autre, le déplacer crée deux vérités sous le même nom.
   Erreur de version → on tagge la version suivante, un numéro brûlé ne coûte rien.
@@ -40,7 +47,7 @@ Ordre d'une release mobile — tagger **avant** de builder, pour que le binaire 
 issu du commit taggé :
 
 ```bash
-# 1. main est verte, on met à jour version dans mobile/app.json, on commite
+# 1. main est verte, on met à jour version dans mobile/app.config.ts, on commite
 git tag -a mobile-v0.3.0 -m "Onglet stages, fix flip de carte"
 git push origin main mobile-v0.3.0
 cd mobile && eas build --profile production && eas submit
@@ -108,13 +115,17 @@ bundle servi au navigateur.
 ## Vérifications
 
 ```bash
-cd mobile   && npm run typecheck && npm run lint
-cd frontend && npm run typecheck && npm run lint
+npm run typecheck --workspaces --if-present
+npm run lint      --workspaces --if-present
 ```
 
+(équivalent à lancer `npm run typecheck && npm run lint` dans `mobile/`, `frontend/` et
+`packages/core/` séparément.)
+
 Un hook `pre-commit` versionné dans `.githooks/` les lance automatiquement sur les
-composants touchés. **À activer une fois par clone** (les hooks ne se transmettent pas
-avec le repo) :
+composants touchés — et sur `mobile` et `frontend` en plus, si c'est `packages/core` qui a
+changé, puisque les deux en dépendent. **À activer une fois par clone** (les hooks ne se
+transmettent pas avec le repo) :
 
 ```bash
 git config core.hooksPath .githooks
