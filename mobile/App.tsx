@@ -27,7 +27,9 @@ import { InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic } from '@
 import { Outfit_400Regular, Outfit_500Medium, Outfit_600SemiBold } from '@expo-google-fonts/outfit';
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 
-import { C, F } from './src/tokens';
+import { C } from '@leclub/core';
+import type { Role } from '@leclub/core';
+import { F } from './src/tokens';
 import ScreenChercher from './src/screens/ScreenChercher';
 import ScreenStagesCandidat from './src/screens/ScreenStagesCandidat';
 import ScreenEvents from './src/screens/ScreenEvents';
@@ -36,7 +38,7 @@ import ScreenProfil from './src/screens/ScreenProfil';
 import ScreenTalents from './src/screens/ScreenTalents';
 import ScreenOffres from './src/screens/ScreenOffres';
 import ScreenInvitation from './src/screens/ScreenInvitation';
-import type { Role, TabScreen } from './src/types';
+import type { TabScreen } from './src/types';
 
 const TABS: Record<Role, TabScreen[]> = {
   candidat: [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],

@@ -4,10 +4,11 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useState, type ReactNode } from 'react';
-import { C, F, hatch } from '../tokens';
+import { C, DATA } from '@leclub/core';
+import type { EventItem } from '@leclub/core';
+import { F, hatch } from '../tokens';
 import { Mono, Card, Stk, Pills, ScreenHead, Screen } from '../atoms';
-import { DATA } from '../data';
-import type { EventItem, TabScreen } from '../types';
+import type { TabScreen } from '../types';
 
 function ScreenEvents({ nav }: { nav: ReactNode }) {
   const [filtre, setFiltre] = useState('Tout');

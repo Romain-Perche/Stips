@@ -3,8 +3,10 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import type { CSSProperties, ReactNode } from 'react';
-import { C, F, hatch } from './tokens';
-import type { Membre, Role, TabScreen } from './types';
+import { C } from '@leclub/core';
+import type { Membre, Role } from '@leclub/core';
+import { F, hatch } from './tokens';
+import type { TabScreen } from './types';
 
 /** Micro-label mono en capitales : « NOTE GLOBALE », « DISPONIBILITÉS »… */
 export function Mono({ children, color = C.muted2, size = 10, style }: {

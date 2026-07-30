@@ -4,10 +4,11 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState, type ReactNode } from 'react';
-import { C, F } from '../tokens';
+import { C, DATA } from '@leclub/core';
+import type { Fil } from '@leclub/core';
+import { F } from '../tokens';
 import { Mono, Card, ScreenHead, Pills, Screen } from '../atoms';
-import { DATA } from '../data';
-import type { Fil, TabScreen } from '../types';
+import type { TabScreen } from '../types';
 
 function ScreenForum({ nav }: { nav: ReactNode }) {
   const [filtre, setFiltre] = useState('Populaire');

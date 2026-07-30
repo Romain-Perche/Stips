@@ -25,7 +25,8 @@ import ScreenProfil from './screens/ScreenProfil';
 import ScreenTalents from './screens/ScreenTalents';
 import ScreenOffres from './screens/ScreenOffres';
 import ScreenInvitation from './screens/ScreenInvitation';
-import type { Role, TabScreen } from './types';
+import type { Role } from '@leclub/core';
+import type { TabScreen } from './types';
 
 const TABS: Record<Role, TabScreen[]> = {
   candidat: [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],

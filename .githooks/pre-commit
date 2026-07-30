@@ -26,8 +26,18 @@ verifie() {
   fi
 }
 
-verifie mobile
-verifie frontend
+a_verifier=""
+ajoute() {
+  case " $a_verifier " in *" $1 "*) ;; *) a_verifier="$a_verifier $1" ;; esac
+}
+touche() { echo "$staged" | grep -q "^$1/"; }
+
+# core est consommé par les deux : le toucher impose de revérifier les dépendants.
+if touche packages/core; then ajoute packages/core; ajoute mobile; ajoute frontend; fi
+if touche mobile;        then ajoute mobile; fi
+if touche frontend;      then ajoute frontend; fi
+
+for composant in $a_verifier; do verifie "$composant"; done
 
 # ── Secrets ───────────────────────────────────────────────────────────────
 # Complémentaire de .gitignore, qui ne protège que par chemin : ici on

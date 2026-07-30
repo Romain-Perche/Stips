@@ -10,8 +10,9 @@
 import { useId, useState, type ReactNode } from 'react';
 import { Pressable, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Defs, Pattern, Rect } from 'react-native-svg';
-import { C, F, HATCH_COLORS, HATCH_STRIPE } from './tokens';
-import type { Membre } from './types';
+import { C, HATCH_COLORS, HATCH_STRIPE } from '@leclub/core';
+import type { Membre } from '@leclub/core';
+import { F } from './tokens';
 
 /** Micro-label mono en capitales : « NOTE GLOBALE », « DISPONIBILITÉS »… */
 export function Mono({ children, color = C.muted2, size = 10, style }: {

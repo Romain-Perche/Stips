@@ -7,9 +7,9 @@
    directement à l'app.
    ══════════════════════════════════════════════════════════════════════ */
 
-import { C, F } from '../tokens';
+import { C, DATA } from '@leclub/core';
+import { F } from '../tokens';
 import { Mono, Avatar, Card, Screen } from '../atoms';
-import { DATA } from '../data';
 
 export default function ScreenInvitation({ onAccepter }: { onAccepter: () => void }) {
   const inv = DATA.invitation;

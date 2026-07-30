@@ -4,9 +4,9 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useState, type ReactNode } from 'react';
-import { C, F } from '../tokens';
+import { C, DATA } from '@leclub/core';
+import { F } from '../tokens';
 import { Mono, Avatar, Stk, ScreenHead, Screen } from '../atoms';
-import { DATA } from '../data';
 import type { TabScreen } from '../types';
 
 function ScreenProfil({ nav }: { nav: ReactNode }) {

@@ -5,10 +5,11 @@
 
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { C, F } from '../tokens';
+import { C, DATA } from '@leclub/core';
+import type { EventItem } from '@leclub/core';
+import { F } from '../tokens';
 import { Mono, Card, Stk, Pills, ScreenHead, Screen, Hatch } from '../atoms';
-import { DATA } from '../data';
-import type { EventItem, TabScreen } from '../types';
+import type { TabScreen } from '../types';
 
 function ScreenEvents() {
   const [filtre, setFiltre] = useState('Tout');

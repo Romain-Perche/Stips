@@ -18,10 +18,11 @@
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { C, F } from '../tokens';
+import { C, DATA } from '@leclub/core';
+import type { Talent } from '@leclub/core';
+import { F } from '../tokens';
 import { Mono, Avatar, Pills, ScreenHead, Screen, RondPiece } from '../atoms';
-import { DATA } from '../data';
-import type { Talent, TabScreen } from '../types';
+import type { TabScreen } from '../types';
 
 function ScreenTalents() {
   const [filtre, setFiltre] = useState('Tous');
