@@ -1,5 +1,6 @@
 #!/bin/sh
-# Refuse un commit si typecheck ou lint échoue sur un composant touché.
+# Refuse un commit si typecheck ou lint échoue sur un composant touché, ou si
+# un secret est sur le point d'entrer dans le repo.
 # Activation (une fois par clone) : git config core.hooksPath .githooks
 # Contournement d'urgence : git commit --no-verify
 
@@ -28,10 +29,42 @@ verifie() {
 verifie mobile
 verifie frontend
 
+# ── Secrets ───────────────────────────────────────────────────────────────
+# Complémentaire de .gitignore, qui ne protège que par chemin : ici on
+# regarde aussi le contenu ajouté, seul moyen d'attraper une clé écrite en
+# dur dans un fichier source. Une ligne qui doit légitimement citer un motif
+# (doc, liste de motifs) porte le marqueur « secret-ok » et est ignorée.
+# Ce fichier est exclu du scan de contenu : il EST la liste de motifs.
+motifs='sk_(live|test)_|rk_(live|test)_|whsec_|service_role|BEGIN [A-Z ]*PRIVATE KEY|(ghp|gho|github_pat)_[A-Za-z0-9]|xox[abpsr]-'
+
+chemins=$(echo "$staged" \
+  | grep -E '\.(jks|keystore|p8|p12|pem|key|mobileprovision|cer|certSigningRequest)$|(^|/)\.env($|\.)' \
+  | grep -v '\.env\.example$' || true)
+if [ -n "$chemins" ]; then
+  echo "→ secrets : fichier sensible mis en scène"
+  echo "$chemins" | sed 's/^/    /'
+  status=1
+fi
+
+for fichier in $staged; do
+  # Ce fichier est exclu : il contient la liste de motifs.
+  [ "$fichier" = ".githooks/pre-commit" ] && continue
+
+  fuites=$(git diff --cached -U0 -- "$fichier" \
+    | grep '^+' | grep -v '^+++' | grep -v 'secret-ok' \
+    | grep -E "$motifs" || true)
+  if [ -n "$fuites" ]; then
+    echo "→ secrets : motif de clé ajouté dans $fichier"
+    echo "$fuites" | sed 's/^+/    /'
+    status=1
+  fi
+done
+
 if [ "$status" -ne 0 ]; then
   echo ""
-  echo "✗ Commit refusé : main doit rester verte."
+  echo "✗ Commit refusé : main doit rester verte, et sans secret."
   echo "  Corrige les erreurs ci-dessus, ou 'git commit --no-verify' si c'est une urgence."
+  echo "  Un secret déjà poussé ne s'efface pas d'un revert : il faut le révoquer."
   exit 1
 fi
 

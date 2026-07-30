@@ -52,6 +52,59 @@ cd mobile && eas build --profile production && eas submit
   `mobile: corrige le flip de carte`, `frontend: ajoute l'écran parrainage`.
 - Un commit = un changement cohérent. Pas de `wip` sur `main`.
 
+## Config et secrets
+
+**Tout ce qui est dans le bundle JS est public.** Un `.ipa` ou un `.apk` se décompresse en
+trente secondes et le bundle se lit. Il n'existe pas d'endroit discret dans une app mobile :
+l'obfuscation, un nom de variable anodin ou un encodage base64 ne changent rien.
+
+| Autorisé dans l'app | Jamais dans l'app |
+| --- | --- |
+| URL de l'API | clé Stripe secrète (`sk_…`), secret de webhook |
+| clé publishable Stripe (`pk_…`) | clé de service de la base (rôle service) |
+| DSN Sentry | secret d'un provider OAuth |
+| identifiants de build (bundle id, variante) | jeton d'API d'un tiers |
+
+La colonne de droite vit côté backend (voir `backend/README.md`) : l'app parle au backend, le
+backend parle aux tiers avec ses secrets. C'est la seule répartition qui tient — si l'app a
+besoin d'un secret pour faire quelque chose, c'est le backend qui doit le faire à sa place.
+
+### Comment une valeur publique arrive dans l'app
+
+- **`extra` dans `mobile/app.config.ts`** — ce qu'on utilise. Une entrée par variante, relue à
+  l'exécution par `mobile/src/config/env.ts`. La valeur est visible dans un fichier committé :
+  son caractère public est assumé, pas subi.
+- **`EXPO_PUBLIC_*`** — inliné par Metro dans le bundle. Le préfixe est un aveu, pas une
+  protection : il n'existe pas d'`EXPO_PRIVATE_`. Évité ici, précisément parce qu'il laisse
+  croire le contraire.
+
+`mobile/app.config.ts` refuse de s'évaluer si une valeur de `extra` ou une variable
+`EXPO_PUBLIC_*` ressemble à un secret, et si `apiUrl` n'est pas en `https` en production.
+`expo start` comme `eas build` échouent donc avant qu'un binaire existe.
+
+### Variables d'environnement EAS
+
+Une variable EAS de visibilité *secret* est protégée **sur les serveurs EAS** : illisible
+depuis le dashboard et la CLI. Ça ne la rend pas secrète dans l'app. Si `app.config.ts` la
+recopie dans `extra`, elle est en clair dans le bundle comme n'importe quelle autre. Ces
+variables servent à changer *comment* un build se fabrique, pas à embarquer un secret.
+
+### Fichiers
+
+- `mobile/.env` n'est pas committé ; `mobile/.env.example` documente les variables attendues.
+- Clés de signature (`.p8`, `.jks`, `.p12`, `.mobileprovision`, `.pem`) : couvertes par le
+  `.gitignore` **racine**, qui vaut pour tout le repo. Celui d'un composant ne protège que son
+  dossier — une clé posée à la racine ou dans `backend/` passerait à travers.
+- Le hook `pre-commit` refuse un fichier de clé ou un `.env` mis en scène, et une ligne ajoutée
+  contenant un motif de secret connu. Une ligne qui doit légitimement en citer un porte le
+  marqueur `secret-ok`.
+
+Un secret déjà poussé ne s'efface pas d'un `revert` : l'objet reste dans l'historique et dans
+les clones. La seule réponse est de le **révoquer** chez le fournisseur.
+
+Côté `frontend/`, même règle avec le préfixe `VITE_` : Vite inline ces variables dans le
+bundle servi au navigateur.
+
 ## Vérifications
 
 ```bash

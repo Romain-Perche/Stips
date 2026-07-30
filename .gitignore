@@ -1,0 +1,25 @@
+# Filet repo-wide. Chaque composant a son propre .gitignore, mais les motifs
+# d'un .gitignore ne s'appliquent qu'à son dossier et en dessous : une clé de
+# signature déposée à la racine ou dans backend/ ne serait couverte par rien.
+# Voir AGENTS.md § Config et secrets.
+
+# Clés de signature et certificats — ne doivent jamais entrer dans git
+*.jks
+*.keystore
+*.p8
+*.p12
+*.pem
+*.key
+*.mobileprovision
+*.cer
+*.certSigningRequest
+
+# Variables d'environnement (les .env.example sont committés, eux)
+.env
+.env.*
+!.env.example
+
+# Dépendances et outillage local
+node_modules/
+.claude/
+.DS_Store

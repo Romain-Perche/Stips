@@ -32,8 +32,11 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# local env files — aucun .env n'entre dans le repo, .env.example documente
+# les variables attendues (voir AGENTS.md § Config et secrets)
+.env
+.env.*
+!.env.example
 
 # typescript
 *.tsbuildinfo
