@@ -32,6 +32,9 @@ de build EAS, pas une branche longue.
 - Un tag **annoté** par release, préfixé par composant : `mobile-v0.3.0`, `web-v0.5.0`,
   `api-v1.2.0`. Toujours `git tag -a`, jamais un tag léger.
 - Le tag `mobile-vX.Y.Z` doit correspondre au champ `version` de `mobile/app.config.ts`.
+  C'est le **seul** numéro de version qu'un humain édite : avec `appVersionSource: "remote"`
+  dans `eas.json`, le `buildNumber` iOS et le `versionCode` Android appartiennent à EAS et
+  s'auto-incrémentent. Ne jamais redescendre `version` — les stores le refusent.
 - **Un tag poussé est immuable.** Jamais de `git tag -f` ni de force-push de tag : si un
   tag a été fetché par quelqu'un d'autre, le déplacer crée deux vérités sous le même nom.
   Erreur de version → on tagge la version suivante, un numéro brûlé ne coûte rien.
@@ -140,3 +143,7 @@ git config core.hooksPath .githooks
 - Remonter la version d'`expo` au-delà de `~54.x` (voir `mobile/AGENTS.md`).
 - Choisir la stack du `backend/` : décision d'architecture à prendre ensemble
   (voir `backend/README.md`).
+- Changer le bundle id une fois qu'une app a été soumise à TestFlight externe ou à Play
+  Console : à ce moment-là il est figé, en changer crée une deuxième app.
+- Remonter `versionMinimale` (la version minimale servie par `GET /config`) : ça bloque
+  définitivement tous les binaires plus anciens. Voir `mobile/RELEASE.md`.

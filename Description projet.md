@@ -109,6 +109,10 @@ compris**. Accepter l'invitation entre directement dans l'app.
 - **Entreprises** : *pas encore tranché.* Accès payant à l'app ? Aux événements ?
   Commission à l'embauche d'un stagiaire ?
 
+⚠️ Si le paiement passe par l'in-app purchase, Apple et Google prélèvent 15 à 30 % — soit
+environ 15 €/membre/an à intégrer au modèle, pas un détail technique. Voir §6 d'« À
+trancher » : la formulation de ce que les 100 € achètent détermine si l'IAP est obligatoire.
+
 ---
 
 ## Où en est le code
@@ -236,3 +240,33 @@ et pointe vers `frontend/src/data.ts` comme contrat de données provisoire.
 4. **Le choix technique du backend.**
 5. **Les données de remplissage** à valider : les faces B de Yanis et Inès, et les boîtes
    Deloitte / BNP Paribas / Sia Partners (seule Rothschild & Co figure dans le design).
+6. **Les 100 €/an : in-app purchase ou paiement web ?** Décision business autant que
+   technique, à prendre avant la release qui introduit le paiement — mais ses conséquences
+   sur la copie et sur le backend se décident avant, elles.
+
+   **Ce qui est en jeu.** La règle 3.1.1 d'Apple impose l'IAP pour le contenu numérique
+   (15-30 % de commission). Mais la règle **3.1.5(a)** dit l'inverse pour les biens et
+   services consommés **hors** de l'app. Or les 100 € achètent « accès à la plateforme +
+   tous les événements » : l'annuaire, le forum et les offres sont numériques, les
+   événements sont des services du monde réel. **La façon dont on formule ce que les 100 €
+   achètent détermine quelle règle s'applique.** Vendus comme *accès aux événements*, avec
+   les fonctions numériques offertes avec le compte, il y a un vrai argument 3.1.5(a).
+   Vendus comme *accès à la plateforme*, Apple y lit un abonnement numérique. Ce n'est pas
+   une garantie — les reviewers varient — mais c'est un cadrage à décider délibérément et
+   à tenir de façon cohérente entre le site, l'écran d'invitation et les CGU, plutôt qu'à
+   découvrir en review.
+
+   **Le contournement web** (payer sur le web, l'app ne fait que débloquer) est légal, mais
+   l'app ne doit alors **ni mentionner ni lier** le paiement externe.
+
+   **Conséquence immédiate, dans les deux cas :** la ligne « 100 € / an, tout compris »
+   affichée sous le CTA de l'écran d'invitation (§ Écrans, invitation) change. Route web →
+   elle disparaît, et « C'est quoi Le Club ? » ne doit pas mener à une page avec un bouton
+   de paiement. Route IAP → elle devient un bloc de divulgation complet (nom de
+   l'abonnement, durée, prix par période, contenu, liens vers Confidentialité **et** CGU).
+   C'est aujourd'hui la seule mention de paiement de toute l'app.
+
+   Coût de la route IAP, à chiffrer comme repli : 30 % la 1re année puis 15 % chez Apple,
+   15 % chez Google, ou 15 % à plat via le Small Business Program ; plus la validation de
+   reçu côté serveur, le « restore purchases » obligatoire, et l'accord Paid Apps avec ses
+   formulaires bancaires et fiscaux (encore un parcours d'identité de plusieurs jours).
