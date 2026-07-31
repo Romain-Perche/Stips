@@ -115,13 +115,77 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: `Le Club${parVariante.suffixeNom}`,
   slug: 'le-club',
-  version: '0.1.0',
+  // Le SEUL numéro de version qu'un humain édite. `eas.json` a
+  // appVersionSource: "remote", donc buildNumber (iOS) et versionCode
+  // (Android) appartiennent à EAS et s'auto-incrémentent : les poser ici
+  // entrerait en conflit. Leur absence est voulue, pas un oubli.
+  // Un tag mobile-vX.Y.Z doit correspondre à cette valeur (voir AGENTS.md).
+  version: '0.1',
   orientation: 'portrait',
   icon: './assets/icon.png',
+  // Opt-out explicite du mode sombre : la DA n'en a pas, et un mode sombre
+  // non stylé est un vrai motif de rejet pour qualité en review.
   userInterfaceStyle: 'light',
+  // Préfixe de lien profond (leclub://…). Posé maintenant alors que rien ne
+  // l'utilise : il servira à ouvrir l'invitation autrement que par un lien
+  // e-mail one-shot (voir « À trancher » §2) et à tout redirect OAuth. Le
+  // changer une fois que des liens traînent dans des boîtes mail est pénible.
+  scheme: 'leclub',
+  // Mises à jour OTA : un correctif JS part en minutes au lieu d'un
+  // aller-retour de review de 24-48 h (autorisé par la règle 2.5.2 d'Apple
+  // tant que ça ne change pas ce que fait l'app). `updates.url` ET
+  // `runtimeVersion` sont tous deux obligatoires.
+  //
+  // Comme le verrou de version, ça ne se rattrape pas : un binaire compilé
+  // sans expo-updates ne recevra JAMAIS de mise à jour OTA. D'où sa présence
+  // avant le premier build. C'est aussi ce qui rend enfin réels les
+  // `channel` d'eas.json, inertes tant que la lib n'était pas installée.
+  updates: { url: 'https://u.expo.dev/84949835-acaa-4698-b4aa-67af144e7f52' },
+  // policy 'appVersion' : la frontière de compatibilité OTA coïncide avec la
+  // frontière de version store. C'est ce qui garantit que la version lue à
+  // l'exécution (src/config/env.ts) reste celle du binaire installé.
+  runtimeVersion: { policy: 'appVersion' },
   ios: {
-    supportsTablet: true,
+    // false (le défaut) est un choix, pas un oubli : true est un ENGAGEMENT
+    // — App Review évalue le rendu iPad, App Store Connect exige des
+    // captures iPad, et la HIG attend toutes les orientations, ce qui
+    // contredit orientation: 'portrait'. La DA est pensée pour un téléphone.
+    supportsTablet: false,
     bundleIdentifier: `${BASE_ID}${parVariante.suffixeId}`,
+    infoPlist: {
+      // Le seul chiffrement de l'app est le HTTPS fourni par l'OS, soit le
+      // cas exempté. Sans cette clé, on remplit le questionnaire de
+      // conformité export à CHAQUE soumission, et une mauvaise réponse
+      // bloque le build sur TestFlight. À revoir si l'app chiffre un jour
+      // quoi que ce soit elle-même.
+      ITSAppUsesNonExemptEncryption: false,
+    },
+    // Manifeste de confidentialité. Sans lui, le scan automatique d'Apple
+    // renvoie ITMS-91053 « Missing API declaration » et bloque le build.
+    // mobile/ios/ n'existe pas (workflow CNG) : cette clé est le seul
+    // endroit possible, Expo génère PrivacyInfo.xcprivacy au prebuild.
+    //
+    // Meilleur effort : les SDK tiers (React Native, modules Expo) portent
+    // leurs propres manifestes, on déclare pour notre code. Le scan d'Apple
+    // est l'autorité et son mail nomme exactement ce qui manque — voir
+    // RELEASE.md § confidentialité.
+    privacyManifests: {
+      // Aucun analytics, aucune publicité, aucun tracking. Tant que c'est
+      // vrai, ça se déclare — et ça rend le questionnaire App Store Connect
+      // trivial. À reprendre le jour où un SDK tiers arrive.
+      NSPrivacyTracking: false,
+      NSPrivacyTrackingDomains: [],
+      NSPrivacyAccessedAPITypes: [
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryUserDefaults',
+          NSPrivacyAccessedAPITypeReasons: ['CA92.1'], // usage interne à l'app
+        },
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryFileTimestamp',
+          NSPrivacyAccessedAPITypeReasons: ['C617.1'], // conteneur de l'app
+        },
+      ],
+    },
   },
   android: {
     package: `${BASE_ID}${parVariante.suffixeId}`,
@@ -131,11 +195,33 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       monochromeImage: './assets/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
+    // Lu dans le AndroidManifest.xml fusionné (npx expo prebuild --platform
+    // android) : ces trois permissions sont injectées par les dépendances
+    // natives (pas par notre code) et aucune fonctionnalité de l'app ne s'en
+    // sert. SYSTEM_ALERT_WINDOW est en particulier une permission sensible
+    // pour Play (liée aux attaques par superposition) — sans blocage, elle
+    // finit dans le binaire de production. À retirer de cette liste le jour
+    // où une vraie fonctionnalité en a besoin (ex. upload de CV/photo →
+    // gérée par les permissions scoped de expo-image-picker, pas celles-ci).
+    blockedPermissions: [
+      'android.permission.SYSTEM_ALERT_WINDOW',
+      'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.WRITE_EXTERNAL_STORAGE',
+    ],
   },
   web: {
     favicon: './assets/favicon.png',
   },
-  plugins: ['expo-font'],
+  plugins: [
+    'expo-font',
+    // assets/splash-icon.png existait sans être référencé. Sur SDK 54 le
+    // splash passe par ce plugin, l'ancienne clé `splash` est legacy.
+    ['expo-splash-screen', {
+      image: './assets/splash-icon.png',
+      backgroundColor: '#f7f5ef',
+      imageWidth: 200,
+    }],
+  ],
   extra,
   owner: 'romain1805',
 });
