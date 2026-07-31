@@ -7,11 +7,11 @@
    directement à l'app.
    ══════════════════════════════════════════════════════════════════════ */
 
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { C, DATA } from '@leclub/core';
 import { F } from '../tokens';
-import { Mono, Avatar, Card, Screen } from '../atoms';
+import { Mono, Avatar, BoutonPlein, Card, Screen } from '../atoms';
 
 export default function ScreenInvitation({ onAccepter }: { onAccepter: () => void }) {
   const inv = DATA.invitation;
@@ -71,11 +71,11 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
         paddingHorizontal: 22, paddingTop: 16, paddingBottom: 22 + insets.bottom, backgroundColor: C.bg,
         borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,.08)',
       }}>
-        <Pressable onPress={onAccepter} style={{
-          padding: 15, borderRadius: 99, backgroundColor: C.ink, alignItems: 'center',
-        }}>
-          <Text style={{ fontFamily: F.uiSemiBold, fontSize: 15, color: C.cream }}>Accepter l'invitation</Text>
-        </Pressable>
+        <BoutonPlein onPress={onAccepter}>Accepter l'invitation</BoutonPlein>
+        {/* ⚠ Cette ligne change quel que soit l'arbitrage IAP / paiement web
+            (voir « À trancher » §6 dans la description du projet) : c'est la
+            seule mention de paiement de toute l'app, donc la seule exposition
+            à la règle 3.1.1 d'Apple. */}
         <Text style={{ textAlign: 'center', fontFamily: F.uiRegular, fontSize: 12, color: C.muted, marginTop: 10 }}>
           100 € / an, tout compris · <Text style={{ color: C.ink, textDecorationLine: 'underline' }}>C'est quoi Le Club ?</Text>
         </Text>

@@ -6,6 +6,9 @@
      · horsNav  : un écran affiché seul, sans nav ('invitation' | null)
                   — c'est le seul écran qui précède la création de compte.
 
+   Au-dessus des deux : le verrou de version, qui passe devant tout, y
+   compris l'invitation (voir src/config/miseAJour.ts).
+
    Le sélecteur candidat/entreprise n'est plus une barre de dev cachée sous
    le téléphone (comme sur le web à l'origine) : c'est un bandeau visible en
    haut de l'app, tant qu'il n'y a pas deux comptes distincts (voir "À
@@ -38,6 +41,8 @@ import ScreenProfil from './src/screens/ScreenProfil';
 import ScreenTalents from './src/screens/ScreenTalents';
 import ScreenOffres from './src/screens/ScreenOffres';
 import ScreenInvitation from './src/screens/ScreenInvitation';
+import ScreenMiseAJour from './src/screens/ScreenMiseAJour';
+import { useVerrouVersion } from './src/config/miseAJour';
 import type { TabScreen } from './src/types';
 
 const TABS: Record<Role, TabScreen[]> = {
@@ -122,6 +127,19 @@ function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => v
   );
 }
 
+/** L'app en régime normal : le bandeau de rôle et les onglets. Extrait pour
+    que le branchement ci-dessous reste lisible à trois cas. */
+function VueApp({ role, onChangerRole }: { role: Role; onChangerRole: (r: Role) => void }) {
+  return (
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <RoleSwitcher role={role} onChange={onChangerRole} />
+      <NavigationContainer>
+        <Tabs role={role} key={role} />
+      </NavigationContainer>
+    </View>
+  );
+}
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic,
@@ -130,10 +148,14 @@ export default function App() {
   });
   const [role, setRole] = useState<Role>('candidat');
   const [horsNav, setHorsNav] = useState<'invitation' | null>('invitation');
+  // Avec les autres hooks, au-dessus du retour anticipé : en dessous, le
+  // `return null` des polices casserait l'ordre des hooks au montage suivant.
+  const verrou = useVerrouVersion();
 
   if (!fontsLoaded) return null;
 
   const changerRole = (r: Role) => { setRole(r); setHorsNav(null); };
+  const fondClair = verrou.bloque || horsNav === 'invitation';
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -141,16 +163,22 @@ export default function App() {
         {/* edges=['top'] une seule fois ici : l'encoche/le statut est déjà
             évité pour tout ce qui suit (RoleSwitcher, ScreenInvitation) —
             les écrans eux-mêmes (atoms.tsx → Screen) n'ont pas à y repenser. */}
-        <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: horsNav === 'invitation' ? C.bg : C.ink }}>
-          {horsNav === 'invitation' ? (
+        <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: fondClair ? C.bg : C.ink }}>
+          {/* Le verrou passe devant tout, invitation comprise. Testé sur
+              `verrou.bloque` et non sur une chaîne pré-calculée : c'est ce qui
+              réduit l'union et rend `verrou.url` lisible ici.
+
+              Aucune latence ajoutée au démarrage : l'app s'affiche tout de
+              suite et l'arbre bascule si la vérification revient bloquée.
+              Bloquer le premier rendu sur la vérification donnerait un écran
+              blanc pendant tout le timeout à CHAQUE démarrage hors ligne —
+              un bug pire, et pour bien plus de monde. */}
+          {verrou.bloque ? (
+            <ScreenMiseAJour url={verrou.url} message={verrou.message} />
+          ) : horsNav === 'invitation' ? (
             <ScreenInvitation onAccepter={() => setHorsNav(null)} />
           ) : (
-            <View style={{ flex: 1, backgroundColor: C.bg }}>
-              <RoleSwitcher role={role} onChange={changerRole} />
-              <NavigationContainer>
-                <Tabs role={role} key={role} />
-              </NavigationContainer>
-            </View>
+            <VueApp role={role} onChangerRole={changerRole} />
           )}
         </SafeAreaView>
       </SafeAreaProvider>

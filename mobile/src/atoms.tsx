@@ -118,6 +118,21 @@ export function Stk({ children, onPress, size = 12, padV = 8, padH = 14, style }
   );
 }
 
+/** Pilule noire pleine, l'action principale d'un écran : « Accepter
+    l'invitation », « Mettre à jour ». Contrairement à Stk (contour → plein
+    au press) elle est pleine au repos — il n'y en a qu'une par écran. */
+export function BoutonPlein({ children, onPress }: {
+  children: ReactNode; onPress?: () => void;
+}) {
+  return (
+    <Pressable onPress={onPress} style={{
+      padding: 15, borderRadius: 99, backgroundColor: C.ink, alignItems: 'center',
+    }}>
+      <Text style={{ fontFamily: F.uiSemiBold, fontSize: 15, color: C.cream }}>{children}</Text>
+    </Pressable>
+  );
+}
+
 /** Rangée de filtres carrés (Tous / 4.5+ / Dispo été / ⚙) */
 export function Pills({ items, active, onChange, border = true }: {
   items: string[]; active: string; onChange?: (p: string) => void; border?: boolean;
