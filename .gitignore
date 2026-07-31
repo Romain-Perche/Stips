@@ -14,6 +14,13 @@
 *.cer
 *.certSigningRequest
 
+# Clé de service-account Google Play (soumission via eas submit). C'est un
+# .json, donc aucun des motifs ci-dessus ne l'attrape. Le mieux reste de la
+# garder hors du repo — chemin absolu, ou fichier d'environnement EAS.
+*service-account*.json
+*service_account*.json
+play-*.json
+
 # Variables d'environnement (les .env.example sont committés, eux)
 .env
 .env.*

@@ -60,6 +60,7 @@ const MOTIFS_SECRETS = [
   /\brk_(live|test)_/, // clé Stripe restricted
   /\bwhsec_/, // secret de webhook Stripe — secret-ok
   /service_role/, // clé de service Supabase — secret-ok
+  /"type"\s*:\s*"service_account"/, // clé de service-account Google — secret-ok
   /-----BEGIN [A-Z ]*PRIVATE KEY/, // secret-ok
   /\b(ghp|gho|github_pat)_[A-Za-z0-9]/, // jeton GitHub
   /\bxox[abpsr]-/, // jeton Slack

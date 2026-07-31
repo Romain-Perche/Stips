@@ -45,10 +45,14 @@ for composant in $a_verifier; do verifie "$composant"; done
 # dur dans un fichier source. Une ligne qui doit légitimement citer un motif
 # (doc, liste de motifs) porte le marqueur « secret-ok » et est ignorée.
 # Ce fichier est exclu du scan de contenu : il EST la liste de motifs.
-motifs='sk_(live|test)_|rk_(live|test)_|whsec_|service_role|BEGIN [A-Z ]*PRIVATE KEY|(ghp|gho|github_pat)_[A-Za-z0-9]|xox[abpsr]-'
+motifs='sk_(live|test)_|rk_(live|test)_|whsec_|service_role|"type": *"service_account"|BEGIN [A-Z ]*PRIVATE KEY|(ghp|gho|github_pat)_[A-Za-z0-9]|xox[abpsr]-'
 
+# La clé de service-account Google Play est un .json : elle n'est attrapée par
+# aucune extension ci-dessus, d'où les motifs de nom. Le scan de contenu la
+# rattraperait (elle contient BEGIN PRIVATE KEY), mais par chance, pas par
+# conception — et la chance n'est pas une garde.
 chemins=$(echo "$staged" \
-  | grep -E '\.(jks|keystore|p8|p12|pem|key|mobileprovision|cer|certSigningRequest)$|(^|/)\.env($|\.)' \
+  | grep -E '\.(jks|keystore|p8|p12|pem|key|mobileprovision|cer|certSigningRequest)$|(^|/)\.env($|\.)|service[-_]account.*\.json$|(^|/)play-.*\.json$' \
   | grep -v '\.env\.example$' || true)
 if [ -n "$chemins" ]; then
   echo "→ secrets : fichier sensible mis en scène"
