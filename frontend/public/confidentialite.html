@@ -1,0 +1,205 @@
+<!doctype html>
+<!--
+  POLITIQUE DE CONFIDENTIALITÉ — page statique autonome.
+
+  Volontairement hors de la SPA React : Vite recopie public/ tel quel dans dist/,
+  donc cette page reste joignable même si le bundle applicatif casse. Ça compte,
+  parce que les deux stores exigent que cette URL réponde en permanence — une URL
+  morte fait retirer une app. Pas de React, pas de routeur, aucune dépendance.
+
+  ⚠️ BROUILLON — chaque [À COMPLÉTER] doit être renseigné avant la première
+  soumission. Un document faux est pire que pas de document : c'est une
+  déclaration légale, pas de la copie marketing. Voir mobile/RELEASE.md §6.
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Politique de confidentialité — Le Club</title>
+  <style>
+    :root {
+      --bg: #f7f5ef; --ink: #14140f; --ink3: #3c3a33; --muted: #77746a;
+      --card: #fff; --line: rgba(0, 0, 0, .1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink3);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 16px; line-height: 1.65;
+    }
+    main { max-width: 46rem; margin: 0 auto; padding: 3rem 1.375rem 6rem; }
+    .wordmark {
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      font-style: italic; font-size: 1.25rem; color: var(--ink);
+    }
+    h1 {
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      font-weight: 400; font-size: clamp(2rem, 6vw, 2.75rem); line-height: 1.1;
+      color: var(--ink); margin: .75rem 0 .25rem;
+    }
+    h2 {
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      font-weight: 400; font-size: 1.5rem; color: var(--ink);
+      margin: 2.75rem 0 .5rem; padding-top: 1.5rem; border-top: 1px solid var(--line);
+    }
+    .mono {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: .625rem; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .maj { color: var(--muted); font-size: .875rem; margin: 0 0 2rem; }
+    .todo {
+      background: #fff6d8; border: 1px solid #e0cd8a; border-radius: .5rem;
+      padding: 1rem 1.125rem; margin: 1.5rem 0; font-size: .9375rem;
+    }
+    .todo strong { color: var(--ink); }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .9375rem; }
+    th, td { text-align: left; padding: .625rem .75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--ink); font-weight: 600; }
+    .scroll { overflow-x: auto; }
+    a { color: var(--ink); }
+    footer { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); font-size: .875rem; color: var(--muted); }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #14140f; --ink: #f7f5ef; --ink3: #d8d4c6; --muted: #a5a296; --card: #1e1e18; --line: rgba(255, 255, 255, .12); }
+      .todo { background: #2b2410; border-color: #5c4d1e; }
+      .todo strong { color: #f0e2b0; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <p class="wordmark">Le Club</p>
+  <p class="mono">Document légal</p>
+  <h1>Politique de confidentialité</h1>
+  <p class="maj">Dernière mise à jour : [À COMPLÉTER — date de publication]</p>
+
+  <div class="todo">
+    <strong>Brouillon.</strong> Cette page doit être complétée et relue avant la première
+    soumission aux stores : elle est saisie comme <em>Privacy Policy URL</em> dans App Store
+    Connect et dans Play Console, et son contenu doit correspondre aux réponses du
+    questionnaire de confidentialité. Chaque <code>[À COMPLÉTER]</code> est un point de
+    décision, pas une formalité.
+  </div>
+
+  <h2>1. Qui est responsable du traitement</h2>
+  <p>
+    [À COMPLÉTER — dénomination exacte de la structure ou nom du responsable, forme juridique,
+    adresse, numéro SIREN le cas échéant]. Ce choix découle de la décision « compte Apple
+    particulier ou organisation » : le nom qui figure ici et celui qui apparaît sur la fiche
+    du store doivent être cohérents.
+  </p>
+  <p>Contact : <a href="mailto:[À COMPLÉTER]">[À COMPLÉTER — adresse e-mail de contact]</a></p>
+
+  <h2>2. Quelles données nous collectons</h2>
+  <p>
+    <strong>À ce jour, l'application ne collecte aucune donnée.</strong> Elle fonctionne sans
+    compte et sans appel réseau. Les sections ci-dessous décrivent ce qui sera collecté dès
+    l'ouverture des comptes, et cette page sera mise à jour dans la même version que cette
+    évolution.
+  </p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Catégorie</th><th>Détail</th><th>Pourquoi</th></tr></thead>
+      <tbody>
+        <tr><td>Identité</td><td>nom, prénom, adresse e-mail</td><td>créer et sécuriser le compte, exécuter l'adhésion</td></tr>
+        <tr><td>Profil</td><td>biographie, école, stage recherché, disponibilités, expériences, CV, lien LinkedIn</td><td>rendre le profil visible des entreprises membres</td></tr>
+        <tr><td>Parrainage</td><td>note et commentaire écrits par le parrain <em>au sujet du candidat</em>, et sa signature</td><td>voir la section 3, qui lui est consacrée</td></tr>
+        <tr><td>Événements</td><td>inscriptions et présences</td><td>gérer les places</td></tr>
+        <tr><td>Forum</td><td>messages, réponses, votes</td><td>contenu publié par le membre, visible des autres membres</td></tr>
+        <tr><td>Paiement</td><td>[À COMPLÉTER selon l'arbitrage in-app purchase / paiement web]</td><td>encaisser l'adhésion. Nous ne stockons aucune donnée bancaire : elle est traitée par le prestataire de paiement</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    <strong>Aucune donnée d'analyse d'audience, aucune publicité, aucun traçage</strong> — ni
+    au sein de l'application, ni entre applications. Nous ne revendons ni ne partageons de
+    données à des fins publicitaires.
+  </p>
+
+  <h2>3. Les avis de parrainage — vos droits</h2>
+  <p>
+    Un candidat n'entre au Club que parrainé. Le parrain rédige une note et un commentaire
+    signé <em>au sujet du candidat</em>, que les entreprises membres consultent. Cette
+    information est une donnée personnelle vous concernant, collectée auprès d'un tiers, et
+    qui peut influencer une décision de recrutement.
+  </p>
+  <p>
+    Vous en êtes informé avant d'accepter l'invitation : le contenu écrit par votre parrain
+    vous est montré. Vous ne pouvez pas réécrire ses mots — c'est son appréciation, pas la
+    vôtre — <strong>mais cela ne vous prive d'aucun recours</strong>. Vous pouvez à tout
+    moment demander la rectification d'un élément factuel inexact, ajouter votre propre
+    réponse, ou vous opposer au traitement. Écrivez à l'adresse de contact ci-dessus.
+  </p>
+  <div class="todo">
+    <strong>[À COMPLÉTER]</strong> Décrire ici le mécanisme réel de contestation une fois
+    qu'il existe (voir <code>backend/README.md</code>) : à qui la demande arrive, dans quel
+    délai elle est traitée, ce qui reste visible pendant l'examen.
+  </div>
+
+  <h2>4. Sur quelle base légale</h2>
+  <ul>
+    <li><strong>Exécution du contrat</strong> — le compte, l'adhésion, l'accès aux événements.</li>
+    <li><strong>Intérêt légitime</strong> — l'annuaire des membres et la mise en relation, qui sont l'objet même du Club.</li>
+    <li><strong>Consentement</strong> — tout élément facultatif du profil, retirable à tout moment.</li>
+    <li><strong>Obligation légale</strong> — conservation des pièces comptables.</li>
+  </ul>
+
+  <h2>5. Qui y a accès</h2>
+  <ul>
+    <li>Les autres membres, selon ce que vous avez choisi de rendre visible.</li>
+    <li>Les entreprises membres, pour les profils candidats et les avis de parrainage.</li>
+    <li>Nos sous-traitants techniques : [À COMPLÉTER — hébergeur ; prestataire de paiement ;
+      Expo / EAS pour la distribution et les mises à jour de l'application ; le cas échéant un
+      outil de suivi des erreurs].</li>
+  </ul>
+  <p>
+    <strong>Transferts hors Union européenne.</strong> Certains de ces prestataires sont
+    établis aux États-Unis (Apple, Google, Expo, et selon le choix retenu le prestataire de
+    paiement ou de suivi d'erreurs). Ces transferts sont encadrés par
+    [À COMPLÉTER — clauses contractuelles types, ou adhésion au cadre de protection des
+    données UE–États-Unis, à vérifier prestataire par prestataire].
+  </p>
+
+  <h2>6. Combien de temps</h2>
+  <ul>
+    <li>Compte et profil : le temps de l'adhésion, puis [À COMPLÉTER] après sa fin.</li>
+    <li>Messages de forum : [À COMPLÉTER — conservés, anonymisés, ou supprimés à la fermeture du compte ?]</li>
+    <li>Pièces comptables : durée légale de conservation.</li>
+  </ul>
+
+  <h2>7. Vos droits</h2>
+  <p>
+    Vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation,
+    d'opposition et de portabilité, ainsi que du droit de retirer votre consentement. Pour
+    l'exercer, écrivez à l'adresse de contact. Nous répondons sous un mois.
+  </p>
+  <p>
+    <strong>Suppression de votre compte.</strong> Vous pouvez supprimer votre compte
+    directement depuis l'application, sans nous écrire. La suppression entraîne l'effacement
+    de votre profil ; [À COMPLÉTER — préciser le sort des messages de forum et des avis de
+    parrainage, cohérent avec ce qui est effectivement implémenté].
+  </p>
+  <p>
+    Si notre réponse ne vous satisfait pas, vous pouvez saisir la Commission nationale de
+    l'informatique et des libertés (CNIL) : <a href="https://www.cnil.fr">www.cnil.fr</a>.
+  </p>
+
+  <h2>8. Âge minimum</h2>
+  <p>
+    L'accès au Club est réservé aux personnes de [À COMPLÉTER — 16 ou 18 ans] et plus. Cette
+    valeur doit correspondre à la classification d'âge déclarée sur les deux stores.
+  </p>
+
+  <h2>9. Modifications</h2>
+  <p>
+    Cette page est mise à jour lorsque nos pratiques changent, en particulier lors de toute
+    version de l'application qui commence à collecter une nouvelle catégorie de données. La
+    date en haut de page indique la dernière révision.
+  </p>
+
+  <footer>
+    <p><a href="/support.html">Support</a> · <a href="/">Le Club</a></p>
+  </footer>
+</main>
+</body>
+</html>

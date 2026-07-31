@@ -1,0 +1,96 @@
+<!doctype html>
+<!--
+  PAGE DE SUPPORT — page statique autonome, même raison que confidentialite.html.
+  App Store Connect exige une « Support URL » joignable pour toute soumission ;
+  Play Console exige au minimum une adresse de contact.
+
+  ⚠️ BROUILLON — les [À COMPLÉTER] doivent être renseignés avant la première
+  soumission. Voir mobile/RELEASE.md §6.
+
+  Ce que cette page ne doit PAS contenir tant que l'arbitrage in-app purchase /
+  paiement web n'est pas tranché (« À trancher » §6 de la description du projet) :
+  aucun lien, bouton ou mention permettant de payer l'adhésion hors de l'app. Sur
+  la route « paiement web », la règle 3.1.1 d'Apple l'interdit, et cette page est
+  liée depuis la fiche du store.
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Support — Le Club</title>
+  <style>
+    :root { --bg: #f7f5ef; --ink: #14140f; --ink3: #3c3a33; --muted: #77746a; --line: rgba(0, 0, 0, .1); }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink3);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 16px; line-height: 1.65;
+    }
+    main { max-width: 40rem; margin: 0 auto; padding: 3rem 1.375rem 6rem; }
+    .wordmark { font-family: ui-serif, Georgia, serif; font-style: italic; font-size: 1.25rem; color: var(--ink); }
+    h1 {
+      font-family: ui-serif, Georgia, serif; font-weight: 400;
+      font-size: clamp(2rem, 6vw, 2.75rem); line-height: 1.1; color: var(--ink);
+      margin: .75rem 0 1.25rem;
+    }
+    h2 {
+      font-family: ui-serif, Georgia, serif; font-weight: 400; font-size: 1.5rem; color: var(--ink);
+      margin: 2.5rem 0 .5rem; padding-top: 1.5rem; border-top: 1px solid var(--line);
+    }
+    .mono {
+      font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .625rem;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+    }
+    .todo {
+      background: #fff6d8; border: 1px solid #e0cd8a; border-radius: .5rem;
+      padding: 1rem 1.125rem; margin: 1.5rem 0; font-size: .9375rem;
+    }
+    .todo strong { color: var(--ink); }
+    a { color: var(--ink); }
+    footer { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); font-size: .875rem; color: var(--muted); }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #14140f; --ink: #f7f5ef; --ink3: #d8d4c6; --muted: #a5a296; --line: rgba(255, 255, 255, .12); }
+      .todo { background: #2b2410; border-color: #5c4d1e; }
+      .todo strong { color: #f0e2b0; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <p class="wordmark">Le Club</p>
+  <p class="mono">Aide</p>
+  <h1>Support</h1>
+
+  <div class="todo">
+    <strong>Brouillon.</strong> Renseigner l'adresse de contact avant la première soumission :
+    cette page est saisie comme <em>Support URL</em> dans App Store Connect, et un reviewer la
+    vérifie.
+  </div>
+
+  <h2>Nous écrire</h2>
+  <p>
+    Une question, un problème technique, une demande concernant vos données :
+    <a href="mailto:[À COMPLÉTER]">[À COMPLÉTER — adresse e-mail de support]</a>.
+    Nous répondons sous [À COMPLÉTER — délai réaliste, ex. 3 jours ouvrés].
+  </p>
+
+  <h2>Mise à jour requise</h2>
+  <p>
+    Si l'application affiche « Cette version du Club n'est plus à jour », installez la
+    dernière version depuis l'App Store ou le Play Store. Les versions anciennes sont
+    bloquées lorsqu'elles ne peuvent plus communiquer correctement avec nos serveurs.
+  </p>
+
+  <h2>Votre compte</h2>
+  <p>
+    Vous pouvez supprimer votre compte directement depuis l'application, dans votre profil.
+    Pour toute autre demande relative à vos données — accès, rectification, opposition —
+    voir la <a href="/confidentialite.html">politique de confidentialité</a>.
+  </p>
+
+  <footer>
+    <p><a href="/confidentialite.html">Confidentialité</a> · <a href="/">Le Club</a></p>
+  </footer>
+</main>
+</body>
+</html>
