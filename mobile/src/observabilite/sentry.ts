@@ -12,9 +12,8 @@
    module d'App et tous les écrans seraient déjà évalués, et une erreur
    levée pendant leur évaluation échapperait au handler.
 
-   Trois conditions pour démarrer, toutes vérifiées ici :
+   Deux conditions pour démarrer, toutes vérifiées ici :
      · un DSN renseigné — sinon il n'y a nulle part où envoyer ;
-     · pas dans Expo Go — le natif de Sentry n'y est pas (voir plus bas) ;
      · pas en développement, sauf `flags.sentryEnDev` — le bruit de dev n'a
        aucune valeur et consomme un quota (5 000 erreurs/mois offertes).
 
@@ -27,31 +26,22 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import * as Sentry from '@sentry/react-native';
-import Constants, { ExecutionEnvironment } from 'expo-constants';
 
 import { env } from '../config/env';
 import { flags } from '../config/flags';
 
-/* ── Expo Go ───────────────────────────────────────────────────────────
-   `@sentry/react-native` embarque du code natif. Expo Go ne contient que
-   les modules natifs compilés dans SDK 54 : Sentry n'en fait pas partie, et
-   on tient à ce qu'Expo Go reste utilisable (c'est toute la raison du
-   pinning SDK 54, voir mobile/AGENTS.md).
-
-   On coupe donc entièrement plutôt que de tomber en mode dégradé. Ce n'est
-   pas une perte : dans Expo Go on a l'écran rouge et les logs Metro, c'est-
-   à-dire exactement la console que le mobile n'a pas en production. Les
-   trois profils EAS produisent de vraies builds (`development` a un dev
-   client), donc le natif est là partout où ça compte.
-   ──────────────────────────────────────────────────────────────────── */
-export const dansExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
-
 /** Le DSN n'est pas un secret — il autorise l'ENVOI d'événements, pas la
-    lecture du projet — mais tant qu'il vaut son placeholder, l'envoyer
-    créerait des erreurs réseau à chaque événement. */
-const dsnRenseigne = env.sentryDsn.length > 0 && !env.sentryDsn.includes('REMPLACER');
+    lecture du projet. Il est renseigné (app.config.ts) ; le test reste parce
+    qu'`extra` peut être vide dans un runtime où la config n'a pas été
+    évaluée, et qu'initialiser sans DSN produirait une erreur réseau à chaque
+    événement au lieu d'un silence. */
+const dsnRenseigne = env.sentryDsn.length > 0;
 
-export const actif = dsnRenseigne && !dansExpoGo && (!__DEV__ || flags.sentryEnDev);
+/* Il n'y a plus de garde « suis-je dans un runtime sans natif ? ». Les trois
+   profils EAS produisent de vraies builds — `development` embarque un dev
+   client — donc le module natif de Sentry est présent partout où ce code
+   tourne. Le seul interrupteur restant est volontaire : `flags.sentryEnDev`. */
+export const actif = dsnRenseigne && (!__DEV__ || flags.sentryEnDev);
 
 /* Créée au niveau du module et non dans `init` : App.tsx doit pouvoir lui
    passer la ref du NavigationContainer, et elle doit exister avant que
@@ -120,9 +110,9 @@ export function enregistrerNavigation(conteneur: unknown): void {
 }
 
 /** Le point d'entrée unique pour signaler une erreur rattrapée. En
-    développement (ou dans Expo Go) où Sentry ne tourne pas, on écrit dans la
-    console : sinon l'erreur disparaît deux fois, et on croirait à tort que
-    le chemin d'erreur n'est jamais emprunté. */
+    développement, où Sentry ne tourne pas, on écrit dans la console : sinon
+    l'erreur disparaît deux fois, et on croirait à tort que le chemin
+    d'erreur n'est jamais emprunté. */
 export function capturer(erreur: unknown, contexte?: Record<string, unknown>): void {
   if (!actif) {
     if (__DEV__) console.warn('[observabilite]', erreur, contexte ?? '');

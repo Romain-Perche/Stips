@@ -91,8 +91,8 @@ Déjà fait dans `app.config.ts`, listé ici pour qu'on sache pourquoi :
 - Plugin `expo-splash-screen` — l'écran de lancement. Pas bloquant, mais l'asset existait
   sans être branché.
 - `expo-updates` + `runtimeVersion` — § mises à jour OTA.
-- Plugin `@sentry/react-native/expo` — § observabilité. **Il reste trois `REMPLACER` à
-  substituer dans `app.config.ts` avant que ça envoie quoi que ce soit.**
+- Plugin `@sentry/react-native/expo` — § observabilité. DSN, organisation, projet et
+  `SENTRY_AUTH_TOKEN` (EAS, `secret`, les trois environnements) sont en place.
 - Le verrou de version — § verrou. **C'est le seul élément qui doit impérativement être dans
   le premier binaire livré.**
 
@@ -114,7 +114,7 @@ superposition), et elle était présente dans `src/main/AndroidManifest.xml` —
 Native la déclare aussi pour son overlay de développement. `VIBRATE` reste : non sensible,
 aucune déclaration Play exigée.
 
-**Ne pas confondre les deux clés** (vérifié contre la doc SDK 54, voir `mobile/AGENTS.md`) :
+**Ne pas confondre les deux clés** (vérifié contre la doc SDK 57, voir `mobile/AGENTS.md`) :
 `android.permissions` **ajoute** des permissions volontaires, il ne restreint rien de ce
 qu'une dépendance injecte déjà — `permissions: []` ne retire donc aucune permission
 indésirable, ce n'est pas un élagage. Pour bloquer une permission injectée par une lib,
@@ -222,34 +222,40 @@ vérifié.** Les profils `preview` et `production` sont concernés ; `developmen
 pas la machine.
 
 Code : `src/observabilite/sentry.ts` (init et garde-fous), `metro.config.js` (source maps),
-plugin `@sentry/react-native/expo` dans `app.config.ts`. Version `~7.2.0`, imposée par
-SDK 54 — installée via `npx expo install`, jamais épinglée à la main.
+plugin `@sentry/react-native/expo` dans `app.config.ts`. Version `~7.11.0`, imposée par
+SDK 57 — installée via `npx expo install`, jamais épinglée à la main.
 
-**Ce qui reste à faire une fois, avant que quoi que ce soit fonctionne :**
+Compte, organisation (`le-club`) et projet React Native (`react-native`) existent ; DSN,
+`organization` et `project` sont renseignés dans `app.config.ts`. `SENTRY_AUTH_TOKEN` est
+dans `mobile/.env` et sur EAS (`secret`, sur `production`, `preview` et `development`).
 
-1. Créer le compte sur sentry.io, une organisation, et **un projet React Native**.
-2. Reporter trois valeurs dans `app.config.ts` — elles sont marquées `TODO(sentry)` et
-   contiennent toutes `REMPLACER` : le `sentryDsn` dans `extra`, puis `organization` et
-   `project` dans les options du plugin.
-3. Générer un jeton d'organisation (Settings → Auth Tokens, portées `project:releases` et
-   `org:read`), le mettre dans `mobile/.env` **et** sur EAS :
-   ```bash
-   npx eas-cli env:create --name SENTRY_AUTH_TOKEN --visibility secret
-   ```
+Sans DSN, `Sentry.init` ne démarre pas et l'app tourne normalement, sans crash reporting —
+no-op explicite, pas panne silencieuse. Ce n'est plus l'état par défaut : depuis que le DSN
+est renseigné, tout build `preview` ou `production` envoie.
 
-Tant que le DSN vaut son placeholder, `Sentry.init` ne démarre pas et l'app tourne
-normalement, sans crash reporting. C'est un no-op explicite, pas une panne silencieuse.
+### Région de données : EU
+
+L'organisation est hébergée dans la **région EU** — c'est visible dans le DSN
+(`…ingest.de.sentry.io`), ça se choisit à la création de l'organisation et **ça ne se change
+plus ensuite**. Deux conséquences :
+
+- L'API de Sentry répond sur `de.sentry.io`, pas sur `sentry.io`. D'où
+  `url: 'https://de.sentry.io/'` dans les options du plugin. Avec le défaut, `sentry-cli`
+  interrogerait l'instance US où l'organisation n'existe pas : l'upload des source maps
+  échoue, donc le build `preview`/`production` échoue avec lui.
+- Les événements (donc les données de crash) sont stockés à Francfort. C'est ce qu'on veut
+  pour une structure française — à mentionner dans la politique de confidentialité le jour
+  où elle détaille les sous-traitants.
 
 **Un seul projet pour les trois variantes**, séparées par le tag `environment`. Trois
 projets voudraient dire trois quotas, trois jetons et trois jeux d'alertes à tenir
 synchrones, pour une isolation dont on n'a pas besoin à cette échelle (5 000 erreurs et
 10 000 spans par mois offerts).
 
-**Sentry ne démarre pas dans Expo Go**, délibérément : son module natif n'y est pas, et on
-tient à ce qu'Expo Go reste utilisable (c'est toute la raison du pinning SDK 54). Ce n'est
-pas une perte — dans Expo Go on a l'écran rouge et les logs Metro, c'est-à-dire exactement
-la console qui manque en production. Conséquence directe : **rien de tout ça ne se teste
-avec `npm start`, il faut une build dev-client.**
+**Sentry ne démarre pas en développement**, délibérément : le bruit de dev n'a aucune
+valeur et consomme le quota. Le flag `sentryEnDev` (`src/config/flags.ts`) le rallume le
+temps de vérifier que le tuyau marche de bout en bout. Il n'y a plus de garde « module
+natif absent » : le dev client embarque le natif de Sentry comme n'importe quelle build.
 
 ### Source maps — deux chemins, pas un
 
@@ -265,6 +271,11 @@ donc le crash reporting ne sert à rien.
 eas update --channel preview --message "…"
 npx @sentry/expo-upload-sourcemaps dist
 ```
+
+La commande d'upload relit `url`, `organization` et `project` dans les options du plugin
+d'`app.config.ts` quand `SENTRY_URL` / `SENTRY_ORG` / `SENTRY_PROJECT` sont absents de
+l'environnement : seul `SENTRY_AUTH_TOKEN` doit y être. C'est pourquoi la région EU se
+règle à un seul endroit et vaut pour les deux chemins d'upload.
 
 L'OTA étant le chemin rapide pour les correctifs JS (§ mises à jour OTA), c'est celui qui
 mordra le plus souvent : chaque correctif envoyé sans cette commande produit des stacks

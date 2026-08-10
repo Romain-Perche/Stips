@@ -28,7 +28,7 @@ export const flags = {
 
       À passer à true une fois, sur un build dev-client, pour vérifier que le
       tuyau marche de bout en bout — puis à remettre à false avant de
-      commiter. Sans effet dans Expo Go, où Sentry ne démarre pas du tout
-      (voir src/observabilite/sentry.ts). */
+      commiter. C'est le seul interrupteur qui décide si Sentry démarre en
+      développement (voir src/observabilite/sentry.ts). */
   sentryEnDev: false as boolean,
 } as const;

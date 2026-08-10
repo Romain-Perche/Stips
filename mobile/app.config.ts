@@ -20,25 +20,32 @@ const variante = (process.env.APP_VARIANT ?? 'development') as Variante;
 // pas eas init ni un build interne, qui le fige pour de vrai.
 const BASE_ID = 'com.leclub.app';
 
+// `icone` est l'icône iOS, et la seule à devoir exister en trois fichiers :
+// iOS ne sait pas la teinter par config, contrairement à Android qui se
+// contente de `adaptiveIcon.backgroundColor` (fondIcone ci-dessous). C'est ce
+// qui permet de distinguer les trois apps installées sur le même téléphone.
 const CONFIG_PAR_VARIANTE: Record<
   Variante,
-  { suffixeNom: string; suffixeId: string; fondIcone: string; apiUrl: string }
+  { suffixeNom: string; suffixeId: string; icone: string; fondIcone: string; apiUrl: string }
 > = {
   development: {
     suffixeNom: ' (dev)',
     suffixeId: '.dev',
+    icone: './assets/icon-development.png',
     fondIcone: '#c9d9c4',
     apiUrl: process.env.API_URL ?? 'http://192.168.1.10:3000',
   },
   preview: {
     suffixeNom: ' (preview)',
     suffixeId: '.preview',
+    icone: './assets/icon-preview.png',
     fondIcone: '#e8d5b7',
     apiUrl: process.env.API_URL ?? 'https://staging.api.leclub.club',
   },
   production: {
     suffixeNom: '',
     suffixeId: '',
+    icone: './assets/icon-production.png',
     fondIcone: '#f7f5ef',
     apiUrl: process.env.API_URL ?? 'https://api.leclub.club',
   },
@@ -103,10 +110,12 @@ const extra = {
   // Un seul DSN pour les trois variantes : un seul projet Sentry, les
   // variantes distinguées par `environment` (src/observabilite/sentry.ts).
   //
-  // TODO(sentry) : remplacer par le vrai DSN. Tant qu'il contient
-  // « REMPLACER », Sentry ne démarre pas — l'app tourne normalement, sans
-  // crash reporting.
-  sentryDsn: 'https://REMPLACER@oREMPLACER.ingest.sentry.io/REMPLACER',
+  // Le « .de. » n'est pas décoratif : l'organisation est hébergée dans la
+  // région EU, donc les événements partent à Francfort et l'API de Sentry
+  // répond sur de.sentry.io — d'où l'`url` du plugin plus bas. La région
+  // d'une organisation se choisit à sa création et ne se change plus.
+  sentryDsn:
+    'https://984dea29e78f0695538bc265088da472@o4511885240762368.ingest.de.sentry.io/4511885554483280',
   eas: { projectId: '84949835-acaa-4698-b4aa-67af144e7f52' },
 };
 
@@ -138,7 +147,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // Un tag mobile-vX.Y.Z doit correspondre à cette valeur (voir AGENTS.md).
   version: '0.1',
   orientation: 'portrait',
-  icon: './assets/icon.png',
+  icon: parVariante.icone,
   // Opt-out explicite du mode sombre : la DA n'en a pas, et un mode sombre
   // non stylé est un vrai motif de rejet pour qualité en review.
   userInterfaceStyle: 'light',
@@ -230,7 +239,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-font',
-    // assets/splash-icon.png existait sans être référencé. Sur SDK 54 le
+    // assets/splash-icon.png existait sans être référencé. Depuis le SDK 54 le
     // splash passe par ce plugin, l'ancienne clé `splash` est legacy.
     ['expo-splash-screen', {
       image: './assets/splash-icon.png',
@@ -248,11 +257,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // variable d'environnement EAS en visibilité « secret », jamais ici et
     // jamais dans `extra` (voir AGENTS.md § Variables d'environnement EAS).
     //
-    // TODO(sentry) : remplacer les deux placeholders.
+    // `url` n'est PAS le défaut (https://sentry.io/) : l'organisation est
+    // dans la région EU, et son API répond sur de.sentry.io. Avec le défaut,
+    // sentry-cli irait interroger l'instance US, où l'organisation n'existe
+    // pas — l'upload échoue, donc le build preview/production échoue aussi.
+    // Ces trois valeurs servent aux DEUX chemins d'upload : le build natif,
+    // et `npx @sentry/expo-upload-sourcemaps` après un `eas update`, qui les
+    // relit ici faute de SENTRY_URL/ORG/PROJECT dans l'environnement.
     ['@sentry/react-native/expo', {
-      url: 'https://sentry.io/',
-      organization: 'REMPLACER-org',
-      project: 'REMPLACER-projet',
+      url: 'https://de.sentry.io/',
+      organization: 'le-club',
+      // Slug par défaut créé par le wizard Sentry. Le renommer côté Sentry
+      // impose de le reporter ici, sinon l'upload part sur un projet inconnu.
+      project: 'react-native',
       // Une build `development` ne quitte pas la machine : ses source maps
       // n'intéressent personne, et exiger le jeton pour la fabriquer
       // n'aurait pour effet que de bloquer le premier build.

@@ -201,13 +201,12 @@ et les types qui la composent viennent tous deux de `packages/core`, plus de cop
 jumelle), mais primitives RN (`View`/`Text`/`Pressable`) au lieu des `div`/`span`, React
 Navigation à la place du routeur maison, et Reanimated à la place des transitions CSS.
 
-**Expo est volontairement figé sur SDK 54 — ne pas remonter sans vérifier.** Depuis mai
-2026 Apple bloque en review les nouvelles builds d'Expo Go : SDK 54 est la dernière version
-installable directement depuis l'App Store et le Play Store. Les SDK 55+ existent mais
-n'arrivent sur un téléphone que via `eas go` + TestFlight ou un dev build. Remonter la
-version ramène l'erreur « Project is incompatible with this version of Expo Go » pour
-quiconque teste avec l'Expo Go du store. Vérifier l'état courant sur
-<https://expo.dev/changelog> avant tout changement.
+**Le développement passe par un development build, pas par Expo Go.** Un binaire qui
+contient nos propres dépendances natives et le client de développement, fabriqué par EAS et
+installé une fois ; ensuite Metro sert le JS et le rechargement est immédiat. On ne
+recompile qu'en cas de changement de dépendance native. C'est ce qui a permis de sortir du
+SDK 54 : Expo Go plafonnait le projet, puisque Apple bloque en review ses nouvelles builds
+depuis mai 2026. Expo est désormais sur le dernier SDK stable — voir `mobile/AGENTS.md`.
 
 Deux pièges du portage web → RN, corrigés, à garder en tête pour les prochains écrans :
 

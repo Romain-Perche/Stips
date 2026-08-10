@@ -211,5 +211,5 @@ function App() {
 
 /* `Sentry.wrap` : branche le suivi des gestes (le dernier tap avant le crash
    arrive dans le fil d'Ariane) et le profiler de rendu. Passe-plat inoffensif
-   quand Sentry n'est pas initialisé — Expo Go et développement compris. */
+   quand Sentry n'est pas initialisé — en développement, notamment. */
 export default envelopper(App);

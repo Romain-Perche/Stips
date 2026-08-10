@@ -1,7 +1,7 @@
 # Le Club — conventions de travail
 
 Trois composants dans un seul repo : `backend/` (rien d'implémenté encore), `frontend/`
-(Vite + React, données factices), `mobile/` (Expo SDK 54). Chacun a son propre cycle de
+(Vite + React, données factices), `mobile/` (Expo SDK 57). Chacun a son propre cycle de
 version. Voir aussi `mobile/AGENTS.md` pour les contraintes Expo.
 
 Le repo est un workspace npm (`workspaces` dans le `package.json` racine) : une seule
@@ -53,7 +53,7 @@ issu du commit taggé :
 # 1. main est verte, on met à jour version dans mobile/app.config.ts, on commite
 git tag -a mobile-v0.3.0 -m "Onglet stages, fix flip de carte"
 git push origin main mobile-v0.3.0
-cd mobile && eas build --profile production && eas submit
+cd mobile && npx eas-cli build --profile production && npx eas-cli submit
 ```
 
 ## Commits
@@ -162,7 +162,9 @@ GitHub (Settings → Rules), une configuration qui vit côté GitHub et non dans
 
 - `git push`, merge dans `main`, création ou suppression de tag, `git push --force`.
 - Lancer un build ou une soumission EAS.
-- Remonter la version d'`expo` au-delà de `~54.x` (voir `mobile/AGENTS.md`).
+- Changer de SDK Expo majeur (`~57.x` aujourd'hui) : ça entraîne `react-native`, `react` et
+  toutes les bibliothèques à code natif, et impose de refabriquer le development build.
+  Voir `mobile/AGENTS.md`.
 - Choisir la stack du `backend/` : décision d'architecture à prendre ensemble
   (voir `backend/README.md`).
 - Changer le bundle id une fois qu'une app a été soumise à TestFlight externe ou à Play
