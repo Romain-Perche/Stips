@@ -45,7 +45,7 @@ for composant in $a_verifier; do verifie "$composant"; done
 # dur dans un fichier source. Une ligne qui doit légitimement citer un motif
 # (doc, liste de motifs) porte le marqueur « secret-ok » et est ignorée.
 # Ce fichier est exclu du scan de contenu : il EST la liste de motifs.
-motifs='sk_(live|test)_|rk_(live|test)_|whsec_|service_role|"type": *"service_account"|BEGIN [A-Z ]*PRIVATE KEY|(ghp|gho|github_pat)_[A-Za-z0-9]|xox[abpsr]-'
+motifs='sk_(live|test)_|rk_(live|test)_|whsec_|service_role|"type": *"service_account"|BEGIN [A-Z ]*PRIVATE KEY|(ghp|gho|github_pat)_[A-Za-z0-9]|xox[abpsr]-|sntry[su]_'
 
 # La clé de service-account Google Play est un .json : elle n'est attrapée par
 # aucune extension ci-dessus, d'où les motifs de nom. Le scan de contenu la
