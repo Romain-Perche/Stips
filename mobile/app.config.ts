@@ -64,6 +64,8 @@ const MOTIFS_SECRETS = [
   /-----BEGIN [A-Z ]*PRIVATE KEY/, // secret-ok
   /\b(ghp|gho|github_pat)_[A-Za-z0-9]/, // jeton GitHub
   /\bxox[abpsr]-/, // jeton Slack
+  /\bsntrys_/, // jeton d'organisation Sentry — secret-ok
+  /\bsntryu_/, // jeton utilisateur Sentry — secret-ok
 ];
 
 function refuseLesSecrets(valeurs: Record<string, unknown>, chemin: string): void {
@@ -88,9 +90,23 @@ function refuseLesSecrets(valeurs: Record<string, unknown>, chemin: string): voi
 const extra = {
   variante,
   apiUrl: parVariante.apiUrl,
-  // Quand Stripe et Sentry arrivent : clé publishable (pk_…) et DSN ici,
-  // et rien d'autre. Jamais la clé secrète ni le secret de webhook — ils
-  // restent côté backend, qui est le seul à parler aux tiers.
+  // Quand Stripe arrive : clé publishable (pk_…) ici, et rien d'autre.
+  // Jamais la clé secrète ni le secret de webhook — ils restent côté
+  // backend, qui est le seul à parler aux tiers.
+  //
+  // Le DSN Sentry est public par construction : il autorise l'ENVOI
+  // d'événements, pas la lecture du projet. Il est donc écrit en clair ici,
+  // comme le reste — caractère public assumé, pas subi (voir AGENTS.md).
+  // Ce qui n'est PAS public, c'est le jeton d'auth qui sert à uploader les
+  // source maps : il vit dans SENTRY_AUTH_TOKEN, jamais dans `extra`.
+  //
+  // Un seul DSN pour les trois variantes : un seul projet Sentry, les
+  // variantes distinguées par `environment` (src/observabilite/sentry.ts).
+  //
+  // TODO(sentry) : remplacer par le vrai DSN. Tant qu'il contient
+  // « REMPLACER », Sentry ne démarre pas — l'app tourne normalement, sans
+  // crash reporting.
+  sentryDsn: 'https://REMPLACER@oREMPLACER.ingest.sentry.io/REMPLACER',
   eas: { projectId: '84949835-acaa-4698-b4aa-67af144e7f52' },
 };
 
@@ -220,6 +236,32 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       image: './assets/splash-icon.png',
       backgroundColor: '#f7f5ef',
       imageWidth: 200,
+    }],
+    // Le plugin n'envoie AUCUNE erreur — c'est Sentry.init qui le fait
+    // (src/observabilite/sentry.ts). Lui, il branche l'upload des source
+    // maps sur le build natif. Sans lui, les stacks arrivent minifiées et
+    // le crash reporting ne sert à rien.
+    //
+    // `organization` et `project` sont des identifiants publics, pas des
+    // secrets : ils nomment où déposer, ils n'autorisent rien. Le jeton qui
+    // autorise, lui, est lu dans SENTRY_AUTH_TOKEN au moment du build —
+    // variable d'environnement EAS en visibilité « secret », jamais ici et
+    // jamais dans `extra` (voir AGENTS.md § Variables d'environnement EAS).
+    //
+    // TODO(sentry) : remplacer les deux placeholders.
+    ['@sentry/react-native/expo', {
+      url: 'https://sentry.io/',
+      organization: 'REMPLACER-org',
+      project: 'REMPLACER-projet',
+      // Une build `development` ne quitte pas la machine : ses source maps
+      // n'intéressent personne, et exiger le jeton pour la fabriquer
+      // n'aurait pour effet que de bloquer le premier build.
+      //
+      // Pour `preview` et `production` en revanche, l'upload est requis et
+      // le build ÉCHOUE si SENTRY_AUTH_TOKEN manque. C'est voulu : ces deux
+      // profils partent chez quelqu'un d'autre, et une build partagée sans
+      // symbolication est exactement la panne qu'on cherche à éviter.
+      disableAutoUpload: variante === 'development',
     }],
   ],
   extra,

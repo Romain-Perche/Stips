@@ -90,9 +90,11 @@ Déjà fait dans `app.config.ts`, listé ici pour qu'on sache pourquoi :
 - `scheme: 'leclub'` — posé avant qu'un lien profond existe, pour que la valeur soit stable.
 - Plugin `expo-splash-screen` — l'écran de lancement. Pas bloquant, mais l'asset existait
   sans être branché.
-- `expo-updates` + `runtimeVersion` — §5.
-- Le verrou de version — §4. **C'est le seul élément qui doit impérativement être dans le
-  premier binaire livré.**
+- `expo-updates` + `runtimeVersion` — § mises à jour OTA.
+- Plugin `@sentry/react-native/expo` — § observabilité. **Il reste trois `REMPLACER` à
+  substituer dans `app.config.ts` avant que ça envoie quoi que ce soit.**
+- Le verrou de version — § verrou. **C'est le seul élément qui doit impérativement être dans
+  le premier binaire livré.**
 
 Fait, par lecture du manifeste fusionné :
 
@@ -211,7 +213,106 @@ automatiquement au bundle embarqué, mais un OTA se teste sur le canal `preview`
 
 ---
 
-## 6. Confidentialité
+## 6. Observabilité
+
+Sur le web on ouvre la console de quelqu'un à distance. Sur mobile, non : un crash chez un
+membre du Club, sans outillage, c'est un message « ça marche pas » et zéro information.
+D'où la règle : **aucune build partagée à quelqu'un d'autre que nous sans crash reporting
+vérifié.** Les profils `preview` et `production` sont concernés ; `development` ne quitte
+pas la machine.
+
+Code : `src/observabilite/sentry.ts` (init et garde-fous), `metro.config.js` (source maps),
+plugin `@sentry/react-native/expo` dans `app.config.ts`. Version `~7.2.0`, imposée par
+SDK 54 — installée via `npx expo install`, jamais épinglée à la main.
+
+**Ce qui reste à faire une fois, avant que quoi que ce soit fonctionne :**
+
+1. Créer le compte sur sentry.io, une organisation, et **un projet React Native**.
+2. Reporter trois valeurs dans `app.config.ts` — elles sont marquées `TODO(sentry)` et
+   contiennent toutes `REMPLACER` : le `sentryDsn` dans `extra`, puis `organization` et
+   `project` dans les options du plugin.
+3. Générer un jeton d'organisation (Settings → Auth Tokens, portées `project:releases` et
+   `org:read`), le mettre dans `mobile/.env` **et** sur EAS :
+   ```bash
+   npx eas-cli env:create --name SENTRY_AUTH_TOKEN --visibility secret
+   ```
+
+Tant que le DSN vaut son placeholder, `Sentry.init` ne démarre pas et l'app tourne
+normalement, sans crash reporting. C'est un no-op explicite, pas une panne silencieuse.
+
+**Un seul projet pour les trois variantes**, séparées par le tag `environment`. Trois
+projets voudraient dire trois quotas, trois jetons et trois jeux d'alertes à tenir
+synchrones, pour une isolation dont on n'a pas besoin à cette échelle (5 000 erreurs et
+10 000 spans par mois offerts).
+
+**Sentry ne démarre pas dans Expo Go**, délibérément : son module natif n'y est pas, et on
+tient à ce qu'Expo Go reste utilisable (c'est toute la raison du pinning SDK 54). Ce n'est
+pas une perte — dans Expo Go on a l'écran rouge et les logs Metro, c'est-à-dire exactement
+la console qui manque en production. Conséquence directe : **rien de tout ça ne se teste
+avec `npm start`, il faut une build dev-client.**
+
+### Source maps — deux chemins, pas un
+
+C'est le point qu'on oublie. Sans source maps, une stack pointe du JS minifié : illisible,
+donc le crash reporting ne sert à rien.
+
+| Ce qui est livré | Upload des source maps |
+| --- | --- |
+| Build natif (`eas build`) | **automatique**, dès que `SENTRY_AUTH_TOKEN` est dans l'environnement de build |
+| Bundle OTA (`eas update`) | **manuel**, une commande à lancer après chaque update |
+
+```bash
+eas update --channel preview --message "…"
+npx @sentry/expo-upload-sourcemaps dist
+```
+
+L'OTA étant le chemin rapide pour les correctifs JS (§ mises à jour OTA), c'est celui qui
+mordra le plus souvent : chaque correctif envoyé sans cette commande produit des stacks
+illisibles précisément pendant qu'on répare quelque chose.
+
+Sur `preview` et `production`, `disableAutoUpload` est à `false` : **le build échoue si le
+jeton manque**. C'est voulu — ces deux profils partent chez quelqu'un d'autre. Sur
+`development` il est à `true`, pour qu'un premier build local ne soit pas bloqué par un
+compte Sentry pas encore créé.
+
+### Vérifier que le tuyau marche, de bout en bout
+
+Une fois seulement, sur une build dev-client :
+
+```bash
+# 1. flags.sentryEnDev = true dans src/config/flags.ts (sinon rien ne part en dev)
+npx eas-cli build --profile development
+# 2. lancer l'app, provoquer un crash JS depuis n'importe quel écran :
+#    throw new Error('test observabilité')
+# 3. l'issue doit apparaître dans Sentry en moins d'une minute, avec :
+#      · environment = development
+#      · une stack qui nomme le FICHIER et la LIGNE (pas du JS minifié)
+#      · un fil d'Ariane montrant les onglets visités avant le crash
+# 4. remettre flags.sentryEnDev = false avant de commiter
+```
+
+Le point 3 est le vrai test : une issue qui arrive avec une stack illisible signifie que
+les source maps ne sont pas montées, et c'est exactement la situation qu'on croit avoir
+évitée. Un crash natif se teste avec `Sentry.nativeCrash()`.
+
+### Analytics — pas encore, et pourquoi
+
+Le chiffre qui compte pour ce produit est le **taux de conversion de l'invitation**
+(invitation → compte créé → premier événement rejoint). Il n'est pas instrumenté, et c'est
+délibéré : sur ces trois étapes, une seule existe en code, et « accepter l'invitation » se
+résume aujourd'hui à masquer un écran. Il n'y a ni création de compte, ni paiement, ni
+inscription à un événement — et le dénominateur, « invitations envoyées », vit dans un
+backend dont la stack n'est pas choisie (`backend/README.md`).
+
+Poser des événements maintenant produirait un catalogue de noms à renommer entièrement le
+jour où le vrai parcours existe, et un entonnoir à 100 % sur une seule étape. À reprendre
+quand l'authentification et l'inscription aux événements existent — c'est à ce moment-là
+qu'il faudra choisir un outil, et mettre à jour le questionnaire de confidentialité
+ci-dessous dans la même release.
+
+---
+
+## 7. Confidentialité
 
 Deux choses distinctes, toutes deux exigées à la soumission.
 
@@ -230,12 +331,22 @@ donnée. C'est *lui* la barrière, pas le document. Réponses prévues, à garde
 | Contact Info (nom, e-mail) | non collecté | collecté, lié à l'identité, pas de tracking |
 | User Content (profil, forum, avis de parrainage) | non collecté | collecté, lié à l'identité, pas de tracking |
 | Identifiers | non collecté | identifiant de compte, lié à l'identité |
-| Usage Data / Diagnostics | non collecté | seulement si Sentry ou un analytics arrive |
+| Usage Data / Diagnostics | **Crash Data + Performance Data**, non liés à l'identité | idem, à réévaluer si un analytics arrive |
 | Tracking (au sens ATT) | **non** | **non** — et si ça change, il faut ATT + `NSUserTrackingUsageDescription` |
 
-Aujourd'hui `Data Not Collected` est **honnêtement** défendable : l'app ne fait aucun appel
-réseau. Ça devient faux avec l'authentification, et le questionnaire doit être mis à jour
-**dans la release qui commence à collecter**, pas après.
+**`Data Not Collected` n'est plus défendable dès le premier build qui embarque un DSN
+Sentry.** Il faut déclarer *Crash Data* et, à cause de `tracesSampleRate`, *Performance
+Data* — les deux **non liés à l'identité** et **sans tracking**, ce qui est exact parce que
+`sendDefaultPii: false` empêche l'envoi de l'IP et de l'identité de l'utilisateur
+(`src/observabilite/sentry.ts`). Remonter cette valeur à `true` changerait la réponse au
+questionnaire : c'est une décision de conformité, pas un réglage.
+
+`NSPrivacyTracking: false` et `NSPrivacyTrackingDomains: []` restent corrects avec Sentry :
+pas d'IDFA, pas de corrélation inter-apps. Sentry porte son propre manifeste de
+confidentialité, donc `ios.privacyManifests` n'a pas à déclarer ses accès d'API.
+
+Ça bougera encore avec l'authentification, et le questionnaire doit être mis à jour **dans
+la release qui commence à collecter**, pas après.
 
 **Règle générale : ajouter un SDK tiers (Sentry, analytics, publicité) oblige à mettre à
 jour, dans la même release, la politique de confidentialité *et* les deux questionnaires *et*
@@ -248,12 +359,14 @@ de parrainage).
 
 ---
 
-## 7. Avant chaque soumission
+## 8. Avant chaque soumission
 
 - [ ] `main` est verte (`npm run typecheck --workspaces` + `lint`)
 - [ ] `version` à jour dans `app.config.ts`, tag annoté `mobile-vX.Y.Z` poussé **avant** le
       build (voir `AGENTS.md`)
-- [ ] Les deux flags du verrou sont dans l'état voulu
+- [ ] Les deux flags du verrou sont dans l'état voulu, et `sentryEnDev` est à `false`
+- [ ] `SENTRY_AUTH_TOKEN` présent côté EAS — sinon le build échoue (c'est voulu)
+- [ ] Une erreur de test remonte dans Sentry avec une stack lisible (§ observabilité)
 - [ ] Questionnaire App Privacy / Data Safety à jour si la collecte a changé
 - [ ] `ios.privacyManifests` à jour si un SDK a été ajouté
 - [ ] Politique de confidentialité et page de support en ligne et joignables
@@ -265,7 +378,7 @@ de parrainage).
 
 ---
 
-## 8. Ce qui n'est pas encore nécessaire
+## 9. Ce qui n'est pas encore nécessaire
 
 À ne pas ajouter par anticipation, mais à ne pas oublier.
 

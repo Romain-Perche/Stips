@@ -31,6 +31,13 @@ export const env = {
       `version` change la branche de mise à jour : les deux restent alignés,
       et il n'y a pas besoin d'expo-application pour lire la version native. */
   version: Constants.expoConfig?.version ?? null,
+  /** DSN Sentry. Public : il autorise l'envoi d'événements, pas la lecture
+      du projet — et de toute façon lisible dans n'importe quel .ipa.
+
+      Chaîne vide et non `null` si absent : le seul consommateur
+      (src/observabilite/sentry.ts) veut juste savoir s'il a de quoi
+      démarrer, et une chaîne évite un `?.` à chaque usage. */
+  sentryDsn: (extra.sentryDsn as string) ?? '',
 };
 
 export const estProd = env.variante === 'production';

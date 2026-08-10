@@ -19,10 +19,14 @@
    le Tab.Navigator ci-dessous — jamais retapé.
    ══════════════════════════════════════════════════════════════════════ */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NavigationContainer, type ParamListBase } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+  type ParamListBase,
+} from '@react-navigation/native';
 import { createBottomTabNavigator, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
@@ -43,6 +47,7 @@ import ScreenOffres from './src/screens/ScreenOffres';
 import ScreenInvitation from './src/screens/ScreenInvitation';
 import ScreenMiseAJour from './src/screens/ScreenMiseAJour';
 import { useVerrouVersion } from './src/config/miseAJour';
+import { capturer, enregistrerNavigation, envelopper } from './src/observabilite/sentry';
 import type { TabScreen } from './src/types';
 
 const TABS: Record<Role, TabScreen[]> = {
@@ -130,18 +135,26 @@ function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => v
 /** L'app en régime normal : le bandeau de rôle et les onglets. Extrait pour
     que le branchement ci-dessous reste lisible à trois cas. */
 function VueApp({ role, onChangerRole }: { role: Role; onChangerRole: (r: Role) => void }) {
+  const conteneurNav = useNavigationContainerRef();
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <RoleSwitcher role={role} onChange={onChangerRole} />
-      <NavigationContainer>
+      {/* `onReady` et pas un useEffect : la ref n'est peuplée qu'une fois le
+          conteneur monté. Sans cet enregistrement, Sentry ne voit aucun
+          changement d'écran — on perd le « il était sur quel onglet quand ça
+          a pété », qui est souvent la moitié de l'information utile. */}
+      <NavigationContainer
+        ref={conteneurNav}
+        onReady={() => enregistrerNavigation(conteneurNav)}
+      >
         <Tabs role={role} key={role} />
       </NavigationContainer>
     </View>
   );
 }
 
-export default function App() {
-  const [fontsLoaded] = useFonts({
+function App() {
+  const [policesChargees, erreurPolices] = useFonts({
     InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic,
     Outfit_400Regular, Outfit_500Medium, Outfit_600SemiBold,
     JetBrainsMono_500Medium,
@@ -152,7 +165,17 @@ export default function App() {
   // `return null` des polices casserait l'ordre des hooks au montage suivant.
   const verrou = useVerrouVersion();
 
-  if (!fontsLoaded) return null;
+  // Le second élément de useFonts était ignoré : une police qui ne charge
+  // pas laissait `policesChargees` à false pour toujours, donc un écran
+  // blanc éternel — et aucun signal nulle part.
+  useEffect(() => {
+    if (erreurPolices) capturer(erreurPolices, { ou: 'useFonts' });
+  }, [erreurPolices]);
+
+  // On rend l'app quand même si le chargement a échoué : React Native
+  // retombe sur la police système. Du texte mal stylé vaut mieux qu'un écran
+  // blanc dont l'utilisateur ne peut pas sortir.
+  if (!policesChargees && !erreurPolices) return null;
 
   const changerRole = (r: Role) => { setRole(r); setHorsNav(null); };
   const fondClair = verrou.bloque || horsNav === 'invitation';
@@ -185,3 +208,8 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
+
+/* `Sentry.wrap` : branche le suivi des gestes (le dernier tap avant le crash
+   arrive dans le fil d'Ariane) et le profiler de rendu. Passe-plat inoffensif
+   quand Sentry n'est pas initialisé — Expo Go et développement compris. */
+export default envelopper(App);

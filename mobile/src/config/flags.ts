@@ -21,4 +21,14 @@ export const flags = {
   /** Affiche l'écran bloquant sans backend, pour le voir en développement.
       Court-circuite tout : ni appel réseau, ni comparaison de version. */
   verrouVersionForce: false as boolean,
+
+  /** Envoie les erreurs à Sentry même en développement, et allume ses logs
+      verbeux. À false par défaut : le bruit de dev n'a aucune valeur et
+      consomme le quota (5 000 erreurs/mois offertes).
+
+      À passer à true une fois, sur un build dev-client, pour vérifier que le
+      tuyau marche de bout en bout — puis à remettre à false avant de
+      commiter. Sans effet dans Expo Go, où Sentry ne démarre pas du tout
+      (voir src/observabilite/sentry.ts). */
+  sentryEnDev: false as boolean,
 } as const;
