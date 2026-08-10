@@ -125,21 +125,38 @@ bundle servi au navigateur.
 ```bash
 npm run typecheck --workspaces --if-present
 npm run lint      --workspaces --if-present
+npm run test      --workspaces --if-present
 ```
 
-(équivalent à lancer `npm run typecheck && npm run lint` dans `mobile/`, `frontend/` et
-`packages/core/` séparément.)
+(équivalent à lancer `npm run typecheck && npm run lint && npm run test` dans `mobile/`,
+`frontend/` et `packages/core/` séparément.) Aucun composant n'a de script `test`
+aujourd'hui : la commande ne fait rien et sort en 0 — elle est câblée pour que le premier
+`test` ajouté soit lancé sans qu'il faille toucher au hook ou à la CI.
 
-Un hook `pre-commit` versionné dans `.githooks/` les lance automatiquement sur les
-composants touchés — et sur `mobile` et `frontend` en plus, si c'est `packages/core` qui a
-changé, puisque les deux en dépendent. **À activer une fois par clone** (les hooks ne se
-transmettent pas avec le repo) :
+Le lint tourne avec `--deny-warnings` : un warning casse le build, exactement comme une
+erreur. C'est voulu — un warning qui ne bloque rien n'est jamais lu ni corrigé. Le socle de
+règles oxlint est à la racine (`.oxlintrc.json` : plugins `react`/`typescript`/`oxc`,
+`rules-of-hooks` en erreur) ; chaque composant l'étend avec `extends` et n'ajoute que ce qui
+lui est propre — par exemple `react/only-export-components` n'est activée que sur
+`frontend/`, voir le commentaire dans `mobile/.oxlintrc.json` pour pourquoi.
+
+Un hook `pre-commit` versionné dans `.githooks/` lance ces trois commandes automatiquement
+sur les composants touchés — et sur `mobile` et `frontend` en plus, si c'est `packages/core`
+qui a changé, puisque les deux en dépendent. **À activer une fois par clone** (les hooks ne
+se transmettent pas avec le repo) :
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
 `git commit --no-verify` contourne le hook — pour un cas d'urgence réel, pas par habitude.
+
+Une GitHub Action (`.github/workflows/ci.yml`) relance les mêmes trois commandes sur chaque
+pull request et sur chaque `push` vers `main`, sur tous les workspaces — c'est le filet qui
+existe même quand le hook local a été contourné ou n'a jamais été activé dans un clone. Le
+job s'appelle `verifications` ; pour qu'une CI rouge bloque effectivement le merge, il doit
+être coché comme check requis dans les réglages de protection de branche de `main` sur
+GitHub (Settings → Rules), une configuration qui vit côté GitHub et non dans ce repo.
 
 ## Ce que Claude ne fait pas sans qu'on le demande explicitement
 
@@ -152,3 +169,7 @@ git config core.hooksPath .githooks
   Console : à ce moment-là il est figé, en changer crée une deuxième app.
 - Remonter `versionMinimale` (la version minimale servie par `GET /config`) : ça bloque
   définitivement tous les binaires plus anciens. Voir `mobile/RELEASE.md`.
+- Retirer un champ d'une réponse d'API déjà servie, en changer le type, ou en changer le
+  sens à nom constant. Voir `backend/README.md`.
+- Modifier les réglages de protection de branche sur GitHub, ou désactiver/contourner un
+  check requis.

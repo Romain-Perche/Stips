@@ -226,7 +226,7 @@ Deux pièges du portage web → RN, corrigés, à garder en tête pour les proch
 Vide pour l'instant, volontairement : le choix technique (langage, base de données,
 hébergement) est une vraie décision d'architecture, à prendre ensemble avant d'écrire du
 code. `backend/README.md` liste ce qu'il devra couvrir, à partir des écrans déjà dessinés,
-et pointe vers `frontend/src/data.ts` comme contrat de données provisoire.
+et pointe vers `packages/core/src/data.ts` comme contrat de données provisoire.
 
 ---
 

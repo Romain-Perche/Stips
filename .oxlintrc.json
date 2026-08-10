@@ -1,0 +1,11 @@
+// Socle commun à frontend/, mobile/ et packages/core — chacun l'étend via
+// `extends`. Ce qui est propre à une plateforme (ex. only-export-components,
+// pensé pour le Fast Refresh de Vite) reste dans le .oxlintrc.json du
+// composant, pas ici. Voir AGENTS.md § Vérifications.
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "rules": {
+    "react/rules-of-hooks": "error"
+  }
+}

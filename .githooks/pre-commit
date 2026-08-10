@@ -24,6 +24,11 @@ verifie() {
   if ! (cd "$racine/$composant" && npm run --silent lint); then
     status=1
   fi
+
+  echo "→ $composant : tests"
+  if ! (cd "$racine/$composant" && npm run --silent --if-present test); then
+    status=1
+  fi
 }
 
 a_verifier=""

@@ -1,0 +1,6 @@
+// Étend le socle racine (../../.oxlintrc.json). Pas de JSX ici aujourd'hui,
+// mais hériter coûte zéro et évite d'oublier ce paquet le jour où il en aura.
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../../.oxlintrc.json"]
+}

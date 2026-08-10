@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Repousser sur une PR annule le run du commit remplacé — inutile de vérifier
+# un état qui n'existe plus. Pas d'annulation sur main : chaque commit de
+# main mérite son propre verdict.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Ce workflow ne fait que lire le dépôt.
+permissions:
+  contents: read
+
+jobs:
+  verifications:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Une seule installation à la racine : c'est un workspace npm, pas un
+      # paquet par composant.
+      - run: npm ci
+
+      - name: typecheck
+        run: npm run typecheck --workspaces --if-present
+
+      # `!cancelled()` et non `always()` : on veut les deux signaux en un seul
+      # run même si le typecheck a cassé, mais pas prolonger un job annulé
+      # (concurrency ci-dessus, ou annulation manuelle).
+      - name: lint
+        if: ${{ !cancelled() }}
+        run: npm run lint --workspaces --if-present
+
+      # Aucun workspace n'a de script `test` aujourd'hui : la commande ne
+      # fait rien et sort en 0. Le jour où l'un en a un, il est lancé sans
+      # toucher à ce fichier.
+      - name: tests
+        if: ${{ !cancelled() }}
+        run: npm run test --workspaces --if-present

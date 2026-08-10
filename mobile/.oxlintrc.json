@@ -1,0 +1,11 @@
+// Étend le socle racine (../.oxlintrc.json) : plugins + rules-of-hooks.
+// Volontairement sans only-export-components (contrairement à frontend) :
+// l'idiome `export default ScreenX as unknown as TabScreen`, utilisé par
+// tous les écrans mobile pour attacher les métadonnées d'onglet, rend
+// l'export "anonyme" aux yeux de la règle et fait remonter ~25 warnings sans
+// rapport avec un vrai défaut (elle cible le Fast Refresh de Vite, pas
+// Metro/Fast Refresh RN). Si l'idiome change, réévaluer.
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../.oxlintrc.json"]
+}
