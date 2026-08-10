@@ -72,8 +72,8 @@ l'obfuscation, un nom de variable anodin ou un encodage base64 ne changent rien.
 | --- | --- |
 | URL de l'API | clé Stripe secrète (`sk_…`), secret de webhook |
 | clé publishable Stripe (`pk_…`) | clé de service de la base (rôle service) |
-| DSN Sentry | secret d'un provider OAuth |
-| identifiants de build (bundle id, variante) | jeton d'API d'un tiers |
+| DSN Sentry (il autorise l'envoi, pas la lecture) | jeton d'auth Sentry (`SENTRY_AUTH_TOKEN`) |
+| identifiants de build (bundle id, variante) | secret d'un provider OAuth, jeton d'API d'un tiers |
 
 La colonne de droite vit côté backend (voir `backend/README.md`) : l'app parle au backend, le
 backend parle aux tiers avec ses secrets. C'est la seule répartition qui tient — si l'app a
@@ -98,6 +98,11 @@ Une variable EAS de visibilité *secret* est protégée **sur les serveurs EAS**
 depuis le dashboard et la CLI. Ça ne la rend pas secrète dans l'app. Si `app.config.ts` la
 recopie dans `extra`, elle est en clair dans le bundle comme n'importe quelle autre. Ces
 variables servent à changer *comment* un build se fabrique, pas à embarquer un secret.
+
+`SENTRY_AUTH_TOKEN` en est l'exemple exact : il sert à **uploader les source maps pendant le
+build**, rien dans l'app ne le voit, et il ne doit jamais passer par `extra`. Le DSN, lui,
+fait le trajet inverse — public, écrit en clair dans `app.config.ts`. Voir
+`mobile/RELEASE.md` § observabilité.
 
 ### Fichiers
 
