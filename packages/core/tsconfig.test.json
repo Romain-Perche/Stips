@@ -1,0 +1,17 @@
+{
+  // Config des seuls fichiers de test. Elle existe pour que `types: ["node"]`
+  // et `allowImportingTsExtensions` ne s'appliquent QU'ICI : le code de core
+  // reste compilé sans DOM et sans Node (voir tsconfig.json), donc rien de
+  // spécifique à une plateforme ne peut y entrer par la porte des tests.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // node:test, node:assert — et rien de plus.
+    "types": ["node"],
+    // Node exige l'extension à l'import quand il retire les types lui-même
+    // (`import … from './version.ts'`). TypeScript ne l'accepte qu'avec ce
+    // drapeau, lui-même conditionné à noEmit — déjà vrai ici.
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src/**/*.test.ts"],
+  "exclude": []
+}

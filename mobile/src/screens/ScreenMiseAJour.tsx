@@ -18,7 +18,7 @@
 
 import { Linking, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C } from '@leclub/core';
+import { C } from '@stips/core';
 import { F } from '../tokens';
 import { BoutonPlein, Mono, Screen } from '../atoms';
 
@@ -29,7 +29,7 @@ export default function ScreenMiseAJour({ url, message }: { url?: string; messag
       <View style={{ flex: 1, paddingHorizontal: 22, paddingTop: 26, gap: 14 }}>
         <Mono>MISE À JOUR REQUISE</Mono>
         <Text style={{ fontFamily: F.serif, fontSize: 34, lineHeight: 37, color: C.ink }}>
-          Cette version du Club n'est plus à jour.
+          Cette version de Stips n'est plus à jour.
         </Text>
         <Text style={{ fontFamily: F.uiRegular, fontSize: 14, lineHeight: 21, color: C.muted }}>
           {message ?? 'Installe la dernière version depuis le store pour continuer.'}

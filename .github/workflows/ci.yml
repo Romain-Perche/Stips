@@ -40,9 +40,9 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run lint --workspaces --if-present
 
-      # Aucun workspace n'a de script `test` aujourd'hui : la commande ne
-      # fait rien et sort en 0. Le jour où l'un en a un, il est lancé sans
-      # toucher à ce fichier.
+      # Seul packages/core a des tests aujourd'hui (`node --test`, sans
+      # dépendance). `--if-present` fait sortir les deux autres en 0 : le jour
+      # où ils en ont, ils sont lancés sans toucher à ce fichier.
       - name: tests
         if: ${{ !cancelled() }}
         run: npm run test --workspaces --if-present

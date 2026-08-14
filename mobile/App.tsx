@@ -34,8 +34,8 @@ import { InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic } from '@
 import { Outfit_400Regular, Outfit_500Medium, Outfit_600SemiBold } from '@expo-google-fonts/outfit';
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 
-import { C } from '@leclub/core';
-import type { Role } from '@leclub/core';
+import { C } from '@stips/core';
+import type { Role } from '@stips/core';
 import { F } from './src/tokens';
 import ScreenChercher from './src/screens/ScreenChercher';
 import ScreenStagesCandidat from './src/screens/ScreenStagesCandidat';

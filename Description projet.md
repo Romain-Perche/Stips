@@ -1,8 +1,8 @@
-# Le Club
+# Stips
 
 *Description mise à jour au 27 juillet 2026 — remplace le PDF initial. Reflète ce qui a
-été validé dans le design doc (`Le Club.dc.html`, 8 tours), les arbitrages donnés ensuite,
-et l'organisation en `frontend/` / `backend/`.*
+été validé dans le design doc (`Le Club.dc.html`, 8 tours — nom d'alors, renommé Stips
+depuis), les arbitrages donnés ensuite, et l'organisation en `frontend/` / `backend/`.*
 
 ---
 
@@ -25,7 +25,7 @@ C'est cette recommandation signée que les entreprises voient en premier.
 | | |
 |---|---|
 | Fond de l'app | `#f7f5ef` — fond de page `#f0eee9` |
-| Noir du Club | `#14140f` (cartes pleines, boutons, onglet actif) |
+| Noir de Stips | `#14140f` (cartes pleines, boutons, onglet actif) |
 | Textes | `#77746a` secondaire · `#8a877c` micro-labels · `#a5a296` inactif |
 | Cartes | blanc `#fff`, bordure `rgba(0,0,0,.1)`, rayon 16 |
 | Titres & chiffres | **Instrument Serif** — italique pour les citations |
@@ -39,12 +39,33 @@ actif marqué `◈` / inactif `◇`, avatars hachurés en attendant les photos.
 
 ---
 
-## Entrée dans le Club
+## Entrée dans Stips
 
-Un seul écran avant la création de compte : **l'invitation nominative** (7 jours de
-validité). « Léa Ferrand te fait entrer dans Le Club, Camille. » On y voit déjà la note et
-le commentaire du parrain (non modifiables), et le rappel du prix : **100 €/an, tout
-compris**. Accepter l'invitation entre directement dans l'app.
+**On n'entre que parrainé, et il y a deux chemins pour y arriver.** Les deux produisent le
+même objet — une recommandation signée par un pro, qui fait exister un membre — et ne
+diffèrent que par qui commence, et par le fait que le pro ait déjà un compte ou non. C'est
+une seule table `parrainage` avec un statut, pas deux mécanismes (voir
+`backend/README.md`).
+
+| | Le stagiaire demande | Le pro invite |
+|---|---|---|
+| Initié par | le futur membre | un pro déjà dans Stips |
+| Le pro remplit | un formulaire **web**, sans installer l'app | l'app |
+| Peut aussi | créer son compte pro à la fin du formulaire | — |
+| Validation manuelle | oui | **non** — le pro est déjà vérifié |
+| Le stagiaire reçoit | un lien qui ouvre l'app | un lien qui ouvre l'app |
+
+**Le formulaire du pro est une page web, ni un PDF ni l'app.** C'est le point de conversion
+le plus critique du produit : un pro qui rend un service à son stagiaire. Lui demander
+d'installer une application pour remplir un formulaire, c'est la friction maximale au pire
+endroit. Un PDF, lui, ne valide rien, ne se signe pas de façon traçable, se retape à la
+main, et casse la trace d'audit qu'impose l'article 16 du RGPD sur cette donnée précise
+(voir `backend/README.md`). La proposition de créer un compte pro arrive **à la fin** du
+formulaire, une fois le service rendu — jamais avant.
+
+L'invitation reçue par le stagiaire est ce que montre déjà `ScreenInvitation.tsx` : la note
+et le commentaire du parrain (non modifiables), le rappel du prix, 7 jours de validité.
+Accepter entre directement dans l'app.
 
 > Écarté : l'écran intermédiaire « parrainage en 3 temps » (code + reco en attente de
 > signature + cotisation) qui figurait dans une version précédente. Retiré à la demande —
@@ -52,96 +73,146 @@ compris**. Accepter l'invitation entre directement dans l'app.
 
 ---
 
-## Point de vue CANDIDAT
+## Les deux rôles : MEMBRE et PRO
 
-**5 onglets** : Chercher · Stages · Agenda · Forum · Qui suis-je ?
+Deux rôles, et deux seulement. **« Parrain » n'en est pas un troisième** : c'est ce qu'est un
+pro ayant signé au moins une recommandation, donc une propriété déduite et non un type de
+compte. Un membre qui devient pro quatre ans plus tard garde le même compte, ses fils de
+forum et la reco qu'il a reçue.
 
-- **Chercher** — l'annuaire du Club, avec une bascule **Personnes / Boîtes**.
-  Côté Personnes : les 128 membres, avec un badge `PARRAIN` sur les maîtres de stage, et un
-  bouton « Écrire » sur chaque ligne. Côté Boîtes : on cherche un endroit d'abord, on voit
-  combien de membres y sont passés et combien de parrains y sont actifs, puis qui y était.
-- **Stages** — *pas encore dessiné.* Le pendant candidat de « Offres » côté entreprise :
-  les stages proposés et la candidature.
-- **Agenda** — « A vos agendas ». Filtres Tout / Sport / Bar / Atelier. Chaque événement
-  porte sa date en gros, le nombre d'inscrits, les places restantes, et une action
-  (« Je viens », « Liste d'attente », « Me prévenir » pour ceux qui n'ont pas encore ouvert).
-- **Forum** — fils de discussion votés, façon Reddit : `club/stage-fiance`,
-  `club/reco-cv`, `club/foot-du-jeudi`. Tri Populaire / Récent / Mes fils, pièces jointes,
-  bouton flottant pour ouvrir un fil.
-- **Qui suis-je ?** — modifier mon profil : photo, bio en deux lignes, stage recherché,
-  disponibilités, 3 expériences maximum, CV et LinkedIn, avec un bouton « Aperçu » pour
-  voir ce que les entreprises verront. C'est maintenant un onglet à part entière (avant,
-  cet écran n'était atteignable que par l'échafaudage de dev).
+**Un pro a accès à presque tout** : les mêmes cinq onglets qu'un membre, avec deux
+différences seulement.
 
----
+| Onglet | MEMBRE | PRO |
+|---|---|---|
+| Recherche | l'annuaire — **partie 1 des profils seulement** | identique |
+| Stages / Offres | les offres des pros, et la candidature | ses offres, les candidatures reçues, **et le deck des membres en recherche** |
+| Agenda | identique | identique |
+| Forum | identique | identique |
+| Qui suis-je ? | partie 1 **et** partie 2 | partie 1 seulement |
 
-## Point de vue ENTREPRISE
+**La carte flip a quitté l'onglet Recherche pour l'onglet Offres des pros.** C'est ce qui
+règle la question des recos : l'annuaire ne montre que la partie 1 d'un profil — photo et
+description — donc **un membre ne lit jamais la note ni le commentaire de parrainage d'un
+autre membre**. Tout ce qui est sensible (notes, commentaires, CV, partie 2) ne se voit que
+côté pro, et seulement pour les membres qui se sont déclarés en recherche.
 
-**2 onglets seulement** : Talents · Offres.
+> Arbitrage : la liste initiale portait deux onglets côté pro pour publier une offre
+> (« mettre des offres de stage » et « proposer des stages »). Fondus en un seul — c'est le
+> même geste, et « Offres » existe déjà (`ScreenOffres.tsx`). Les membres en recherche n'y
+> réapparaissent pas non plus : c'est exactement ce que sert l'onglet Recherche. Ce que
+> montre « Offres », que Recherche ne montre pas, ce sont les **candidatures reçues**.
 
-> Arbitrage : la vue entreprise est volontairement restreinte à ces deux usages —
-> rechercher des candidats potentiels, et gérer ses offres. Pas d'Agenda ni de Forum côté
-> entreprise pour l'instant (ces deux écrans restent codés et partagés en interne, mais ne
-> sont plus branchés à la navigation entreprise).
+Cette symétrie n'est pas cosmétique : elle veut dire que la liste d'onglets par rôle dans
+`App.tsx` diffère d'un seul écran, et que la vue entreprise à 2 onglets a disparu.
 
-- **Talents** — la recherche de candidats potentiels. Une grande **carte flip**, une à la
-  fois, qu'on fait tourner en tapant dessus.
+### Les onglets, en détail
+
+- **Recherche** — l'annuaire, avec sa bascule **Personnes / Boîtes** (`ScreenChercher.tsx`,
+  écrans 8a / 8b). Ne montre que la partie 1 des profils, avec un badge `PARRAIN` sur les
+  pros et un bouton pour écrire. Côté Boîtes : on cherche un endroit d'abord, on voit combien
+  de membres y sont passés et combien de parrains y sont actifs, puis qui y était.
+
+- **Stages** (membre) — *premier jet écrit* (`ScreenStagesCandidat.tsx`, plus un placeholder).
+  Les offres publiées par les pros, filtre Tout / Mes candidatures, et un bouton « Postuler »
+  par offre. En bas, le pendant du « Publier une offre » du pro : un rappel que c'est la
+  partie 2 de « Qui suis-je ? » qui rend visible.
+
+- **Offres** (pro) — l'espace de recrutement, qui porte trois choses : les offres en ligne
+  avec leur nombre de candidatures reçues et non lues, les candidatures de chacune derrière
+  son « Voir », et le **deck de cartes flip** des membres déclarés en recherche — une carte à
+  la fois, qu'on fait tourner en tapant dessus.
 
   | Face A | Face B |
   |---|---|
   | La note globale (`4.6`) | Le stage recherché |
   | Le parrain et son rôle | Les disponibilités |
-  | Son commentaire, en italique | Les expériences principales |
-  | | Accès : CV · LinkedIn · lettre de reco |
+  | Son commentaire, en italique | Le niveau d'expérience |
+  | Bouton **Contacter** | |
 
-  Filtres par critère : `Tous` / `4.5+` / `Dispo été` / réglages.
+  Un bouton sur la carte ouvre le **profil complet** : toutes les notes, tous les
+  commentaires, le CV. C'est un troisième état, au-delà des deux faces.
 
-- **Offres** — « Mes offres » : les offres en ligne avec le nombre de candidatures reçues
-  et de non lues, les brouillons, les clôturées, et la publication d'une nouvelle offre
-  (« Visible par les 128 profils parrainés »).
+  Une **bascule interne** à deux entrées, Offres / Talents, du même genre que le
+  Personnes / Boîtes de Recherche, avec le titre qui change selon la section. Écrite
+  (`ScreenOffres.tsx`). Les candidatures ne sont **pas** une troisième entrée : elles
+  appartiennent à une offre, donc elles vivent derrière le « Voir » de cette offre — un niveau
+  de profondeur, pas un onglet. Le deck n'y est pas recopié : il est extrait de
+  `ScreenTalents.tsx` en un `TalentDeck` exporté que les deux montent — l'onglet Talents tant
+  qu'il existe, cette section ensuite.
+- **Agenda** — « A vos agendas ». Chaque événement porte sa date en gros, le nombre
+  d'inscrits, les places restantes, et une action (« Je viens », « Liste d'attente »,
+  « Me prévenir » pour ceux qui n'ont pas encore ouvert).
+- **Forum** — fils de discussion façon Reddit : `stips/stage-fiance`, `stips/reco-cv`,
+  `stips/foot-du-jeudi`. Pièces jointes, bouton flottant pour ouvrir un fil.
+- **Qui suis-je ?** — en **deux parties** :
+  - *Partie 1*, pour tout le monde : photo et une courte description de soi.
+  - *Partie 2*, réservée aux membres et remplie seulement si une recherche de stage est
+    envisagée : stage recherché, disponibilités, 3 expériences maximum, CV et LinkedIn,
+    avec un bouton « Aperçu ». **C'est le fait de remplir cette partie qui met un membre
+    dans le deck Recherche** — un seul interrupteur, pas deux notions à synchroniser.
+
+### Ce que cette révision retire
+
+Une seule chose : **les catégories d'événement** (`Sport` / `Bar` / `Atelier`), et avec elles
+la rangée de filtres de l'Agenda.
+
+Les votes du forum et la vue Boîtes, un temps candidats à la suppression, restent tous les
+deux. Le vote change en revanche de comportement : une personne a **un** vote par fil, donc
+un second clic sur ▲ le modifie ou l'annule au lieu de l'empiler comme aujourd'hui. Voir
+`backend/README.md` § le forum.
+
+⚠️ Le code porte encore l'ancien modèle : `Role` vaut `'candidat' | 'entreprise'`
+(`packages/core/src/types.ts`), `App.tsx` donne 2 onglets à `entreprise` et n'y met pas
+`ScreenChercher`, et `DATA` contient encore des `cats`. Le renommage et le recâblage sont une
+étape à part.
 
 ---
 
 ## Modèle économique
 
-- **Candidats** : 100 €/an → accès à la plateforme + tous les événements (foot, ateliers,
+- **Membres** : 100 €/an → accès à la plateforme + tous les événements (foot, ateliers,
   soirées, bières incluses). C'est affiché tel quel à l'inscription.
-- **Entreprises** : *pas encore tranché.* Accès payant à l'app ? Aux événements ?
-  Commission à l'embauche d'un stagiaire ?
+- **Pros** : **gratuit**, et c'est désormais un choix assumé plutôt qu'une question ouverte.
+  Un pro accède à presque tout sans payer : c'est la contrepartie du parrainage, qui est ce
+  qui alimente le produit. Le revenu vient donc entièrement des membres, et une commission
+  à l'embauche resterait la seule piste côté pro si elle devait s'ouvrir un jour.
 
 ⚠️ Si le paiement passe par l'in-app purchase, Apple et Google prélèvent 15 à 30 % — soit
-environ 15 €/membre/an à intégrer au modèle, pas un détail technique. Voir §6 d'« À
-trancher » : la formulation de ce que les 100 € achètent détermine si l'IAP est obligatoire.
+environ 15 €/membre/an à intégrer au modèle, pas un détail technique. Voir « À trancher », son
+entrée *in-app purchase* : la formulation de ce que les 100 € achètent détermine si l'IAP est
+obligatoire.
 
 ---
 
 ## Où en est le code
 
 ```
-Le Club/
+Stips/
 ├── frontend/                  ← l'app, un fichier par onglet
 │   ├── package.json           React + TypeScript, scaffoldé avec Vite
 │   ├── index.html             point d'entrée Vite : polices, <div id="root">
 │   └── src/
 │       ├── main.tsx           monte <App/>, importe styles.css
 │       ├── App.tsx            le routeur : rôle × onglet
-│       ├── types.ts           la forme des données (interfaces TypeScript)
-│       ├── tokens.ts          palette + polices — seul endroit à toucher pour la DA
-│       ├── data.ts             toutes les données factices, à remplacer par le backend
+│       ├── types.ts           le seul type non partageable (TabScreen, propre au web)
+│       ├── tokens.ts          ré-export de la palette de @stips/core
 │       ├── atoms.tsx           briques communes : StatusBar, Card, TabBar, Screen…
 │       ├── DevChrome.tsx        barre de dev hors du téléphone (échafaudage, pas l'app)
 │       ├── styles.css           le seul <style> global (cadre téléphone, carte flip…)
 │       └── screens/
-│           ├── ScreenChercher.tsx        Chercher (candidat)
-│           ├── ScreenStagesCandidat.tsx  Stages (candidat, placeholder)
-│           ├── ScreenEvents.tsx          Agenda (candidat)
-│           ├── ScreenForum.tsx           Forum (candidat)
-│           ├── ScreenProfil.tsx          Qui suis-je ? (candidat)
-│           ├── ScreenTalents.tsx         Talents (entreprise)
-│           ├── ScreenOffres.tsx          Offres (entreprise)
+│           ├── ScreenChercher.tsx        Recherche (les deux rôles)
+│           ├── ScreenStagesCandidat.tsx  Stages (membre, placeholder)
+│           ├── ScreenEvents.tsx          Agenda (les deux rôles)
+│           ├── ScreenForum.tsx           Forum (les deux rôles)
+│           ├── ScreenProfil.tsx          Qui suis-je ? (les deux rôles)
+│           ├── ScreenTalents.tsx         le deck de cartes flip — à absorber dans Offres
+│           ├── ScreenOffres.tsx          Offres (pro)
 │           └── ScreenInvitation.tsx      écran d'entrée (pas un onglet)
+├── mobile/                     le portage React Native (Expo) — voir plus bas
+├── packages/core/              @stips/core : types, DATA, palette, logo, version
 └── backend/
-    └── README.md               dossier réservé, rien d'implémenté — voir plus bas
+    └── README.md               stack arrêtée, rien d'implémenté — voir plus bas
 ```
 
 React + TypeScript, servi par un vrai serveur de dev local (Vite) :
@@ -172,13 +243,26 @@ et `TabBar` lit `Ecran.tab.label` directement. Renommer un onglet, ou décider q
 sa navigation, se fait à un seul endroit — jamais deux noms différents pour le même écran
 entre la barre du bas et son titre.
 
+C'est l'état actuel du code, pas la cible. Après la révision des rôles, `TABS` vaut :
+
+```ts
+const TABS: Record<Role, TabScreen[]> = {
+  membre: [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],
+  pro:    [ScreenChercher, ScreenOffres,         ScreenEvents, ScreenForum, ScreenProfil],
+};
+```
+
+Cinq onglets de chaque côté, un seul écran de différence. `ScreenChercher.tsx` reste dans la
+nav des deux rôles ; c'est `ScreenTalents.tsx` qui en sort — le deck de cartes est absorbé par
+`ScreenOffres.tsx` et n'est plus un onglet à lui seul.
+
 Correspondance avec le design doc :
 
 | Design | Fichier |
 |---|---|
-| 2a | `ScreenTalents.tsx` |
-| 6a | `ScreenOffres.tsx` |
-| 8a / 8b | `ScreenChercher.tsx` |
+| 2a | `ScreenTalents.tsx` — absorbé par l'onglet Offres du pro, plus un onglet |
+| 6a | `ScreenOffres.tsx` — devient l'espace de recrutement (offres + candidatures + deck) |
+| 8a / 8b | `ScreenChercher.tsx` — l'onglet Recherche des deux rôles, partie 1 seulement |
 | 3a | `ScreenEvents.tsx` |
 | 4b | `ScreenForum.tsx` |
 | 5a2 | `ScreenInvitation.tsx` |
@@ -231,15 +315,11 @@ et pointe vers `packages/core/src/data.ts` comme contrat de données provisoire.
 
 ## À trancher
 
-1. **L'onglet Stages côté candidat** n'existe pas encore. À dessiner.
-2. **Comment on atteint « Invitation »** en dehors d'un lien e-mail one-shot, et **comment
-   on bascule candidat / entreprise** : deux comptes distincts ? Un choix à l'inscription ?
-   Pour l'instant, barre de dev sous le téléphone.
-3. **Le modèle entreprise.**
-4. **Le choix technique du backend.**
-5. **Les données de remplissage** à valider : les faces B de Yanis et Inès, et les boîtes
-   Deloitte / BNP Paribas / Sia Partners (seule Rothschild & Co figure dans le design).
-6. **Les 100 €/an : in-app purchase ou paiement web ?** Décision business autant que
+1. **Les données de remplissage des boîtes** : Deloitte, BNP Paribas et Sia Partners sont
+   inventées — seule Rothschild & Co figure dans le design. Les faces B ne sont plus une
+   question : elles viennent de la partie 2 de « Qui suis-je ? », donc de ce que le membre a
+   saisi.
+2. **Les 100 €/an : in-app purchase ou paiement web ?** Décision business autant que
    technique, à prendre avant la release qui introduit le paiement — mais ses conséquences
    sur la copie et sur le backend se décident avant, elles.
 
@@ -260,7 +340,7 @@ et pointe vers `packages/core/src/data.ts` comme contrat de données provisoire.
 
    **Conséquence immédiate, dans les deux cas :** la ligne « 100 € / an, tout compris »
    affichée sous le CTA de l'écran d'invitation (§ Écrans, invitation) change. Route web →
-   elle disparaît, et « C'est quoi Le Club ? » ne doit pas mener à une page avec un bouton
+   elle disparaît, et « C'est quoi Stips ? » ne doit pas mener à une page avec un bouton
    de paiement. Route IAP → elle devient un bloc de divulgation complet (nom de
    l'abonnement, durée, prix par période, contenu, liens vers Confidentialité **et** CGU).
    C'est aujourd'hui la seule mention de paiement de toute l'app.
@@ -269,3 +349,27 @@ et pointe vers `packages/core/src/data.ts` comme contrat de données provisoire.
    15 % chez Google, ou 15 % à plat via le Small Business Program ; plus la validation de
    reçu côté serveur, le « restore purchases » obligatoire, et l'accord Paid Apps avec ses
    formulaires bancaires et fiscaux (encore un parcours d'identité de plusieurs jours).
+
+### Tranché depuis
+
+- **Les rôles** — deux, `membre` et `pro`, un pro accède à presque tout, « parrain » est une
+  propriété déduite. Remplace « deux comptes distincts ? » et « le modèle entreprise ».
+- **La stack backend** — Fastify + Drizzle + Postgres derrière notre propre API. Voir
+  `backend/README.md`.
+- **Le chemin d'entrée** — deux origines, une seule table `parrainage`, formulaire web pour
+  le pro sans compte. Pas de validation manuelle quand le pro a déjà un compte : il est déjà
+  vérifié. Le nom du parrain est conservé même s'il n'a jamais créé de compte.
+- **Les recos ne sont pas visibles par les pairs** — l'annuaire s'arrête à la partie 1, et
+  la carte flip vit dans l'onglet Offres du pro.
+- **Les votes du forum restent**, avec un vote par personne et par fil.
+- **La vue Boîtes reste**, dans l'onglet Recherche.
+- **Tout le monde peut écrire à tout le monde** — donc pas de table d'autorisation, mais un
+  blocage et une limite de débit qui deviennent le seul frein.
+- **La cascade de suppression de compte** — la reco part avec le membre supprimé, les recos
+  écrites par un pro supprimé restent, les messages restent chez leurs destinataires.
+- **Le recours sur une reco est le signalement**, et rien d'autre : pas de droit de réponse
+  affiché, zéro colonne ajoutée. « La reco est forcément bonne » ne suffisait pas
+  juridiquement — le raisonnement est dans `backend/README.md`.
+- **Le niveau d'expérience est déclaré**, pas déduit.
+- **L'objectif immédiat est une app de démo** — les quatre points qui bloquent une vraie mise
+  en ligne sont parqués dans `backend/README.md` § avant la mise en ligne réelle.

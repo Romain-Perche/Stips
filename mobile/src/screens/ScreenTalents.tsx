@@ -18,8 +18,8 @@
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { C, DATA } from '@leclub/core';
-import type { Talent } from '@leclub/core';
+import { C, DATA } from '@stips/core';
+import type { Talent } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Avatar, Pills, ScreenHead, Screen, RondPiece } from '../atoms';
 import type { TabScreen } from '../types';

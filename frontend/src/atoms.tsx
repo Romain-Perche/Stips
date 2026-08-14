@@ -3,8 +3,8 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import type { CSSProperties, ReactNode } from 'react';
-import { C } from '@leclub/core';
-import type { Membre, Role } from '@leclub/core';
+import { C } from '@stips/core';
+import type { Membre, Role } from '@stips/core';
 import { F, hatch } from './tokens';
 import type { TabScreen } from './types';
 
@@ -19,7 +19,13 @@ export function Mono({ children, color = C.muted2, size = 10, style }: {
   );
 }
 
-/** Barre d'état du téléphone : l'heure à gauche, « Le Club » à droite */
+/** Barre d'état du téléphone : l'heure à gauche, le wordmark à droite.
+
+    Reprend la police et le traitement de l'ancien wordmark « Le Club »
+    (italique, Instrument Serif) : seul le texte a changé. Le dessin du
+    logo (SVG de `public/`, une seule teinte puisque le web n'a pas de
+    variantes) est indépendant de cette barre — voir
+    `scripts/logo/generer.mjs`. */
 export function StatusBar({ color = C.ink }: { color?: string }) {
   return (
     <div style={{
@@ -28,7 +34,7 @@ export function StatusBar({ color = C.ink }: { color?: string }) {
       color, font: `500 13px ${F.mono}`,
     }}>
       <span>9:41</span>
-      <span style={{ font: `italic 400 20px/1 ${F.serif}`, letterSpacing: '.01em' }}>Le Club</span>
+      <span style={{ font: `italic 400 20px/1 ${F.serif}`, letterSpacing: '.01em' }}>Stips</span>
     </div>
   );
 }

@@ -5,7 +5,7 @@
     "@expo-google-fonts/instrument-serif": "^0.4.1",
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
     "@expo-google-fonts/outfit": "^0.4.3",
-    "@leclub/core": "*",
+    "@stips/core": "*",
     "@react-navigation/bottom-tabs": "^7.18.14",
     "@react-navigation/native": "^7.3.14",
     "@react-navigation/native-stack": "^7.18.6",

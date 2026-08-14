@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@leclub/core": "*",
+    "@stips/core": "*",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },

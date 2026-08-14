@@ -50,7 +50,7 @@ Une seule décision en attente en débloque quatre :
 ```
 choisir le domaine
    ├─→ bundle id définitif        (TODO(bundle-id) dans app.config.ts)
-   ├─→ apiUrl réel                (api.leclub.club est un placeholder)
+   ├─→ apiUrl réel                (api.stips.club est un placeholder)
    ├─→ URL de politique + support (exigées à la soumission)
    └─→ fiche App Store Connect → ascAppId → eas.json submit.production
 ```
@@ -87,9 +87,8 @@ Déjà fait dans `app.config.ts`, listé ici pour qu'on sache pourquoi :
   exactement ce qui manque le cas échéant. Seul `NSPrivacyAccessedAPITypes` est appliqué
   automatiquement ; `NSPrivacyCollectedDataTypes` alimente le rapport agrégé, la vraie
   barrière étant le questionnaire (§6).
-- `scheme: 'leclub'` — posé avant qu'un lien profond existe, pour que la valeur soit stable.
-- Plugin `expo-splash-screen` — l'écran de lancement. Pas bloquant, mais l'asset existait
-  sans être branché.
+- `scheme: 'stips'` — posé avant qu'un lien profond existe, pour que la valeur soit stable.
+- Plugin `expo-splash-screen` — l'écran de lancement, une image par variante. Pas bloquant.
 - `expo-updates` + `runtimeVersion` — § mises à jour OTA.
 - Plugin `@sentry/react-native/expo` — § observabilité. DSN, organisation, projet et
   `SENTRY_AUTH_TOKEN` (EAS, `secret`, les trois environnements) sont en place.
@@ -124,9 +123,15 @@ c'est `android.blockedPermissions` (implémenté via `tools:node="remove"` dans 
 elle passera par les permissions scoped d'`expo-image-picker` ou `expo-document-picker`,
 pas par celles bloquées ici.
 
-Confort, pas un requis : les variantes dev et preview n'ont pas d'icône iOS distincte. Android
-se teinte par config (`adaptiveIcon.backgroundColor` par variante), iOS exige de vrais PNG
-séparés. Utile pour distinguer trois apps sur le même téléphone, ne bloque aucun build.
+Confort, pas un requis : chaque variante porte une teinte de logo distincte — taupe en
+production, bleu en preview, rouge en dev. iOS exige de vrais PNG séparés (il ne sait pas
+teinter une icône par configuration) ; Android s'en passe, son icône adaptative étant un
+premier plan commun posé sur `adaptiveIcon.backgroundColor`, une couleur par variante.
+L'écran de démarrage suit la même teinte, parce que c'est ce qu'on voit avant tout le reste.
+Utile pour distinguer trois apps sur le même téléphone, ne bloque aucun build.
+
+Ces images sont **générées**, pas dessinées : `npm run logo` (voir `AGENTS.md` § Logo et
+icônes). Les éditer à la main serait perdu au prochain passage du générateur.
 
 Numéro de la première version publique : `0.1` (`version` dans `app.config.ts`), pour le
 premier build de test. Deux segments suffisent — ni Expo ni Play n'exigent trois chiffres,
@@ -216,7 +221,7 @@ automatiquement au bundle embarqué, mais un OTA se teste sur le canal `preview`
 ## 6. Observabilité
 
 Sur le web on ouvre la console de quelqu'un à distance. Sur mobile, non : un crash chez un
-membre du Club, sans outillage, c'est un message « ça marche pas » et zéro information.
+membre de Stips, sans outillage, c'est un message « ça marche pas » et zéro information.
 D'où la règle : **aucune build partagée à quelqu'un d'autre que nous sans crash reporting
 vérifié.** Les profils `preview` et `production` sont concernés ; `development` ne quitte
 pas la machine.
@@ -228,6 +233,11 @@ SDK 57 — installée via `npx expo install`, jamais épinglée à la main.
 Compte, organisation (`le-club`) et projet React Native (`react-native`) existent ; DSN,
 `organization` et `project` sont renseignés dans `app.config.ts`. `SENTRY_AUTH_TOKEN` est
 dans `mobile/.env` et sur EAS (`secret`, sur `production`, `preview` et `development`).
+
+L'organisation garde le slug `le-club`, antérieur au passage à Stips : la renommer côté
+Sentry (dashboard) est un prérequis avant de toucher `organization` dans `app.config.ts`,
+sans quoi l'upload des source maps part vers un slug qui n'existe plus. Même chose pour le
+projet EAS et son `slug` (voir `app.config.ts`).
 
 Sans DSN, `Sentry.init` ne démarre pas et l'app tourne normalement, sans crash reporting —
 no-op explicite, pas panne silencieuse. Ce n'est plus l'état par défaut : depuis que le DSN
@@ -373,8 +383,8 @@ de parrainage).
 ## 8. Avant chaque soumission
 
 - [ ] `main` est verte (`npm run typecheck --workspaces` + `lint`)
-- [ ] `version` à jour dans `app.config.ts`, tag annoté `mobile-vX.Y.Z` poussé **avant** le
-      build (voir `AGENTS.md`)
+- [ ] `version` à jour dans `app.config.ts`, tag annoté reprenant cette valeur telle quelle
+      (`version: '0.2'` → `mobile-v0.2`), poussé **avant** le build (voir `AGENTS.md`)
 - [ ] Les deux flags du verrou sont dans l'état voulu, et `sentryEnDev` est à `false`
 - [ ] `SENTRY_AUTH_TOKEN` présent côté EAS — sinon le build échoue (c'est voulu)
 - [ ] Une erreur de test remonte dans Sentry avec une stack lisible (§ observabilité)
@@ -400,5 +410,5 @@ de parrainage).
 | `expo-tracking-transparency` / ATT | seulement si un SDK publicitaire ou de tracking inter-app arrive. Sentry seul ne déclenche pas |
 | Sign in with Apple (règle 4.8) | seulement si login social tiers. Un login e-mail/invitation ne déclenche pas |
 | Suppression de compte dans l'app (5.1.1(v)) | la release qui ajoute la création de compte. **Non reportable au-delà** |
-| IAP / StoreKit / Play Billing | seulement sur la route IAP — voir « À trancher » §6 de la description du projet |
+| IAP / StoreKit / Play Billing | seulement sur la route IAP — voir « À trancher », entrée *in-app purchase*, dans la description du projet |
 | `assetPatternsToBeBundled` | seulement si des assets doivent voyager en OTA |

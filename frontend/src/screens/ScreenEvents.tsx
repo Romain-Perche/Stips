@@ -1,11 +1,11 @@
 /* ══════════════════════════════════════════════════════════════════════
    ONGLET « Agenda » — candidat · design 3a
-   « A vos agendas » : les prochains rendez-vous du Club.
+   « A vos agendas » : les prochains rendez-vous de Stips.
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useState, type ReactNode } from 'react';
-import { C, DATA } from '@leclub/core';
-import type { EventItem } from '@leclub/core';
+import { C, DATA } from '@stips/core';
+import type { EventItem } from '@stips/core';
 import { F, hatch } from '../tokens';
 import { Mono, Card, Stk, Pills, ScreenHead, Screen } from '../atoms';
 import type { TabScreen } from '../types';

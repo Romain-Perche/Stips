@@ -10,8 +10,8 @@
 import { useId, useState, type ReactNode } from 'react';
 import { Pressable, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Defs, Pattern, Rect } from 'react-native-svg';
-import { C, HATCH_COLORS, HATCH_STRIPE } from '@leclub/core';
-import type { Membre } from '@leclub/core';
+import { C, HATCH_COLORS, HATCH_STRIPE } from '@stips/core';
+import type { Membre } from '@stips/core';
 import { F } from './tokens';
 
 /** Micro-label mono en capitales : « NOTE GLOBALE », « DISPONIBILITÉS »… */
@@ -27,11 +27,17 @@ export function Mono({ children, color = C.muted2, size = 10, style }: {
 
 /** En-tête de marque en haut de chaque écran (le vrai statut du téléphone
     — heure, réseau, batterie — est déjà rendu par l'OS ; on ne garde que
-    le wordmark, contrairement à la maquette web qui devait le simuler). */
+    le wordmark, contrairement à la maquette web qui devait le simuler).
+
+    Reprend la police et le traitement de l'ancien wordmark « Le Club »
+    (Instrument Serif italique) : seul le texte a changé. Le dessin du
+    logo (icône d'app, écran de démarrage, une teinte par variante) est
+    indépendant de cet en-tête et n'en dépend pas — voir
+    `scripts/logo/generer.mjs`. */
 export function AppHeader({ color = C.ink }: { color?: string }) {
   return (
     <View style={{ height: 40, flexShrink: 0, justifyContent: 'flex-end', paddingHorizontal: 22, paddingBottom: 8 }}>
-      <Text style={{ fontFamily: F.serifItalic, fontSize: 20, color, letterSpacing: 0.2 }}>Le Club</Text>
+      <Text style={{ fontFamily: F.serifItalic, fontSize: 20, color, letterSpacing: 0.2 }}>Stips</Text>
     </View>
   );
 }

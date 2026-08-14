@@ -3,7 +3,7 @@
    vraie source de données (le futur backend) plus tard.
    ══════════════════════════════════════════════════════════════════════ */
 
-import type { MoiProfile, Invitation, Talent, Membre, Boite, Offre, EventItem, Fil } from './types';
+import type { MoiProfile, Invitation, Talent, Membre, Boite, Offre, Candidature, EventItem, Fil } from './types';
 
 export const DATA: {
   moi: MoiProfile;
@@ -13,6 +13,7 @@ export const DATA: {
   membresTotal: number;
   boites: Boite[];
   offres: { resume: string; liste: Offre[] };
+  candidatures: Candidature[];
   events: EventItem[];
   fils: Fil[];
 } = {
@@ -83,7 +84,7 @@ export const DATA: {
     },
   ],
 
-  // ── L'annuaire du Club, onglet « Personnes » (écran 8a) ────────────────
+  // ── L'annuaire de Stips, onglet « Personnes » (écran 8a) ───────────────
   membres: [
     { nom: 'Yanis Bekkar',  sous: 'M2 Data · a fait Rothschild & Co' },
     { nom: 'Inès Marchal',  sous: 'M1 Audit · a fait Deloitte' },
@@ -141,6 +142,15 @@ export const DATA: {
     ],
   },
 
+  // ── Les candidatures reçues, vues par le pro (onglet Offres) ───────────
+  // `heures` plutôt qu'une chaîne « il y a 3 h » : c'est l'écran qui écrit
+  // la phrase. Voir `backend/README.md` § les valeurs qu'on ne stocke pas.
+  candidatures: [
+    { talent: 'camille', offre: 'Analyste M&A — stage de césure', heures: 3,  lue: false },
+    { talent: 'yanis',   offre: 'Data analyst junior — été 2027', heures: 9,  lue: false },
+    { talent: 'ines',    offre: 'Analyste M&A — stage de césure', heures: 28, lue: true  },
+  ],
+
   // ── Les événements (écran 3a) ──────────────────────────────────────────
   events: [
     { jour: '12', mois: 'SEPT', cats: ['Sport'], meta: 'SPORT · 20H00',
@@ -149,21 +159,21 @@ export const DATA: {
     { jour: '18', mois: 'SEPT', cats: ['Bar', 'Atelier'], meta: 'BAR · ATELIER · 19H30',
       titre: 'Refais ton CV · Chez Jeannette', sous: 'Une bière, un CV relu par un recruteur',
       pied: '31 inscrits · complet', cta: "Liste d'attente" },
-    { jour: '02', mois: 'OCT', cats: ['Bar'], meta: 'SOIRÉE DU CLUB · 20H00',
-      titre: 'Rentrée du Club · Rooftop Marais', sous: 'Toute la promo, 12 boîtes présentes',
+    { jour: '02', mois: 'OCT', cats: ['Bar'], meta: 'SOIRÉE STIPS · 20H00',
+      titre: 'Rentrée Stips · Rooftop Marais', sous: 'Toute la promo, 12 boîtes présentes',
       pied: 'Ouvre le 20 sept.', cta: 'Me prévenir', dark: true },
   ],
 
   // ── Le forum (écran 4b) ────────────────────────────────────────────────
   fils: [
-    { id: 'f1', votes: 48, meta: 'club/stage-fiance · Yanis · 2 h', heures: 2,
+    { id: 'f1', votes: 48, meta: 'stips/stage-fiance · Yanis · 2 h', heures: 2,
       titre: "Retour d'entretien Rothschild : les 4 questions qui tombent à tous les coups",
       extrait: 'Je sors du 3e tour, je vous mets tout ce dont je me souviens…',
       reponses: 23 },
-    { id: 'f2', votes: 31, meta: 'club/reco-cv · Léa F. · marraine · 5 h', heures: 5,
+    { id: 'f2', votes: 31, meta: 'stips/reco-cv · Léa F. · marraine · 5 h', heures: 5,
       titre: 'Je relis 10 CV ce week-end — postez le vôtre ici',
       piece: 'PIÈCE JOINTE · TEMPLATE CV', reponses: 17 },
-    { id: 'f3', votes: 12, meta: 'club/foot-du-jeudi · Sarah · 1 j', heures: 24,
+    { id: 'f3', votes: 12, meta: 'stips/foot-du-jeudi · Sarah · 1 j', heures: 24,
       titre: 'Il manque 2 joueurs jeudi 20h — qui prend le dernier créneau ?',
       reponses: 9, dark: true },
   ],
