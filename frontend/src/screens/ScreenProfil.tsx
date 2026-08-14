@@ -4,7 +4,7 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useState, type ReactNode } from 'react';
-import { C, DATA } from '@leclub/core';
+import { C, DATA } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Avatar, Stk, ScreenHead, Screen } from '../atoms';
 import type { TabScreen } from '../types';

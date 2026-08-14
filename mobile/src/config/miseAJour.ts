@@ -30,8 +30,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { AppState, Platform } from 'react-native';
-import { comparerVersions } from '@leclub/core';
-import type { ConfigDistante } from '@leclub/core';
+import { comparerVersions } from '@stips/core';
+import type { ConfigDistante } from '@stips/core';
 import { env } from './env';
 import { flags } from './flags';
 

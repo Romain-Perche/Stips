@@ -5,8 +5,8 @@
 
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { C, DATA } from '@leclub/core';
-import type { Fil } from '@leclub/core';
+import { C, DATA } from '@stips/core';
+import type { Fil } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, ScreenHead, Pills, Screen, Hatch } from '../atoms';
 import type { TabScreen } from '../types';

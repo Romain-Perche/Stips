@@ -10,7 +10,19 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    // Core est consommé par Metro (React Native) ET par Vite (navigateur) :
+    // rien de spécifique à une plateforme ne doit y compiler. `lib` sans DOM
+    // ferme la porte au web ; `types: []` ferme celle de Node, qui serait
+    // sinon ouverte par le seul fait qu'@types/node existe dans le
+    // node_modules hoisté de la racine. Les deux ensemble font que `document`
+    // comme `process` sont des erreurs de compilation ici, pas des bombes à
+    // retardement découvertes au premier bundle.
+    "types": []
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Les tests, eux, ont besoin de node:test et node:assert. Ils sont
+  // typecheckés à part, par tsconfig.test.json — c'est ce qui permet de leur
+  // donner les types Node sans les donner au code de production.
+  "exclude": ["src/**/*.test.ts"]
 }

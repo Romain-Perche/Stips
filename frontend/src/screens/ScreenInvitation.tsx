@@ -7,7 +7,7 @@
    directement à l'app.
    ══════════════════════════════════════════════════════════════════════ */
 
-import { C, DATA } from '@leclub/core';
+import { C, DATA } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Avatar, Card, Screen } from '../atoms';
 
@@ -23,7 +23,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
             <div style={{
               font: `400 34px/1.08 ${F.serif}`, color: C.ink,
               marginTop: 10, textWrap: 'pretty',
-            }}>{inv.parrain} te fait entrer dans Le Club, {inv.prenom}.</div>
+            }}>{inv.parrain} te fait entrer dans Stips, {inv.prenom}.</div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -75,7 +75,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
           font: `600 15px ${F.ui}`, textAlign: 'center', cursor: 'pointer',
         }}>Accepter l'invitation</div>
         <div style={{ textAlign: 'center', font: `400 12px ${F.ui}`, color: C.muted, marginTop: 10 }}>
-          100 € / an, tout compris · <span style={{ color: C.ink, textDecoration: 'underline', cursor: 'pointer' }}>C'est quoi Le Club ?</span>
+          100 € / an, tout compris · <span style={{ color: C.ink, textDecoration: 'underline', cursor: 'pointer' }}>C'est quoi Stips ?</span>
         </div>
       </div>
     </Screen>

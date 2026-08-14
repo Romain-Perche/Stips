@@ -60,6 +60,16 @@ export interface Offre {
   pied: string;
 }
 
+/** Une candidature reçue sur une offre. `talent` et `offre` renvoient à
+    `Talent.id` et `Offre.titre` — des liens par valeur, faute de clés
+    étrangères ici (voir `backend/README.md`). */
+export interface Candidature {
+  talent: string;
+  offre: string;
+  heures: number;
+  lue: boolean;
+}
+
 export interface EventItem {
   jour: string;
   mois: string;

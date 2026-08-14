@@ -9,7 +9,7 @@
 
 import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, DATA } from '@leclub/core';
+import { C, DATA } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Avatar, BoutonPlein, Card, Screen } from '../atoms';
 
@@ -25,7 +25,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
             <Mono>INVITATION NOMINATIVE · VALABLE 7 JOURS</Mono>
             <Text style={{
               fontFamily: F.serif, fontSize: 34, lineHeight: 37, color: C.ink, marginTop: 10,
-            }}>{inv.parrain} te fait entrer dans Le Club, {inv.prenom}.</Text>
+            }}>{inv.parrain} te fait entrer dans Stips, {inv.prenom}.</Text>
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -77,7 +77,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
             seule mention de paiement de toute l'app, donc la seule exposition
             à la règle 3.1.1 d'Apple. */}
         <Text style={{ textAlign: 'center', fontFamily: F.uiRegular, fontSize: 12, color: C.muted, marginTop: 10 }}>
-          100 € / an, tout compris · <Text style={{ color: C.ink, textDecorationLine: 'underline' }}>C'est quoi Le Club ?</Text>
+          100 € / an, tout compris · <Text style={{ color: C.ink, textDecorationLine: 'underline' }}>C'est quoi Stips ?</Text>
         </Text>
       </View>
     </Screen>

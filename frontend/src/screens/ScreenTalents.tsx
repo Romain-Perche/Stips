@@ -4,13 +4,30 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
-import { C, DATA } from '@leclub/core';
-import type { Talent } from '@leclub/core';
+import { C, DATA } from '@stips/core';
+import type { Talent } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Avatar, Pills, ScreenHead, Screen } from '../atoms';
 import type { TabScreen } from '../types';
 
 function ScreenTalents({ nav }: { nav: ReactNode }) {
+  return (
+    <Screen nav={nav}>
+      <ScreenHead titre="Les Talents" />
+      <TalentDeck />
+    </Screen>
+  );
+}
+
+/** Le deck seul, sans coquille d'écran : ses filtres, sa carte et sa
+    pagination, rien d'autre.
+
+    Extrait parce qu'il a maintenant deux points de montage — cet onglet
+    aujourd'hui, et la section « Talents » de l'onglet Offres du pro
+    (`ScreenOffres.tsx`). La révision des rôles fait disparaître l'onglet
+    et ne garde que le second ; en attendant, les deux affichent le même
+    deck et non deux copies. */
+export function TalentDeck() {
   const [filtre, setFiltre] = useState('Tous');
   const [i, setI] = useState(0);
   const [flip, setFlip] = useState(false);
@@ -27,8 +44,7 @@ function ScreenTalents({ nav }: { nav: ReactNode }) {
   const changer = (n: number) => { setFlip(false); setI(n); };
 
   return (
-    <Screen nav={nav}>
-      <ScreenHead titre="Les Talents" />
+    <>
       <Pills items={['Tous', '4.5+', 'Dispo été', '⚙']} active={filtre}
         onChange={p => { if (p !== '⚙') { setFiltre(p); changer(0); } }} />
 
@@ -60,7 +76,7 @@ function ScreenTalents({ nav }: { nav: ReactNode }) {
           )}
         </div>
       </div>
-    </Screen>
+    </>
   );
 }
 

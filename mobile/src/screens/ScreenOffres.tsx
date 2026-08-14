@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { C, DATA } from '@leclub/core';
+import { C, DATA } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, Stk, ScreenHead, Pills, Screen } from '../atoms';
 import type { TabScreen } from '../types';

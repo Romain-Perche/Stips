@@ -4,8 +4,8 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState, type ReactNode } from 'react';
-import { C, DATA } from '@leclub/core';
-import type { Fil } from '@leclub/core';
+import { C, DATA } from '@stips/core';
+import type { Fil } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, ScreenHead, Pills, Screen } from '../atoms';
 import type { TabScreen } from '../types';

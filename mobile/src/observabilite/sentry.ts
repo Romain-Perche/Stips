@@ -2,7 +2,7 @@
    OBSERVABILITÉ — Sentry.
 
    Sur le web on ouvre la console de quelqu'un à distance. Sur mobile, non :
-   un crash chez un membre du Club, sans outillage, c'est un message « ça
+   un crash chez un membre de Stips, sans outillage, c'est un message « ça
    marche pas » et zéro information. D'où le crash reporting AVANT la
    première build partagée à quelqu'un d'autre que nous.
 
@@ -62,7 +62,7 @@ if (actif) {
        tenir synchrones, pour une isolation dont on n'a pas besoin. */
     environment: env.variante,
 
-    /* Le Club est un annuaire de vraies personnes, avec de vrais noms et des
+    /* Stips est un annuaire de vraies personnes, avec de vrais noms et des
        avis de parrainage nominatifs. `sendDefaultPii: true` enverrait à
        Sentry l'IP et l'identité de l'utilisateur avec chaque événement.
 

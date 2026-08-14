@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════
-   TOKENS — les polices, propres à mobile (voir @leclub/core pour la
+   TOKENS — les polices, propres à mobile (voir @stips/core pour la
    palette et le motif hachuré, partagés avec le web).
 
    Contrairement au web, React Native n'a pas de raccourci `font: "500

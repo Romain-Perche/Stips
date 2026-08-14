@@ -14,40 +14,61 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 type Variante = 'development' | 'preview' | 'production';
 const variante = (process.env.APP_VARIANT ?? 'development') as Variante;
 
-// TODO(bundle-id) : "com.leclub.app" est un placeholder — aucun domaine
+// TODO(bundle-id) : "com.stips.app" est un placeholder — aucun domaine
 // n'est encore choisi. Change-le librement tant qu'aucune app n'a été
 // soumise à TestFlight (externe) ou Play Console : c'est CE moment-là,
 // pas eas init ni un build interne, qui le fige pour de vrai.
-const BASE_ID = 'com.leclub.app';
+const BASE_ID = 'com.stips.app';
 
-// `icone` est l'icône iOS, et la seule à devoir exister en trois fichiers :
-// iOS ne sait pas la teinter par config, contrairement à Android qui se
-// contente de `adaptiveIcon.backgroundColor` (fondIcone ci-dessous). C'est ce
-// qui permet de distinguer les trois apps installées sur le même téléphone.
+// Les trois teintes du logo (section 6 du document de design) : taupe en
+// production, bleu en preview, rouge en dev. C'est le seul écart de dessin
+// entre les trois apps, et c'est ce qui permet de savoir laquelle des trois
+// installées sur le même téléphone on est en train d'ouvrir.
+//
+// `icone` doit exister en trois fichiers parce qu'iOS ne sait pas teinter une
+// icône par configuration. Android s'en passe : son icône adaptative est un
+// premier plan commun (le S crème) posé sur `adaptiveIcon.backgroundColor`,
+// donc la teinte y est cette simple couleur — `fondIcone` ci-dessous.
+//
+// Tous ces fichiers sont produits par `node scripts/logo/generer.mjs`, qui
+// vérifie au passage que les `fondIcone` d'ici sont bien les trois teintes
+// de TEINTES_VARIANTE (@stips/core). Ne pas les modifier à la main sans
+// relancer le générateur : l'icône et son fond Android se décoloreraient
+// l'une par rapport à l'autre.
 const CONFIG_PAR_VARIANTE: Record<
   Variante,
-  { suffixeNom: string; suffixeId: string; icone: string; fondIcone: string; apiUrl: string }
+  {
+    suffixeNom: string;
+    suffixeId: string;
+    icone: string;
+    splash: string;
+    fondIcone: string;
+    apiUrl: string;
+  }
 > = {
   development: {
     suffixeNom: ' (dev)',
     suffixeId: '.dev',
     icone: './assets/icon-development.png',
-    fondIcone: '#c9d9c4',
+    splash: './assets/splash-development.png',
+    fondIcone: '#B3382C',
     apiUrl: process.env.API_URL ?? 'http://192.168.1.10:3000',
   },
   preview: {
     suffixeNom: ' (preview)',
     suffixeId: '.preview',
     icone: './assets/icon-preview.png',
-    fondIcone: '#e8d5b7',
-    apiUrl: process.env.API_URL ?? 'https://staging.api.leclub.club',
+    splash: './assets/splash-preview.png',
+    fondIcone: '#1B3A6B',
+    apiUrl: process.env.API_URL ?? 'https://staging.api.stips.club',
   },
   production: {
     suffixeNom: '',
     suffixeId: '',
     icone: './assets/icon-production.png',
-    fondIcone: '#f7f5ef',
-    apiUrl: process.env.API_URL ?? 'https://api.leclub.club',
+    splash: './assets/splash-production.png',
+    fondIcone: '#8C7B6B',
+    apiUrl: process.env.API_URL ?? 'https://api.stips.club',
   },
 };
 const parVariante = CONFIG_PAR_VARIANTE[variante];
@@ -116,7 +137,10 @@ const extra = {
   // d'une organisation se choisit à sa création et ne se change plus.
   sentryDsn:
     'https://984dea29e78f0695538bc265088da472@o4511885240762368.ingest.de.sentry.io/4511885554483280',
-  eas: { projectId: '84949835-acaa-4698-b4aa-67af144e7f52' },
+  // Identifiant du projet EAS, posé par `eas init`. C'est LUI qui identifie le
+  // projet côté serveur, pas le `slug` — d'où le fait qu'on ait dû créer un
+  // nouveau projet pour changer de slug plutôt que renommer l'ancien.
+  eas: { projectId: '82261123-db69-4927-8028-eeb8329a15a7' },
 };
 
 refuseLesSecrets(extra, 'extra');
@@ -138,8 +162,14 @@ if (variante === 'production' && !extra.apiUrl.startsWith('https://')) {
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: `Le Club${parVariante.suffixeNom}`,
-  slug: 'le-club',
+  name: `Stips${parVariante.suffixeNom}`,
+  // Le slug d'un projet EAS ne se renomme pas : il est fixé à la création, et
+  // ni le dashboard ni la CLI n'offrent de le changer. Passer de « le-club » à
+  // « stips » a donc voulu dire créer un NOUVEAU projet EAS — nouveau
+  // `projectId`, nouvelle `updates.url`. Sans conséquence ici (aucun binaire
+  // n'était distribué), mais après une soumission store ça couperait l'OTA de
+  // tous les binaires installés, qui interrogent l'ancien projet à vie.
+  slug: 'stips',
   // Le SEUL numéro de version qu'un humain édite. `eas.json` a
   // appVersionSource: "remote", donc buildNumber (iOS) et versionCode
   // (Android) appartiennent à EAS et s'auto-incrémentent : les poser ici
@@ -151,11 +181,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // Opt-out explicite du mode sombre : la DA n'en a pas, et un mode sombre
   // non stylé est un vrai motif de rejet pour qualité en review.
   userInterfaceStyle: 'light',
-  // Préfixe de lien profond (leclub://…). Posé maintenant alors que rien ne
+  // Préfixe de lien profond (stips://…). Posé maintenant alors que rien ne
   // l'utilise : il servira à ouvrir l'invitation autrement que par un lien
   // e-mail one-shot (voir « À trancher » §2) et à tout redirect OAuth. Le
   // changer une fois que des liens traînent dans des boîtes mail est pénible.
-  scheme: 'leclub',
+  scheme: 'stips',
   // Mises à jour OTA : un correctif JS part en minutes au lieu d'un
   // aller-retour de review de 24-48 h (autorisé par la règle 2.5.2 d'Apple
   // tant que ça ne change pas ce que fait l'app). `updates.url` ET
@@ -165,7 +195,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // sans expo-updates ne recevra JAMAIS de mise à jour OTA. D'où sa présence
   // avant le premier build. C'est aussi ce qui rend enfin réels les
   // `channel` d'eas.json, inertes tant que la lib n'était pas installée.
-  updates: { url: 'https://u.expo.dev/84949835-acaa-4698-b4aa-67af144e7f52' },
+  updates: { url: 'https://u.expo.dev/82261123-db69-4927-8028-eeb8329a15a7' },
   // policy 'appVersion' : la frontière de compatibilité OTA coïncide avec la
   // frontière de version store. C'est ce qui garantit que la version lue à
   // l'exécution (src/config/env.ts) reste celle du binaire installé.
@@ -239,10 +269,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-font',
-    // assets/splash-icon.png existait sans être référencé. Depuis le SDK 54 le
-    // splash passe par ce plugin, l'ancienne clé `splash` est legacy.
+    // Depuis le SDK 54 le splash passe par ce plugin, l'ancienne clé `splash`
+    // est legacy. Le wordmark entier, pas le S seul : c'est le premier écran
+    // et il a la place. Une image par variante, elle aussi teintée — le
+    // splash est ce qu'on voit AVANT tout le reste, donc le premier endroit
+    // où se rendre compte qu'on a ouvert la mauvaise des trois apps.
+    //
+    // Le fond crème est posé ici et non dans le PNG, dont le fond est
+    // transparent : c'est lui qui remplit l'écran entier, l'image n'en
+    // occupant que 200 pt de large.
     ['expo-splash-screen', {
-      image: './assets/splash-icon.png',
+      image: parVariante.splash,
       backgroundColor: '#f7f5ef',
       imageWidth: 200,
     }],
@@ -266,6 +303,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // relit ici faute de SENTRY_URL/ORG/PROJECT dans l'environnement.
     ['@sentry/react-native/expo', {
       url: 'https://de.sentry.io/',
+      // Slug de l'organisation Sentry réelle, créée sous « le-club » avant le
+      // passage à Stips. Le renommer ici sans le renommer D'ABORD côté
+      // sentry.io romprait l'upload des source maps (« projet inconnu ») —
+      // même logique que `slug` plus haut. À aligner une fois l'organisation
+      // renommée sur le dashboard Sentry, pas avant.
       organization: 'le-club',
       // Slug par défaut créé par le wizard Sentry. Le renommer côté Sentry
       // impose de le reporter ici, sinon l'upload part sur un projet inconnu.

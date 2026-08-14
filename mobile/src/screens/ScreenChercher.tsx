@@ -1,12 +1,12 @@
 /* ══════════════════════════════════════════════════════════════════════
    ONGLET « Chercher » — candidat · design 8a / 8b
-   L'annuaire du Club, avec la bascule Personnes / Boîtes.
+   L'annuaire de Stips, avec la bascule Personnes / Boîtes.
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { C, DATA } from '@leclub/core';
-import type { Boite } from '@leclub/core';
+import { C, DATA } from '@stips/core';
+import type { Boite } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, PersonRow, SearchField, Segmented, Screen } from '../atoms';
 import type { TabScreen } from '../types';
@@ -39,7 +39,7 @@ function ScreenChercher() {
         </Text>
         {!personnes && (
           <Text style={{ fontFamily: F.uiRegular, fontSize: 13, color: C.muted, marginTop: 4 }}>
-            Vois qui du Club y est passé avant de postuler
+            Vois qui de Stips y est passé avant de postuler
           </Text>
         )}
         <SearchField value={q} onChange={setQ}
