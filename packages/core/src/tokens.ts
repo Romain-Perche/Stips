@@ -5,6 +5,8 @@
    séparément. Voir frontend/src/tokens.ts et mobile/src/tokens.ts.
    ══════════════════════════════════════════════════════════════════════ */
 
+import type { Role } from './types';
+
 export const C = {
   bg:        '#f7f5ef',   // fond de l'app
   ink:       '#14140f',   // noir de Stips
@@ -24,6 +26,19 @@ export const C = {
   fieldLine: 'rgba(0,0,0,.14)',
   wash:      'rgba(0,0,0,.05)',
 } as const;
+
+/** Le nom d'un rôle et sa couleur, affichés en haut à gauche de chaque
+    écran — là où une maquette de téléphone met l'heure. C'est la seule
+    chose qui dit à quel titre on est connecté, et les deux seules couleurs
+    de l'app en dehors du noir de Stips : l'écart est assumé, il faut qu'un
+    coup d'œil suffise.
+
+    Une seule déclaration pour le libellé : le bandeau de bascule de rôle le
+    reprend en capitales, jamais un mot différent pour le même rôle. */
+export const ROLES = {
+  membre: { libelle: 'Stipeur', teinte: '#780000' },  // rouge
+  pro:    { libelle: 'Pro',     teinte: '#003049' },  // bleu
+} as const satisfies Record<Role, { libelle: string; teinte: string }>;
 
 /** La teinte du S du wordmark, une par variante de build.
 

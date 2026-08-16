@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════
-   ONGLET « Forum » — candidat · design 4b
+   ONGLET « Forum » — les deux rôles · design 4b
    Fils de discussion votés, façon Reddit.
    ══════════════════════════════════════════════════════════════════════ */
 

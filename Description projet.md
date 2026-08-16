@@ -32,6 +32,14 @@ C'est cette recommandation signée que les entreprises voient en premier.
 | Interface | **Outfit** |
 | Micro-labels capitales | **JetBrains Mono** 10px, `letter-spacing: .08em` |
 | Format | mobile, cadre 380 × 800 |
+| Type de compte | `#780000` Stipeur · `#003049` Pro |
+
+La dernière ligne est la **seule** entorse au « sans couleur d'accent », et elle est
+délibérée : en haut à gauche de chaque écran, là où une maquette de téléphone met l'heure,
+le rôle sous lequel on est connecté, écrit dans sa couleur. Rien d'autre dans l'app ne
+porte ces deux teintes, ce qui est exactement ce qui les rend lisibles d'un coup d'œil.
+Une seule déclaration, `ROLES` dans `packages/core/src/tokens.ts` : le libellé y sert
+aussi au bandeau de bascule de rôle, en capitales.
 
 Vocabulaire d'interface récurrent : micro-label mono au-dessus de chaque bloc, filtres
 carrés (rayon 7), boutons contour en pilule qui se remplissent de noir au survol, onglet
@@ -109,11 +117,11 @@ Cette symétrie n'est pas cosmétique : elle veut dire que la liste d'onglets pa
 ### Les onglets, en détail
 
 - **Recherche** — l'annuaire, avec sa bascule **Personnes / Boîtes** (`ScreenChercher.tsx`,
-  écrans 8a / 8b). Ne montre que la partie 1 des profils, avec un badge `PARRAIN` sur les
+  écrans 8a / 8b). Ne montre que la partie 1 des profils, avec un badge `PRO` sur les
   pros et un bouton pour écrire. Côté Boîtes : on cherche un endroit d'abord, on voit combien
   de membres y sont passés et combien de parrains y sont actifs, puis qui y était.
 
-- **Stages** (membre) — *premier jet écrit* (`ScreenStagesCandidat.tsx`, plus un placeholder).
+- **Stages** (membre) — *premier jet écrit, web et mobile* (`ScreenStagesCandidat.tsx`).
   Les offres publiées par les pros, filtre Tout / Mes candidatures, et un bouton « Postuler »
   par offre. En bas, le pendant du « Publier une offre » du pro : un rappel que c'est la
   partie 2 de « Qui suis-je ? » qui rend visible.
@@ -125,26 +133,28 @@ Cette symétrie n'est pas cosmétique : elle veut dire que la liste d'onglets pa
 
   | Face A | Face B |
   |---|---|
-  | La note globale (`4.6`) | Le stage recherché |
+  | Le qualificatif choisi par le parrain (`Autonomie`) | Le stage recherché |
   | Le parrain et son rôle | Les disponibilités |
-  | Son commentaire, en italique | Le niveau d'expérience |
+  | Son commentaire, en italique | |
   | Bouton **Contacter** | |
 
   Un bouton sur la carte ouvre le **profil complet** : toutes les notes, tous les
   commentaires, le CV. C'est un troisième état, au-delà des deux faces.
 
   Une **bascule interne** à deux entrées, Offres / Talents, du même genre que le
-  Personnes / Boîtes de Recherche, avec le titre qui change selon la section. Écrite
-  (`ScreenOffres.tsx`). Les candidatures ne sont **pas** une troisième entrée : elles
+  Personnes / Boîtes de Recherche, avec le titre qui change selon la section. Écrite, web et
+  mobile (`ScreenOffres.tsx`). Les candidatures ne sont **pas** une troisième entrée : elles
   appartiennent à une offre, donc elles vivent derrière le « Voir » de cette offre — un niveau
-  de profondeur, pas un onglet. Le deck n'y est pas recopié : il est extrait de
-  `ScreenTalents.tsx` en un `TalentDeck` exporté que les deux montent — l'onglet Talents tant
-  qu'il existe, cette section ensuite.
+  de profondeur, pas un onglet. Le deck n'y est pas recopié : `ScreenTalents.tsx` n'exporte
+  plus qu'un `TalentDeck`, que cette section monte. Et les compteurs de candidatures y sont
+  **calculés** depuis `DATA.candidatures`, jamais lus dans `Offre.recues` — sinon la carte
+  annonce 12 et le détail en montre 2.
 - **Agenda** — « A vos agendas ». Chaque événement porte sa date en gros, le nombre
   d'inscrits, les places restantes, et une action (« Je viens », « Liste d'attente »,
   « Me prévenir » pour ceux qui n'ont pas encore ouvert).
-- **Forum** — fils de discussion façon Reddit : `stips/stage-fiance`, `stips/reco-cv`,
-  `stips/foot-du-jeudi`. Pièces jointes, bouton flottant pour ouvrir un fil.
+- **Forum** — des forums thématiques façon Reddit : `stips/stage-fiance`, `stips/reco-cv`,
+  `stips/foot-du-jeudi`. Chacun porte des **fils**, qui portent eux-mêmes des réponses —
+  le slug est le forum, pas le fil. Pièces jointes, bouton flottant pour ouvrir un fil.
 - **Qui suis-je ?** — en **deux parties** :
   - *Partie 1*, pour tout le monde : photo et une courte description de soi.
   - *Partie 2*, réservée aux membres et remplie seulement si une recherche de stage est
@@ -162,10 +172,11 @@ deux. Le vote change en revanche de comportement : une personne a **un** vote pa
 un second clic sur ▲ le modifie ou l'annule au lieu de l'empiler comme aujourd'hui. Voir
 `backend/README.md` § le forum.
 
-⚠️ Le code porte encore l'ancien modèle : `Role` vaut `'candidat' | 'entreprise'`
-(`packages/core/src/types.ts`), `App.tsx` donne 2 onglets à `entreprise` et n'y met pas
-`ScreenChercher`, et `DATA` contient encore des `cats`. Le renommage et le recâblage sont une
-étape à part.
+✅ Le code applique ce modèle depuis le 16 août 2026, côté web **et** mobile : `Role` vaut
+`'membre' | 'pro'`, les deux rôles ont les cinq mêmes onglets à un écran près,
+`ScreenTalents.tsx` n'est plus un onglet mais le `TalentDeck` monté par `ScreenOffres.tsx`,
+la partie 2 de « Qui suis-je ? » ne s'affiche que pour un membre, et `DATA` a perdu ses
+`cats`. Reste la correction du type `Offre` (voir `TODO.md`).
 
 ---
 
@@ -198,6 +209,7 @@ Stips/
 │       ├── types.ts           le seul type non partageable (TabScreen, propre au web)
 │       ├── tokens.ts          ré-export de la palette de @stips/core
 │       ├── atoms.tsx           briques communes : StatusBar, Card, TabBar, Screen…
+│       ├── role.ts             le rôle courant, par contexte (badge + partie 2)
 │       ├── DevChrome.tsx        barre de dev hors du téléphone (échafaudage, pas l'app)
 │       ├── styles.css           le seul <style> global (cadre téléphone, carte flip…)
 │       └── screens/
@@ -206,7 +218,7 @@ Stips/
 │           ├── ScreenEvents.tsx          Agenda (les deux rôles)
 │           ├── ScreenForum.tsx           Forum (les deux rôles)
 │           ├── ScreenProfil.tsx          Qui suis-je ? (les deux rôles)
-│           ├── ScreenTalents.tsx         le deck de cartes flip — à absorber dans Offres
+│           ├── ScreenTalents.tsx         le deck de cartes flip, monté par Offres (plus un onglet)
 │           ├── ScreenOffres.tsx          Offres (pro)
 │           └── ScreenInvitation.tsx      écran d'entrée (pas un onglet)
 ├── mobile/                     le portage React Native (Expo) — voir plus bas
@@ -234,8 +246,8 @@ important les écrans eux-mêmes, jamais en retapant leur nom :
 
 ```ts
 const TABS: Record<Role, TabScreen[]> = {
-  candidat:   [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],
-  entreprise: [ScreenTalents, ScreenOffres],
+  membre: [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],
+  pro:    [ScreenChercher, ScreenOffres,         ScreenEvents, ScreenForum, ScreenProfil],
 };
 ```
 
@@ -243,18 +255,17 @@ et `TabBar` lit `Ecran.tab.label` directement. Renommer un onglet, ou décider q
 sa navigation, se fait à un seul endroit — jamais deux noms différents pour le même écran
 entre la barre du bas et son titre.
 
-C'est l'état actuel du code, pas la cible. Après la révision des rôles, `TABS` vaut :
+Cinq onglets de chaque côté, un seul écran de différence. `ScreenChercher.tsx` est dans la
+nav des deux rôles ; `ScreenTalents.tsx` n'y est plus — le deck de cartes est monté par
+`ScreenOffres.tsx` et n'est plus un onglet à lui seul. La même liste, mot pour mot, existe
+dans `mobile/App.tsx` : les deux doivent bouger ensemble.
 
-```ts
-const TABS: Record<Role, TabScreen[]> = {
-  membre: [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],
-  pro:    [ScreenChercher, ScreenOffres,         ScreenEvents, ScreenForum, ScreenProfil],
-};
-```
-
-Cinq onglets de chaque côté, un seul écran de différence. `ScreenChercher.tsx` reste dans la
-nav des deux rôles ; c'est `ScreenTalents.tsx` qui en sort — le deck de cartes est absorbé par
-`ScreenOffres.tsx` et n'est plus un onglet à lui seul.
+Le rôle courant n'est en revanche **pas** une prop qui descend d'écran en écran : deux
+consommateurs seulement (le badge de la barre d'état, la partie 2 de « Qui suis-je ? »),
+mais tous les deux profondément enfouis, et côté mobile React Navigation ne transmet que
+ses propres props. D'où un contexte, `RoleCtx` (`frontend/src/role.ts` et
+`mobile/src/role.ts`), dont la valeur `null` — personne n'est connecté — est ce qui fait
+qu'aucun badge n'apparaît sur l'écran d'invitation.
 
 Correspondance avec le design doc :
 
@@ -270,9 +281,11 @@ Correspondance avec le design doc :
 | — | `ScreenStagesCandidat.tsx` *(placeholder)* |
 | ~~5a~~ | *retiré* |
 
-Ce qui marche déjà : la navigation entre onglets (5 côté candidat, 2 côté entreprise), la
-recherche qui filtre vraiment, les filtres de chaque écran, la carte qui tourne, le deck de
-profils, les votes du forum, l'entrée directe invitation → app.
+Ce qui marche déjà : la navigation entre onglets (5 de chaque côté, un seul écran de
+différence), le badge de rôle en haut à gauche, la recherche qui filtre vraiment, les
+filtres de chaque écran, la carte qui tourne, le deck de profils derrière la bascule
+Offres / Talents, le détail des candidatures d'une offre, la candidature à un stage, les
+votes du forum, l'entrée directe invitation → app.
 
 Ce qui est volontairement inerte : « Écrire », « Voir », « Publier une offre »,
 « Je viens », les pièces (CV / LinkedIn / reco), l'ouverture d'un fil, « Enregistrer » sur
@@ -370,6 +383,5 @@ et pointe vers `packages/core/src/data.ts` comme contrat de données provisoire.
 - **Le recours sur une reco est le signalement**, et rien d'autre : pas de droit de réponse
   affiché, zéro colonne ajoutée. « La reco est forcément bonne » ne suffisait pas
   juridiquement — le raisonnement est dans `backend/README.md`.
-- **Le niveau d'expérience est déclaré**, pas déduit.
 - **L'objectif immédiat est une app de démo** — les quatre points qui bloquent une vraie mise
   en ligne sont parqués dans `backend/README.md` § avant la mise en ligne réelle.

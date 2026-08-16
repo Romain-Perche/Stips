@@ -2,7 +2,7 @@
    APP — le routeur
 
    Deux axes d'état, volontairement séparés :
-     · role     : 'candidat' | 'entreprise'  → décide de la liste d'onglets
+     · role     : 'membre' | 'pro'  → décide de la liste d'onglets
      · tab      : l'onglet actif dans la nav du bas
      · horsNav  : un écran affiché par-dessus, sans nav ('invitation' | null)
                   — c'est le seul écran qui précède la création de compte.
@@ -22,28 +22,38 @@ import ScreenStagesCandidat from './screens/ScreenStagesCandidat';
 import ScreenEvents from './screens/ScreenEvents';
 import ScreenForum from './screens/ScreenForum';
 import ScreenProfil from './screens/ScreenProfil';
-import ScreenTalents from './screens/ScreenTalents';
 import ScreenOffres from './screens/ScreenOffres';
 import ScreenInvitation from './screens/ScreenInvitation';
+import { RoleCtx } from './role';
 import type { Role } from '@stips/core';
 import type { TabScreen } from './types';
 
+/* Cinq onglets de chaque côté, un seul écran de différence : le membre a
+   « Stages » (les offres et sa candidature) là où le pro a « Offres »
+   (ses offres, les candidatures reçues, et le deck des membres en
+   recherche). Tout le reste est commun.
+
+   Ce qui sépare vraiment les deux rôles n'est donc pas la nav mais ce que
+   chaque écran montre : l'annuaire s'arrête à la partie 1 des profils
+   pour tout le monde, et les recos ne se lisent que dans le deck de
+   l'onglet Offres. Voir `Description projet.md` § les deux rôles.
+
+   ScreenTalents n'est plus un onglet — son deck vit dans ScreenOffres. */
 const TABS: Record<Role, TabScreen[]> = {
-  candidat: [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],
-  // Vue entreprise volontairement restreinte : la recherche de candidats
-  // potentiels (Talents) et la gestion des offres (Offres). Pas d'Agenda
-  // ni de Forum côté entreprise pour l'instant.
-  entreprise: [ScreenTalents, ScreenOffres],
+  membre: [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],
+  pro:    [ScreenChercher, ScreenOffres,         ScreenEvents, ScreenForum, ScreenProfil],
 };
 
 export default function App() {
-  const [role, setRole] = useState<Role>('candidat');
-  const [tab, setTab] = useState(TABS.candidat[0].tab.id);
+  const [role, setRole] = useState<Role>('membre');
+  const [tab, setTab] = useState(TABS.membre[0].tab.id);
   const [horsNav, setHorsNav] = useState<'invitation' | null>('invitation');
 
   const changerRole = (r: Role) => {
     setRole(r);
-    setTab(TABS[r][0].tab.id);
+    // On reste sur le même onglet quand l'autre rôle l'a aussi (quatre sur
+    // cinq) : c'est ce qui rend la différence lisible d'un coup d'œil.
+    setTab(t => TABS[r].some(s => s.tab.id === t) ? t : TABS[r][0].tab.id);
     setHorsNav(null);
   };
 
@@ -53,7 +63,11 @@ export default function App() {
   } else {
     const screens = TABS[role];
     const Ecran = screens.find(s => s.tab.id === tab) ?? screens[0];
-    ecran = <Ecran nav={<TabBar screens={screens} active={tab} onChange={setTab} />} />;
+    ecran = (
+      <RoleCtx.Provider value={role}>
+        <Ecran nav={<TabBar screens={screens} active={tab} onChange={setTab} />} />
+      </RoleCtx.Provider>
+    );
   }
 
   return (

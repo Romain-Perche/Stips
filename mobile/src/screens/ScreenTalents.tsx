@@ -1,6 +1,12 @@
 /* ══════════════════════════════════════════════════════════════════════
-   ONGLET « Talents » — entreprise · design 2a
-   La recherche de candidats potentiels : grande carte flip, une à la fois.
+   LE DECK DE TALENTS — design 2a · plus un onglet
+
+   Les membres qui se sont déclarés en recherche, une carte flip par
+   personne. C'était l'onglet « Talents » du pro ; la révision des rôles
+   en fait la section « Talents » de l'onglet Offres — seul endroit de
+   l'app où la note et le commentaire d'un parrain se lisent. Le fichier
+   n'exporte donc plus que `TalentDeck`, monté par `ScreenOffres.tsx`
+   (même découpage que côté web, sinon les deux divergent).
 
    La carte flip du web repose sur `transform-style: preserve-3d` : un seul
    conteneur tourne, et la face B contre-tournée de 180° devient le *dos* de
@@ -15,37 +21,38 @@
    (donc invisibles), ce qui rend la bascule de visibilité imperceptible.
    ══════════════════════════════════════════════════════════════════════ */
 
-import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useState } from 'react';
 import { C, DATA } from '@stips/core';
 import type { Talent } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Avatar, Pills, ScreenHead, Screen, RondPiece } from '../atoms';
-import type { TabScreen } from '../types';
+import { Mono, Avatar, RondPiece } from '../atoms';
 
-function ScreenTalents() {
-  const [filtre, setFiltre] = useState('Tous');
-  const [i, setI] = useState(0);
+/** Une carte par talent, à la suite, qu'on parcourt en scrollant — pas de
+    filtres ni de pagination par bouton. */
+export function TalentDeck() {
+  return (
+    <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+      <View style={{ padding: 22, paddingBottom: 96, gap: 12 }}>
+        {DATA.talents.map(t => <TalentCard key={t.id} t={t} />)}
+      </View>
+    </ScrollView>
+  );
+}
+
+/** Une carte du deck, avec sa propre animation de flip indépendante des
+    autres cartes. */
+function TalentCard({ t }: { t: Talent }) {
   // `flipped` double la progression animée : il pilote `pointerEvents`, qui
   // n'est pas animable. Sans ça la face cachée, dernière dans l'arbre,
   // continuerait d'intercepter les taps destinés à la face visible.
   const [flipped, setFlipped] = useState(false);
   const progress = useSharedValue(0);
 
-  const liste = useMemo(() => {
-    if (filtre === '4.5+')      return DATA.talents.filter(t => t.note >= 4.5);
-    if (filtre === 'Dispo été') return DATA.talents.filter(t => t.dispoEte);
-    return DATA.talents;
-  }, [filtre]);
-
-  const idx = Math.min(i, Math.max(0, liste.length - 1));
-  const t = liste[idx];
-
-  const animer = (v: 0 | 1, duration = 620) => {
-    progress.value = withTiming(v, { duration, easing: Easing.bezier(0.22, 1.1, 0.36, 1) });
+  const animer = (v: 0 | 1) => {
+    progress.value = withTiming(v, { duration: 620, easing: Easing.bezier(0.22, 1.1, 0.36, 1) });
   };
-  const changer = (n: number) => { setFlipped(false); animer(0, 300); setI(n); };
   const toggleFlip = () => { const next = !flipped; setFlipped(next); animer(next ? 1 : 0); };
   const retourner = () => { setFlipped(false); animer(0); };
 
@@ -64,40 +71,14 @@ function ScreenTalents() {
   }));
 
   return (
-    <Screen>
-      <ScreenHead titre="Les Talents" />
-      <Pills items={['Tous', '4.5+', 'Dispo été', '⚙']} active={filtre}
-        onChange={p => { if (p !== '⚙') { setFiltre(p); changer(0); } }} />
-
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
-        <View style={{ padding: 22, paddingBottom: 96 }}>
-          {t ? (
-            <>
-              <Pressable onPress={toggleFlip} style={{ height: 452 }}>
-                <Animated.View style={[FACE, faceAStyle]} pointerEvents={flipped ? 'none' : 'auto'}>
-                  <TalentFaceA t={t} />
-                </Animated.View>
-                <Animated.View style={[FACE, faceBStyle]} pointerEvents={flipped ? 'auto' : 'none'}>
-                  <TalentFaceB t={t} onRetourner={retourner} />
-                </Animated.View>
-              </Pressable>
-
-              {/* Pagination du deck */}
-              <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: 16 }}>
-                {liste.map((_, n) => (
-                  <Pressable key={n} onPress={() => changer(n)} style={{
-                    width: n === idx ? 22 : 4, height: 4, borderRadius: 9,
-                    backgroundColor: n === idx ? C.ink : 'rgba(0,0,0,.18)',
-                  }} />
-                ))}
-              </View>
-            </>
-          ) : (
-            <Mono>AUCUN PROFIL POUR CE FILTRE</Mono>
-          )}
-        </View>
-      </ScrollView>
-    </Screen>
+    <Pressable onPress={toggleFlip} style={{ height: 350 }}>
+      <Animated.View style={[FACE, faceAStyle]} pointerEvents={flipped ? 'none' : 'auto'}>
+        <TalentFaceA t={t} />
+      </Animated.View>
+      <Animated.View style={[FACE, faceBStyle]} pointerEvents={flipped ? 'auto' : 'none'}>
+        <TalentFaceB t={t} onRetourner={retourner} />
+      </Animated.View>
+    </Pressable>
   );
 }
 
@@ -110,15 +91,15 @@ const FACE = {
   padding: 24,
 };
 
-/** Face A : la note, le parrain, le commentaire */
+/** Face A : le qualificatif, le parrain, le commentaire */
 function TalentFaceA({ t }: { t: Talent }) {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Avatar size={64} />
         <View style={{ alignItems: 'flex-end' }}>
-          <Text style={{ fontFamily: F.serif, fontSize: 46, lineHeight: 46, color: C.ink }}>{t.note}</Text>
-          <Mono>NOTE GLOBALE</Mono>
+          <Text style={{ fontFamily: F.serif, fontSize: 30, lineHeight: 34, color: C.ink }}>{t.qualificatif}</Text>
+          <Mono>LE MOT DE SON PARRAIN</Mono>
         </View>
       </View>
       <Text style={{ fontFamily: F.uiSemiBold, fontSize: 26, lineHeight: 30, color: C.ink, marginTop: 18 }}>{t.nom}</Text>
@@ -181,7 +162,3 @@ function TalentFaceB({ t, onRetourner }: { t: Talent; onRetourner: () => void })
     </View>
   );
 }
-
-(ScreenTalents as unknown as TabScreen).tab = { id: 'talents', label: 'Talents' };
-
-export default ScreenTalents as unknown as TabScreen;

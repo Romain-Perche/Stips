@@ -6,7 +6,7 @@
    d'invitation qui précède la création de compte). À supprimer quand cet
    accès existera dans l'app (lien e-mail one-shot).
 
-   La bascule de rôle candidat/entreprise, elle, vit désormais dans l'app
+   La bascule de rôle membre/pro, elle, vit désormais dans l'app
    elle-même — voir <RoleSwitcher> dans atoms.tsx.
    ══════════════════════════════════════════════════════════════════════ */
 

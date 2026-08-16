@@ -7,19 +7,30 @@ export interface Experience {
   duree: string;
 }
 
+/** Les trois derniers champs ne concernent que la partie 2 de « Qui suis-je
+    ? », réservée au membre : un pro n'a pas de stage à chercher, donc pas
+    de raison de les remplir. */
 export interface MoiProfile {
   nom: string;
   bio: string;
-  stage: string;
-  dispo: string;
-  experiences: Experience[];
+  stage?: string;
+  dispo?: string;
+  experiences?: Experience[];
 }
+
+/** Le mot que le parrain choisit pour résumer son stagiaire, dans une liste
+    fermée. Des noms et pas des adjectifs : « Rigueur » s'écrit pareil pour
+    tout le monde, « Rigoureux / Rigoureuse » obligerait à dériver la forme
+    de `personne.accord` à chaque affichage. */
+export type Qualificatif =
+  | 'Autonomie' | 'Rigueur'    | 'Curiosité'  | 'Fiabilité'
+  | 'Méthode'   | 'Ténacité'   | 'Créativité' | 'Initiative';
 
 export interface Invitation {
   prenom: string;
   parrain: string;
   role: string;
-  note: string;
+  qualificatif: Qualificatif;
   reco: string;
   signee: string;
   avantages: string[];
@@ -29,7 +40,7 @@ export interface Talent {
   id: string;
   nom: string;
   ecole: string;
-  note: number;
+  qualificatif: Qualificatif;
   parrain: string;
   parrainRole: string;
   reco: string;
@@ -73,7 +84,6 @@ export interface Candidature {
 export interface EventItem {
   jour: string;
   mois: string;
-  cats: string[];
   meta: string;
   titre: string;
   sous: string;
@@ -101,4 +111,7 @@ export interface TabMeta {
   label: string;
 }
 
-export type Role = 'candidat' | 'entreprise';
+/** Deux rôles, et deux seulement. « Parrain » n'en est pas un troisième :
+    c'est ce qu'est un pro ayant signé au moins une recommandation, donc une
+    propriété déduite. Un membre qui devient pro garde le même compte. */
+export type Role = 'membre' | 'pro';

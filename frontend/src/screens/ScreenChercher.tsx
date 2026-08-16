@@ -1,6 +1,12 @@
 /* ══════════════════════════════════════════════════════════════════════
-   ONGLET « Chercher » — candidat · design 8a / 8b
+   ONGLET « Chercher » — les deux rôles · design 8a / 8b
    L'annuaire de Stips, avec la bascule Personnes / Boîtes.
+
+   Partie 1 des profils SEULEMENT — photo, nom, une ligne. Ni note, ni
+   commentaire de parrain, ni CV : un membre ne lit jamais la reco d'un
+   autre membre, et un pro non plus ici. Tout ça vit dans le deck de
+   l'onglet Offres (`ScreenTalents.tsx`), pour les seuls membres qui se
+   sont déclarés en recherche.
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState, type ReactNode } from 'react';

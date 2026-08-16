@@ -1,7 +1,9 @@
 # TODO — Stips
 
-Classé par urgence, puis réparti entre ce que **Romain** fait et ce que **Claude** fait dans
-une discussion dédiée (une par ligne : voir `AGENTS.md`, une étape par conversation).
+**Une seule numérotation, de 1 à 18, valable pour tout le fichier.** Les sections ne font que
+regrouper — par urgence, puis par qui fait quoi (Romain, ou Claude dans une discussion dédiée :
+voir `AGENTS.md`, une étape par conversation). Le numéro, lui, donne l'ordre à suivre de bout en
+bout ; ce qui peut se recouvrir est dit en fin de fichier.
 
 **Objectif actuel : une app de démo**, pas une mise en production. Ce qui bloque une vraie
 mise en ligne est parqué dans [`backend/README.md`](backend/README.md) § avant la mise en
@@ -11,42 +13,46 @@ ligne réelle, et n'apparaît pas ici.
 
 ## 🔴 Maintenant
 
-| Tâche | Qui | Débloque |
-|---|---|---|
-| Regarder les deux écrans (`cd frontend && npm run dev`) et dire ce qui ne va pas | Romain | le port React Native |
-| **Écrire le schéma Drizzle** | Claude | tout le backend |
-| Créer le projet Supabase (région **UE**) | Romain | l'auth et le stockage des CV |
-| Prendre le nom de domaine | Romain | rien tout de suite, mais c'est le seul point qui a une horloge |
+| # | Tâche | Qui | Débloque |
+|---|---|---|---|
+| 1 | **Écrire le schéma Drizzle** | Claude | tout le backend |
+| 2 | Créer le projet Supabase (région **UE**) | Romain | l'auth et le stockage des CV |
+| 3 | Prendre le nom de domaine | Romain | rien tout de suite, mais c'est le seul point qui a une horloge |
 
 Le domaine gèle le bundle id à la première TestFlight externe — 10 à 15 €/an, à prendre avant
 d'en avoir besoin plutôt qu'après.
 
 ## 🟠 Ensuite
 
-| Tâche | Qui |
-|---|---|
-| Serveur Fastify + `GET /config` | Claude |
-| `packages/api` — schémas zod et client HTTP | Claude |
-| Renommer le modèle de rôles dans le code | Claude |
-| Porter les deux écrans en React Native | Claude |
-| Corriger le type `Offre` | Claude |
-| Créer le projet Railway, région **EU West**, puis choisir le fournisseur d'e-mail | Romain |
+| # | Tâche | Qui |
+|---|---|---|
+| 4 | Serveur Fastify + `GET /config` | Claude |
+| 5 | `packages/api` — schémas zod et client HTTP | Claude |
+| 6 | ~~Renommer le modèle de rôles dans le code~~ ✅ 16 août 2026 | Claude |
+| 7 | ~~Porter les deux écrans en React Native~~ ✅ 16 août 2026 | Claude |
+| 8 | Corriger le type `Offre` | Claude |
+| 9 | Créer le projet Railway, région **EU West** | Romain |
+| 10 | Choisir le fournisseur d'e-mail | Romain |
 
 ## ⚪ Plus tard
 
-| Tâche | Qui |
-|---|---|
-| Auth par lien magique + flux de parrainage complet | Claude |
-| Brancher les écrans sur l'API (retirer `DATA`) | Claude |
-| Trancher : in-app purchase ou paiement web | Romain |
-| Cocher la CI comme check requis sur `main` (GitHub → Settings → Rules) | Romain |
-| Valider les données de remplissage des boîtes | Romain |
+| # | Tâche | Qui |
+|---|---|---|
+| 11 | Auth par lien magique + flux de parrainage complet | Claude |
+| 12 | Brancher les écrans sur l'API (retirer `DATA`) | Claude |
+| 13 | Trancher : in-app purchase ou paiement web | Romain |
+| 14 | Créer le compte Stripe (mode test d'abord) | Romain |
+| 15 | Brancher Stripe : Checkout + webhook `invoice.paid` | Claude |
+| 16 | Cocher la CI comme check requis sur `main` (GitHub → Settings → Rules) | Romain |
+| 17 | Valider les données de remplissage des boîtes | Romain |
+| 18 | Trancher le nom d'un membre : « Stipeur » ou « Stiper » | Romain |
 
 ---
 
 # Pour Claude — une discussion par tâche
 
-Dans l'ordre. Chaque bloc dit l'enjeu, ce qu'il faut lire avant, et le piège.
+Les numéros sont ceux des tableaux ci-dessus, d'où les trous : ce qui manque est une tâche de
+Romain. Chaque bloc dit l'enjeu, ce qu'il faut lire avant, et le piège.
 
 ### 1. Écrire le schéma Drizzle
 
@@ -61,14 +67,24 @@ choix.
 - Les contraintes doivent être **dans la base**, pas dans le code : clé primaire composite sur
   `vote` et sur `inscription`, index unique sur la paire de `conversation`, `ON DELETE` différent
   selon la table (voir la règle 5.1.1(v) dans le README).
-- Aucun compteur, sauf `fil.score` et `conversation.dernier_message_at` — et seulement parce que
-  ce sont des clés de tri.
+- Aucun compteur, sauf `fil.score`, `fil.rang` et `conversation.dernier_message_at` — et
+  seulement parce que ce sont des clés de tri.
+- **`fil.rang` est une colonne générée** (`GENERATED ALWAYS AS … STORED`), pas une valeur que le
+  code met à jour : c'est ce qui rend impossible de l'oublier après un vote. Index sur
+  `(forum_id, rang DESC)`. Le fuseau doit être **écrit dans l'expression**
+  (`created_at AT TIME ZONE 'UTC'`) et non réglé sur la base : une colonne générée exige une
+  expression `IMMUTABLE`, et `extract(epoch FROM timestamptz)` ne l'est pas tant que le fuseau
+  vient de la session. Voir le § du forum dans `backend/README.md`.
+- **Déplacer `stripe_customer_id` de `abonnement` vers `personne`** (`unique`, nullable). Un
+  `cus_…` identifie la personne à vie, pas une période payée : laissé sur `abonnement`, il se
+  recopie à chaque renouvellement. C'est maintenant qu'on le corrige, une migration appliquée
+  ne se défait pas. Voir la tâche 15.
 - Ne **pas** lancer la migration sur une base autre qu'une base locale jetable (`AGENTS.md`).
   Écrire le fichier, oui ; l'appliquer, non.
-- Le rang de liste d'attente est une fonction fenêtre. Si Drizzle ne l'exprime pas, du SQL brut,
-  pas un contournement en JavaScript.
+- Le rang de liste d'attente (`inscription`, sans rapport avec `fil.rang`) est une fonction
+  fenêtre. Si Drizzle ne l'exprime pas, du SQL brut, pas un contournement en JavaScript.
 
-### 2. Serveur Fastify + `GET /config`
+### 4. Serveur Fastify + `GET /config`
 
 **Enjeu.** La première route, et la seule dont le contrat est immortel : c'est elle qui dit aux
 vieux binaires d'aller se mettre à jour. Elle n'a besoin ni de base ni d'auth, donc elle peut
@@ -87,7 +103,7 @@ l'API. Le client existe déjà : `mobile/src/config/miseAJour.ts`, désactivé p
 - `backend/` devient un workspace npm : l'installation reste à la racine (hoisting), donc les
   commandes Railway ciblent `-w backend`. Voir `backend/README.md` § Railway.
 
-### 3. `packages/api` — schémas zod et client HTTP
+### 5. `packages/api` — schémas zod et client HTTP
 
 **Enjeu.** C'est la frontière entre le backend et les deux apps. Une seule déclaration par
 forme de réponse, et la validation à l'exécution vient avec.
@@ -104,36 +120,26 @@ forme de réponse, et la validation à l'exécution vient avec.
 - Va dans `packages/api`, **pas** dans `packages/core` : core est pur, sans dépendance runtime,
   `fetch` n'y est même pas typé.
 
-### 4. Renommer le modèle de rôles dans le code
+### 6. ~~Renommer le modèle de rôles dans le code~~ · fait le 16 août 2026
 
-**Enjeu.** Le code porte encore l'ancien modèle et contredit les docs. Purement mécanique, mais
-ça touche les trois workspaces, donc autant le faire d'un coup.
+`Role` vaut `'membre' | 'pro'` ; les deux rôles ont cinq onglets et un seul écran de
+différence (`ScreenStagesCandidat` contre `ScreenOffres`) ; `ScreenTalents` n'est plus un
+onglet mais le seul `TalentDeck` que monte `ScreenOffres` ; la partie 2 de « Qui suis-je ? »
+est réservée au membre ; `DATA` a perdu ses `cats`, l'Agenda ses filtres, et `offres.resume`
+son incohérence. Web et mobile dans le même commit.
 
-**À lire d'abord.** [`Description projet.md`](Description%20projet.md) § les deux rôles, où la
-cible de `TABS` est écrite telle quelle.
+Le rôle courant passe par un **contexte** (`frontend/src/role.ts`, `mobile/src/role.ts`) et
+non par une prop : deux consommateurs seulement, mais profondément enfouis, et côté mobile
+React Navigation ne transmet que ses propres props. Sa valeur `null` (personne n'est
+connecté) est ce qui laisse l'écran d'invitation sans badge.
 
-**Ce qu'il y a à faire.** `Role` passe de `'candidat' | 'entreprise'` à `'membre' | 'pro'`
-(`packages/core/src/types.ts`) ; `TABS` donne cinq onglets aux deux rôles avec `ScreenChercher`
-dedans et `ScreenTalents` dehors ; `RoleSwitcher` change ses libellés ; `DATA` perd ses `cats`
-et l'Agenda sa rangée de filtres. Côté web **et** mobile.
+### 7. ~~Porter les deux écrans en React Native~~ · fait le 16 août 2026
 
-**Le piège.** `ScreenTalents` cesse d'être un onglet mais `TalentDeck` reste : c'est
-`ScreenOffres` qui le monte. Ne pas supprimer le fichier.
+`ScreenOffres` (bascule Offres / Talents, détail des candidatures d'une offre, compteurs
+calculés) et `ScreenStagesCandidat` (filtre, candidature) existent des deux côtés, avec le
+même découpage `TalentDeck` qu'en web.
 
-### 5. Porter les deux écrans en React Native
-
-**Enjeu.** `mobile/` doit rester à parité avec `frontend/`. À faire seulement **après** que
-Romain a validé le premier jet web, sinon on porte un dessin qui va changer.
-
-**À lire d'abord.** `frontend/src/screens/ScreenStagesCandidat.tsx` et `ScreenOffres.tsx`, puis
-[`mobile/AGENTS.md`](mobile/AGENTS.md).
-
-**Les pièges.** Les deux vrais pièges du portage sont déjà documentés dans
-[`Description projet.md`](Description%20projet.md) : pas de `transform-style: preserve-3d` en
-RN, et en RN tout est flex. Le `TalentDeck` extrait côté web doit l'être aussi côté mobile —
-même découpage, sinon les deux divergent.
-
-### 6. Corriger le type `Offre`
+### 8. Corriger le type `Offre`
 
 **Enjeu.** `Offre` n'a **pas d'employeur** ni de date limite. Invisible tant que seul le pro
 regardait ses propres offres ; l'écran Stages du membre laisse un trou visible à la place.
@@ -145,7 +151,7 @@ Puis reprendre les deux écrans qui l'affichent, web et mobile.
 **Le piège.** Ça touche `packages/core`, donc le hook pre-commit relance les vérifications sur
 `frontend` **et** `mobile` : les deux doivent compiler dans le même commit.
 
-### 7. Auth par lien magique + flux de parrainage
+### 11. Auth par lien magique + flux de parrainage
 
 **Enjeu.** La plus grosse pièce, et le cœur du produit : on n'entre que parrainé. Deux origines,
 une seule table, une machine à états, et un formulaire web pour un pro qui n'a pas de compte.
@@ -163,7 +169,7 @@ puis [`Description projet.md`](Description%20projet.md) § entrée dans Stips.
 - `parrainage` porte des identités en **texte** aux premières étapes, et `parrain_nom` ne
   s'efface jamais.
 
-### 8. Brancher les écrans sur l'API
+### 12. Brancher les écrans sur l'API
 
 **Enjeu.** Remplacer `DATA` par de vrais appels. C'est le moment où `packages/core/src/data.ts`
 disparaît.
@@ -173,34 +179,71 @@ décrit ce que le backend a promis, pas ce qu'il a envoyé. Le geste existe déj
 dans `mobile/src/config/miseAJour.ts` : une réponse malformée dégrade vers `null` au lieu de
 lever.
 
+### 15. Brancher Stripe
+
+**Enjeu.** Les 100 €/an. Techniquement la pièce la plus simple du backend — Stripe héberge le
+formulaire, donc aucune donnée de carte ne traverse notre serveur et le périmètre PCI-DSS
+disparaît. Le risque est ailleurs, entièrement dans l'ordre des opérations.
+
+**Bloqué par une décision, pas par du code.** Ne rien écrire avant que Romain ait tranché
+IAP ou paiement web (tâche 13) : la règle 3.1.1 d'Apple impose l'achat intégré, et sa
+commission, pour un service numérique consommé dans l'app. L'adhésion conditionne le forum,
+la messagerie et le deck — donc l'exception 3.1.3(e) sur les services consommés hors de l'app
+ne va pas de soi. Construire le flux Stripe avant cette décision, c'est risquer de le jeter.
+
+**À lire d'abord.** [`backend/SCHEMA.md`](backend/SCHEMA.md) § table `abonnement`, et la
+répartition des secrets dans [`AGENTS.md`](AGENTS.md).
+
+**Les pièges.**
+- **Le webhook est la source de vérité, jamais l'`success_url`.** Accorder l'accès au retour de
+  redirection est le bug classique : la personne peut fermer l'onglet avant qu'elle parte, ou
+  appeler l'URL à la main. On insère la ligne `abonnement` sur `invoice.paid`, pas au retour.
+- **Vérifier la signature `Stripe-Signature`** avec le secret de webhook, sinon n'importe qui
+  poste un faux `invoice.paid` et s'offre l'adhésion.
+- **`stripe_customer_id` est sur la mauvaise table** dans le schéma actuel : un `cus_…`
+  identifie la personne à vie, pas une période payée. Sur `abonnement`, il se recopie à chaque
+  renouvellement — autant d'occasions de diverger. À déplacer vers `personne` (`unique`,
+  nullable) **au moment d'écrire le schéma Drizzle** (tâche 1), pas après la première migration.
+- L'accès se teste en SQL local (`now() BETWEEN debut AND fin`), sans jamais rappeler l'API
+  Stripe sur le chemin d'une requête.
+- `sk_…` et le secret de webhook restent côté serveur ; seule `pk_…` peut entrer dans l'app.
+
 ---
 
 # Pour Romain
 
-| Tâche | Pourquoi c'est toi | Quand |
-|---|---|---|
-| Regarder les deux écrans et dire ce qui ne va pas | c'est ton dessin | 🔴 maintenant |
-| Créer le projet Supabase, région UE | il faut un compte et une carte | 🔴 maintenant |
-| Prendre le nom de domaine | pareil, et le bundle id en dépend | 🔴 maintenant |
-| Créer le projet **Railway**, région **EU West** (elle ne l'est pas par défaut) | il faut un compte | 🟠 avant le premier build sur un téléphone qui n'est pas le tien |
-| Choisir le fournisseur d'e-mail (Resend, Postmark, Scaleway TEM) | décision + compte + DNS | 🟠 avant que de vraies personnes reçoivent des invitations |
-| Trancher IAP ou paiement web | décision business, 15 à 30 % de commission en jeu | ⚪ avant la release qui introduit le paiement |
-| Cocher la CI comme check requis sur `main` | ça vit dans les réglages GitHub, pas dans le repo | ⚪ quand tu veux |
-| Valider les boîtes de remplissage | Deloitte, BNP et Sia Partners sont inventées | ⚪ quand tu veux |
+Mêmes numéros, mêmes trous : ce qui manque est une tâche de Claude.
+
+| # | Tâche | Pourquoi c'est toi | Quand |
+|---|---|---|---|
+| 2 | Créer le projet Supabase, région UE | il faut un compte et une carte | 🔴 maintenant |
+| 3 | Prendre le nom de domaine | pareil, et le bundle id en dépend | 🔴 maintenant |
+| 9 | Créer le projet **Railway**, région **EU West** (elle ne l'est pas par défaut) | il faut un compte | 🟠 avant le premier build sur un téléphone qui n'est pas le tien |
+| 10 | Choisir le fournisseur d'e-mail (Resend, Postmark, Scaleway TEM) | décision + compte + DNS | 🟠 avant que de vraies personnes reçoivent des invitations |
+| 13 | Trancher IAP ou paiement web | décision business, 15 à 30 % de commission en jeu — et elle bloque la tâche 15, pas l'inverse | ⚪ avant la release qui introduit le paiement |
+| 14 | Créer le compte Stripe, en mode test | il faut un compte, un IBAN et une vérification d'identité ; le mode test suffit pour que je construise le flux | ⚪ après avoir tranché 13 |
+| 16 | Cocher la CI comme check requis sur `main` | ça vit dans les réglages GitHub, pas dans le repo | ⚪ quand tu veux |
+| 17 | Valider les boîtes de remplissage | Deloitte, BNP et Sia Partners sont inventées | ⚪ quand tu veux |
+| 18 | Trancher « Stipeur » ou « Stiper » | c'est un nom de marque, pas une décision technique — j'ai mis « Stipeur » en attendant, c'est une ligne de `ROLES` dans `packages/core/src/tokens.ts` et rien d'autre | ⚪ quand tu veux |
 
 ---
 
 ## Ce qui peut avancer en parallèle
 
-Trois chantiers indépendants, donc oui, ça se recouvre :
+L'ordre 1 → 18 est une file d'attente sûre, pas une contrainte : trois chantiers sont
+indépendants, donc oui, ça se recouvre.
 
-- **Pendant que j'écris le schéma Drizzle (1)**, tu peux regarder les écrans, créer le projet
-  Supabase et prendre le domaine. Aucun des trois ne me bloque, et les deux derniers me
-  débloqueront pour la tâche 7.
-- **`GET /config` (2) ne dépend de rien** — ni base, ni auth, ni schéma. Il peut se faire avant,
+- **Pendant que j'écris le schéma Drizzle (1)**, tu peux créer le projet Supabase (2) et prendre
+  le domaine (3). Aucun des deux ne me bloque, et les deux me débloqueront pour la tâche 11.
+- **`GET /config` (4) ne dépend de rien** — ni base, ni auth, ni schéma. Il peut se faire avant,
   pendant ou après le schéma, dans n'importe quel ordre.
-- **Le renommage des rôles (4), le port mobile (5) et la correction d'`Offre` (6)** sont du
-  travail front, sans aucun lien avec le backend. Ils peuvent s'intercaler n'importe où.
+- **La correction d'`Offre` (8)** est du travail front, sans aucun lien avec le backend (comme
+  l'étaient 6 et 7, faites). Elle peut s'intercaler n'importe où.
 
-En revanche, **3 attend 1** (les schémas zod décrivent le schéma), **7 attend 1 et le projet
-Supabase**, et **8 attend 2, 3 et 7**.
+En revanche, **5 attend 1** (les schémas zod décrivent le schéma), **11 attend 1 et 2**, et
+**12 attend 4, 5 et 11**.
+
+**15 (Stripe) n'attend pas du code mais une décision** : tant que 13 (IAP ou paiement web) n'est
+pas tranché, l'écrire revient peut-être à l'écrire pour rien. Seul le déplacement de
+`stripe_customer_id` est à faire tout de suite, dans la tâche 1 — il ne dépend d'aucune des
+deux options.

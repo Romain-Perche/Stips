@@ -1,82 +1,46 @@
 /* ══════════════════════════════════════════════════════════════════════
-   ONGLET « Talents » — entreprise · design 2a
-   La recherche de candidats potentiels : grande carte flip, une à la fois.
+   LE DECK DE TALENTS — design 2a · plus un onglet
+
+   Les membres qui se sont déclarés en recherche, une carte flip par
+   personne. C'était l'onglet « Talents » du pro ; la révision des rôles
+   en fait la section « Talents » de l'onglet Offres — seul endroit de
+   l'app où la note et le commentaire d'un parrain se lisent.
+
+   Le fichier reste, sans coquille d'écran ni métadonnées d'onglet : il
+   n'exporte plus que `TalentDeck`, monté par `ScreenOffres.tsx`.
    ══════════════════════════════════════════════════════════════════════ */
 
-import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { C, DATA } from '@stips/core';
 import type { Talent } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Avatar, Pills, ScreenHead, Screen } from '../atoms';
-import type { TabScreen } from '../types';
+import { Mono, Avatar } from '../atoms';
 
-function ScreenTalents({ nav }: { nav: ReactNode }) {
+/** Une carte par talent, à la suite, qu'on parcourt en scrollant — pas de
+    filtres ni de pagination par bouton. */
+export function TalentDeck() {
   return (
-    <Screen nav={nav}>
-      <ScreenHead titre="Les Talents" />
-      <TalentDeck />
-    </Screen>
+    <div className="body">
+      <div style={{
+        padding: '18px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12,
+      }}>
+        {DATA.talents.map(t => <TalentCard key={t.id} t={t} />)}
+      </div>
+    </div>
   );
 }
 
-/** Le deck seul, sans coquille d'écran : ses filtres, sa carte et sa
-    pagination, rien d'autre.
-
-    Extrait parce qu'il a maintenant deux points de montage — cet onglet
-    aujourd'hui, et la section « Talents » de l'onglet Offres du pro
-    (`ScreenOffres.tsx`). La révision des rôles fait disparaître l'onglet
-    et ne garde que le second ; en attendant, les deux affichent le même
-    deck et non deux copies. */
-export function TalentDeck() {
-  const [filtre, setFiltre] = useState('Tous');
-  const [i, setI] = useState(0);
+/** Une carte du deck, avec son propre flip indépendant des autres. */
+function TalentCard({ t }: { t: Talent }) {
   const [flip, setFlip] = useState(false);
-
-  const liste = useMemo(() => {
-    if (filtre === '4.5+')      return DATA.talents.filter(t => t.note >= 4.5);
-    if (filtre === 'Dispo été') return DATA.talents.filter(t => t.dispoEte);
-    return DATA.talents;
-  }, [filtre]);
-
-  const idx = Math.min(i, Math.max(0, liste.length - 1));
-  const t = liste[idx];
-
-  const changer = (n: number) => { setFlip(false); setI(n); };
-
   return (
-    <>
-      <Pills items={['Tous', '4.5+', 'Dispo été', '⚙']} active={filtre}
-        onChange={p => { if (p !== '⚙') { setFiltre(p); changer(0); } }} />
-
-      <div className="body">
-        <div style={{ padding: '18px 22px 96px' }}>
-          {t ? (
-            <>
-              <div className={'flip' + (flip ? ' on' : '')}
-                   onClick={() => setFlip(f => !f)} style={{ height: 452 }}>
-                <div className="flipin">
-                  <TalentFaceA t={t} />
-                  <TalentFaceB t={t} onRetourner={() => setFlip(false)} />
-                </div>
-              </div>
-
-              {/* Pagination du deck */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 16 }}>
-                {liste.map((_, n) => (
-                  <div key={n} onClick={() => changer(n)} style={{
-                    width: n === idx ? 22 : 4, height: 4, borderRadius: 9, cursor: 'pointer',
-                    background: n === idx ? C.ink : 'rgba(0,0,0,.18)',
-                    transition: 'width .2s',
-                  }} />
-                ))}
-              </div>
-            </>
-          ) : (
-            <Mono>AUCUN PROFIL POUR CE FILTRE</Mono>
-          )}
-        </div>
+    <div className={'flip' + (flip ? ' on' : '')}
+      onClick={() => setFlip(f => !f)} style={{ height: 350 }}>
+      <div className="flipin">
+        <TalentFaceA t={t} />
+        <TalentFaceB t={t} onRetourner={() => setFlip(false)} />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -85,15 +49,15 @@ const FACE: CSSProperties = {
   padding: 24, display: 'flex', flexDirection: 'column', height: 350,
 };
 
-/** Face A : la note, le parrain, le commentaire */
+/** Face A : le qualificatif, le parrain, le commentaire */
 function TalentFaceA({ t }: { t: Talent }) {
   return (
     <div className="face" style={FACE}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Avatar size={64} />
         <div style={{ textAlign: 'right' }}>
-          <div style={{ font: `400 46px/1 ${F.serif}`, color: C.ink }}>{t.note}</div>
-          <Mono>NOTE GLOBALE</Mono>
+          <div style={{ font: `400 30px/1.15 ${F.serif}`, color: C.ink }}>{t.qualificatif}</div>
+          <Mono>LE MOT DE SON PARRAIN</Mono>
         </div>
       </div>
       <div style={{ marginTop: 18, font: `600 26px/1.15 ${F.ui}`, color: C.ink }}>{t.nom}</div>
@@ -171,14 +135,10 @@ function TalentFaceB({ t, onRetourner }: { t: Talent; onRetourner: () => void })
         {rond('IN', 'LinkedIn')}
         {rond('℞', 'Lettre de reco du parrain', `400 17px ${F.serif}`)}
         <div onClick={e => { e.stopPropagation(); onRetourner(); }}
-             style={{ marginLeft: 'auto' }}>
+          style={{ marginLeft: 'auto' }}>
           {rond('↻', null, `400 15px ${F.ui}`)}
         </div>
       </div>
     </div>
   );
 }
-
-(ScreenTalents as TabScreen).tab = { id: 'talents', label: 'Talents' };
-
-export default ScreenTalents as TabScreen;

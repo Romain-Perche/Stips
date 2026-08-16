@@ -1,5 +1,7 @@
 /* ══════════════════════════════════════════════════════════════════════
-   ONGLET « Chercher » — candidat · design 8a / 8b
+   ONGLET « Chercher » — les deux rôles · design 8a / 8b
+   Partie 1 des profils SEULEMENT — ni note, ni commentaire de parrain, ni
+   CV : tout ça vit dans le deck de l'onglet Offres du pro.
    L'annuaire de Stips, avec la bascule Personnes / Boîtes.
    ══════════════════════════════════════════════════════════════════════ */
 
