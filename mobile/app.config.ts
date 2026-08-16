@@ -303,12 +303,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // relit ici faute de SENTRY_URL/ORG/PROJECT dans l'environnement.
     ['@sentry/react-native/expo', {
       url: 'https://de.sentry.io/',
-      // Slug de l'organisation Sentry réelle, créée sous « le-club » avant le
-      // passage à Stips. Le renommer ici sans le renommer D'ABORD côté
-      // sentry.io romprait l'upload des source maps (« projet inconnu ») —
-      // même logique que `slug` plus haut. À aligner une fois l'organisation
-      // renommée sur le dashboard Sentry, pas avant.
-      organization: 'le-club',
+      // Slug de l'organisation Sentry, renommée « le-club » → « stips » sur le
+      // dashboard. Contrairement au slug d'un projet EAS, celui d'une
+      // organisation Sentry se renomme en place : même organisation, même
+      // région, même DSN — seul ce champ suit. Il doit rester aligné sur le
+      // dashboard, sinon l'upload des source maps part vers un slug inexistant.
+      organization: 'stips',
       // Slug par défaut créé par le wizard Sentry. Le renommer côté Sentry
       // impose de le reporter ici, sinon l'upload part sur un projet inconnu.
       project: 'react-native',
