@@ -230,14 +230,19 @@ Code : `src/observabilite/sentry.ts` (init et garde-fous), `metro.config.js` (so
 plugin `@sentry/react-native/expo` dans `app.config.ts`. Version `~7.11.0`, imposée par
 SDK 57 — installée via `npx expo install`, jamais épinglée à la main.
 
-Compte, organisation (`le-club`) et projet React Native (`react-native`) existent ; DSN,
+Compte, organisation (`stips`) et projet React Native (`react-native`) existent ; DSN,
 `organization` et `project` sont renseignés dans `app.config.ts`. `SENTRY_AUTH_TOKEN` est
 dans `mobile/.env` et sur EAS (`secret`, sur `production`, `preview` et `development`).
 
-L'organisation garde le slug `le-club`, antérieur au passage à Stips : la renommer côté
-Sentry (dashboard) est un prérequis avant de toucher `organization` dans `app.config.ts`,
-sans quoi l'upload des source maps part vers un slug qui n'existe plus. Même chose pour le
-projet EAS et son `slug` (voir `app.config.ts`).
+L'organisation a été renommée `le-club` → `stips` sur le dashboard Sentry, et
+`organization` dans `app.config.ts` a suivi. L'ordre importe : renommer le champ avant le
+dashboard fait partir l'upload des source maps vers un slug inexistant. Un renommage
+d'organisation Sentry se fait en place — ni le DSN, ni la région, ni les événements déjà
+reçus ne bougent. C'est ce qui le distingue du `slug` d'un projet EAS, qui lui n'est pas
+renommable et impose de recréer le projet (voir `app.config.ts`).
+
+Un jeton d'auth Sentry porte le slug de l'organisation **au moment de son émission** : après
+un renommage, en regénérer un plutôt que supposer que l'ancien suit.
 
 Sans DSN, `Sentry.init` ne démarre pas et l'app tourne normalement, sans crash reporting —
 no-op explicite, pas panne silencieuse. Ce n'est plus l'état par défaut : depuis que le DSN
