@@ -1,28 +1,28 @@
 /* ══════════════════════════════════════════════════════════════════════
-   ONGLET « Agenda » — candidat · design 3a
+   ONGLET « Agenda » — les deux rôles · design 3a
    « A vos agendas » : les prochains rendez-vous de Stips.
+
+   Sans filtres : les catégories d'événement (Sport / Bar / Atelier) ont
+   été retirées à la révision des rôles — la liste tient sur un écran, et
+   `meta` porte déjà le genre de la soirée en clair.
    ══════════════════════════════════════════════════════════════════════ */
 
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { C, DATA } from '@stips/core';
 import type { EventItem } from '@stips/core';
 import { F, hatch } from '../tokens';
-import { Mono, Card, Stk, Pills, ScreenHead, Screen } from '../atoms';
+import { Mono, Card, Stk, ScreenHead, Screen } from '../atoms';
 import type { TabScreen } from '../types';
 
 function ScreenEvents({ nav }: { nav: ReactNode }) {
-  const [filtre, setFiltre] = useState('Tout');
-  const liste = filtre === 'Tout' ? DATA.events : DATA.events.filter(e => e.cats.includes(filtre));
-
   return (
     <Screen nav={nav}>
       <ScreenHead titre="A vos agendas" />
-      <Pills items={['Tout', 'Sport', 'Bar', 'Atelier']} active={filtre} onChange={setFiltre} />
 
       <div className="body">
         <div style={{ padding: '14px 22px 96px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {liste.map(e => <EventCard key={e.titre} e={e} />)}
-          {liste.length === 0 && <Mono>AUCUN ÉVÉNEMENT</Mono>}
+          {DATA.events.map(e => <EventCard key={e.titre} e={e} />)}
+          {DATA.events.length === 0 && <Mono>AUCUN ÉVÉNEMENT</Mono>}
         </div>
       </div>
     </Screen>

@@ -10,11 +10,12 @@
 import { useId, useState, type ReactNode } from 'react';
 import { Pressable, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Defs, Pattern, Rect } from 'react-native-svg';
-import { C, HATCH_COLORS, HATCH_STRIPE } from '@stips/core';
+import { C, HATCH_COLORS, HATCH_STRIPE, ROLES } from '@stips/core';
 import type { Membre } from '@stips/core';
 import { F } from './tokens';
+import { useRole } from './role';
 
-/** Micro-label mono en capitales : « NOTE GLOBALE », « DISPONIBILITÉS »… */
+/** Micro-label mono en capitales : « LE MOT DE SON PARRAIN », « DISPONIBILITÉS »… */
 export function Mono({ children, color = C.muted2, size = 10, style }: {
   children: ReactNode; color?: string; size?: number; style?: StyleProp<ViewStyle>;
 }) {
@@ -25,19 +26,36 @@ export function Mono({ children, color = C.muted2, size = 10, style }: {
   );
 }
 
-/** En-tête de marque en haut de chaque écran (le vrai statut du téléphone
-    — heure, réseau, batterie — est déjà rendu par l'OS ; on ne garde que
-    le wordmark, contrairement à la maquette web qui devait le simuler).
+/** En-tête en haut de chaque écran : le type de compte à gauche, le
+    wordmark à droite. Le vrai statut du téléphone — heure, réseau,
+    batterie — est déjà rendu par l'OS au-dessus, contrairement à la
+    maquette web qui doit le simuler ; c'est donc le seul contenu de cette
+    bande, et le rôle y prend la place que le web donne à l'heure.
 
-    Reprend la police et le traitement de l'ancien wordmark « Le Club »
+    Le wordmark reprend la police et le traitement de l'ancien « Le Club »
     (Instrument Serif italique) : seul le texte a changé. Le dessin du
     logo (icône d'app, écran de démarrage, une teinte par variante) est
     indépendant de cet en-tête et n'en dépend pas — voir
     `scripts/logo/generer.mjs`. */
 export function AppHeader({ color = C.ink }: { color?: string }) {
+  const role = useRole();
   return (
-    <View style={{ height: 40, flexShrink: 0, justifyContent: 'flex-end', paddingHorizontal: 22, paddingBottom: 8 }}>
-      <Text style={{ fontFamily: F.serifItalic, fontSize: 20, color, letterSpacing: 0.2 }}>Stips</Text>
+    <View style={{
+      height: 40, flexShrink: 0, flexDirection: 'row', alignItems: 'flex-end',
+      justifyContent: 'space-between', paddingHorizontal: 22, paddingBottom: 8,
+    }}>
+      {/* Rien hors connexion (écran d'invitation) : `justifyContent` garde
+          le wordmark à droite sans qu'il faille un élément vide.
+          Plus gros que le reste de l'en-tête : c'est le seul repère qui
+          dit à quel titre on regarde l'app. */}
+      {role && (
+        <Text style={{ fontFamily: F.monoMedium, fontSize: 16, letterSpacing: 0.6, color: ROLES[role].teinte }}>
+          {ROLES[role].libelle}
+        </Text>
+      )}
+      <Text style={{
+        fontFamily: F.serifItalic, fontSize: 20, color, letterSpacing: 0.2, marginLeft: 'auto',
+      }}>Stips</Text>
     </View>
   );
 }
@@ -139,7 +157,7 @@ export function BoutonPlein({ children, onPress }: {
   );
 }
 
-/** Rangée de filtres carrés (Tous / 4.5+ / Dispo été / ⚙) */
+/** Rangée de filtres carrés (Populaire / Récent / Mes fils / ⚙) */
 export function Pills({ items, active, onChange, border = true }: {
   items: string[]; active: string; onChange?: (p: string) => void; border?: boolean;
 }) {
@@ -213,7 +231,7 @@ export function SearchField({ value, onChange, placeholder }: {
   );
 }
 
-/** Rangée « une personne » : avatar, nom (+ badge PARRAIN), sous-titre, action */
+/** Rangée « une personne » : avatar, nom (+ badge PRO), sous-titre, action */
 export function PersonRow({ p, size = 44, last, onWrite }: {
   p: Membre; size?: number; last?: boolean; onWrite?: () => void;
 }) {
@@ -231,7 +249,7 @@ export function PersonRow({ p, size = 44, last, onWrite }: {
               paddingVertical: 2, paddingHorizontal: 7, borderRadius: 5,
               backgroundColor: C.ink, color: C.cream, fontFamily: F.monoMedium, fontSize: 9,
               overflow: 'hidden',
-            }}>PARRAIN</Text>
+            }}>PRO</Text>
           )}
         </View>
         <Text style={{ fontFamily: F.uiRegular, fontSize: 12, color: C.muted, marginTop: 2 }}>{p.sous}</Text>

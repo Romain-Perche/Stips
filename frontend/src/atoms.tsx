@@ -3,12 +3,13 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import type { CSSProperties, ReactNode } from 'react';
-import { C } from '@stips/core';
+import { C, ROLES } from '@stips/core';
 import type { Membre, Role } from '@stips/core';
 import { F, hatch } from './tokens';
+import { useRole } from './role';
 import type { TabScreen } from './types';
 
-/** Micro-label mono en capitales : « NOTE GLOBALE », « DISPONIBILITÉS »… */
+/** Micro-label mono en capitales : « LE MOT DE SON PARRAIN », « DISPONIBILITÉS »… */
 export function Mono({ children, color = C.muted2, size = 10, style }: {
   children: ReactNode; color?: string; size?: number; style?: CSSProperties;
 }) {
@@ -19,21 +20,38 @@ export function Mono({ children, color = C.muted2, size = 10, style }: {
   );
 }
 
-/** Barre d'état du téléphone : l'heure à gauche, le wordmark à droite.
+/** Barre d'état du téléphone : le type de compte à gauche, le wordmark à
+    droite.
 
-    Reprend la police et le traitement de l'ancien wordmark « Le Club »
+    À gauche, là où une maquette de téléphone met l'heure : le rôle sous
+    lequel on est connecté, dans sa couleur (`ROLES`, dans @stips/core).
+    L'heure ne servait à rien — savoir si on regarde l'app en Stipeur ou en
+    Pro, si.
+
+    Le wordmark reprend la police et le traitement de l'ancien « Le Club »
     (italique, Instrument Serif) : seul le texte a changé. Le dessin du
     logo (SVG de `public/`, une seule teinte puisque le web n'a pas de
     variantes) est indépendant de cette barre — voir
     `scripts/logo/generer.mjs`. */
 export function StatusBar({ color = C.ink }: { color?: string }) {
+  const role = useRole();
   return (
     <div style={{
       height: 54, flex: 'none', display: 'flex', alignItems: 'flex-end',
       justifyContent: 'space-between', padding: '0 22px 6px',
       color, font: `500 13px ${F.mono}`,
     }}>
-      <span>9:41</span>
+      {/* Pas de badge hors connexion (écran d'invitation) — mais un
+          élément vide quand même, sinon le wordmark passe à gauche.
+          Plus gros et plus gras que le reste de la barre : c'est le seul
+          repère qui dit à quel titre on regarde l'app, il doit se lire
+          sans y penser. */}
+      <span style={{
+        font: `500 20px ${F.mono}`, letterSpacing: '.04em',
+        color: role ? ROLES[role].teinte : undefined,
+      }}>
+        {role ? ROLES[role].libelle : ''}
+      </span>
       <span style={{ font: `italic 400 20px/1 ${F.serif}`, letterSpacing: '.01em' }}>Stips</span>
     </div>
   );
@@ -86,7 +104,7 @@ export function Stk({ children, onClick, size = 12, pad = '8px 14px', style }: {
   );
 }
 
-/** Rangée de filtres carrés (Tous / 4.5+ / Dispo été / ⚙) */
+/** Rangée de filtres carrés (Populaire / Récent / Mes fils / ⚙) */
 export function Pills({ items, active, onChange, border = true }: {
   items: string[]; active: string; onChange?: (p: string) => void; border?: boolean;
 }) {
@@ -134,15 +152,15 @@ export function Segmented({ items, active, onChange }: {
   );
 }
 
-/** Le choix candidat / entreprise : bandeau plein, en haut de l'app,
-    toujours visible. Provisoire tant que le compte entreprise n'est pas
-    distinct du compte candidat (voir « À trancher » dans la description
-    du projet) — remplace l'ancien sélecteur caché dans la barre de dev. */
+/** Le choix membre / pro : bandeau plein, en haut de l'app, toujours
+    visible. C'est un échafaudage de démo — dans l'app réelle le rôle vient
+    du compte, il ne se bascule pas. Les libellés sont ceux de `ROLES` en
+    capitales, jamais deux mots pour le même rôle. */
 export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   return (
     <div style={{ flex: 'none', background: C.ink, padding: '14px 16px 10px' }}>
       <div style={{ display: 'flex', background: 'rgba(255,255,255,.12)', borderRadius: 14, padding: 4 }}>
-        {(['candidat', 'entreprise'] as const).map(r => {
+        {(['membre', 'pro'] as const).map(r => {
           const on = r === role;
           return (
             <div key={r} onClick={() => onChange(r)} style={{
@@ -150,7 +168,7 @@ export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Rol
               background: on ? C.cream : 'transparent',
               color: on ? C.ink : C.creamMut,
               font: `600 15px ${F.ui}`, letterSpacing: '.02em',
-            }}>{r === 'candidat' ? 'CANDIDAT' : 'ENTREPRISE'}</div>
+            }}>{ROLES[r].libelle.toUpperCase()}</div>
           );
         })}
       </div>
@@ -171,7 +189,7 @@ export function SearchField({ value, onChange, placeholder }: {
     }}>
       <span style={{ font: `400 15px ${F.ui}`, color: rempli ? C.ink : C.faint }}>⌕</span>
       <input className="bare" value={value} placeholder={placeholder}
-             onChange={e => onChange(e.target.value)} />
+        onChange={e => onChange(e.target.value)} />
       {rempli && (
         <span onClick={() => onChange('')} style={{
           font: `400 15px ${F.ui}`, color: C.faint, cursor: 'pointer',
@@ -181,7 +199,7 @@ export function SearchField({ value, onChange, placeholder }: {
   );
 }
 
-/** Rangée « une personne » : avatar, nom (+ badge PARRAIN), sous-titre, action */
+/** Rangée « une personne » : avatar, nom (+ badge PRO), sous-titre, action */
 export function PersonRow({ p, size = 44, last, onWrite }: {
   p: Membre; size?: number; last?: boolean; onWrite?: () => void;
 }) {
@@ -198,7 +216,7 @@ export function PersonRow({ p, size = 44, last, onWrite }: {
             <span style={{
               padding: '2px 7px', borderRadius: 5, background: C.ink, color: C.cream,
               font: `500 9px ${F.mono}`,
-            }}>PARRAIN</span>
+            }}>PRO</span>
           )}
         </div>
         <div style={{ font: `400 12px ${F.ui}`, color: C.muted, marginTop: 2 }}>{p.sous}</div>

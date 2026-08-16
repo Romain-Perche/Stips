@@ -23,7 +23,7 @@ import { useState, type ReactNode } from 'react';
 import { C, DATA } from '@stips/core';
 import type { Candidature, Offre } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Card, Stk, Avatar, Pills, Segmented, Screen } from '../atoms';
+import { Mono, Card, Stk, Avatar, Segmented, Screen } from '../atoms';
 import { TalentDeck } from './ScreenTalents';
 import type { TabScreen } from '../types';
 
@@ -38,7 +38,6 @@ const recuesPour = (titre: string) => DATA.candidatures.filter(c => c.offre === 
 
 function ScreenOffres({ nav }: { nav: ReactNode }) {
   const [section, setSection] = useState<Section>('Offres');
-  const [filtre, setFiltre] = useState('En ligne');
   const [ouverte, setOuverte] = useState<string | null>(null);
 
   const offre = DATA.offres.liste.find(o => o.titre === ouverte);
@@ -90,15 +89,11 @@ function ScreenOffres({ nav }: { nav: ReactNode }) {
 
       {section === 'Talents' ? <TalentDeck /> : (
         <>
-          <Pills items={['En ligne', 'Brouillons', 'Clôturées']} active={filtre} onChange={setFiltre} />
-
           <div className="body">
             <div style={{ padding: '16px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {filtre === 'En ligne' ? DATA.offres.liste.map(o => (
+              {DATA.offres.liste.map(o => (
                 <OffreCard key={o.titre} o={o} onVoir={() => setOuverte(o.titre)} />
-              )) : (
-                <Mono>RIEN DANS « {filtre.toUpperCase()} »</Mono>
-              )}
+              ))}
 
               {/* Publier une offre */}
               <Card dark style={{
@@ -156,8 +151,8 @@ function OffreCard({ o, onVoir }: { o: Offre; onVoir: () => void }) {
   );
 }
 
-/** Une candidature, dans le détail d'une offre : le candidat, sa note, et
-    depuis quand elle attend. */
+/** Une candidature, dans le détail d'une offre : le candidat, le mot de son
+    parrain, et depuis quand elle attend. */
 function CandidatureCard({ c }: { c: Candidature }) {
   const t = DATA.talents.find(x => x.id === c.talent);
   return (
@@ -178,8 +173,8 @@ function CandidatureCard({ c }: { c: Candidature }) {
         </div>
         {t && (
           <div style={{ textAlign: 'right', flex: 'none' }}>
-            <div style={{ font: `400 26px/1 ${F.serif}`, color: C.ink }}>{t.note}</div>
-            <Mono>NOTE</Mono>
+            <div style={{ font: `400 16px/1.2 ${F.serif}`, color: C.ink }}>{t.qualificatif}</div>
+            <Mono>QUALITÉ</Mono>
           </div>
         )}
       </div>

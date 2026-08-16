@@ -7,18 +7,19 @@ import type { MoiProfile, Invitation, Talent, Membre, Boite, Offre, Candidature,
 
 export const DATA: {
   moi: MoiProfile;
+  moiPro: MoiProfile;
   invitation: Invitation;
   talents: Talent[];
   membres: Membre[];
   membresTotal: number;
   boites: Boite[];
-  offres: { resume: string; liste: Offre[] };
+  offres: { liste: Offre[] };
   candidatures: Candidature[];
   events: EventItem[];
   fils: Fil[];
 } = {
 
-  // ── Le profil de l'utilisateur candidat ────────────────────────────────
+  // ── Le profil du membre connecté ───────────────────────────────────────
   moi: {
     nom: 'Camille Roux',
     bio: 'M1 Finance à Dauphine, je cherche un stage de césure en M&A. Je joue au foot le jeudi.',
@@ -31,12 +32,20 @@ export const DATA: {
     ],
   },
 
+  // ── Le profil du pro connecté ───────────────────────────────────────────
+  // Pas de partie 2 : un pro ne cherche pas de stage, `stage`/`dispo`/
+  // `experiences` restent absents (voir MoiProfile).
+  moiPro: {
+    nom: 'Léa Ferrand',
+    bio: 'Maître de stage M&A chez BNP Paribas. Je recrute pour la rentrée 2027 et je relis des CV le jeudi midi.',
+  },
+
   // ── L'invitation reçue du parrain (écran 5a2) ──────────────────────────
   invitation: {
     prenom:   'Camille',
     parrain:  'Léa Ferrand',
     role:     'Ta maître de stage · BNP Paribas',
-    note:     '4.6',
+    qualificatif: 'Autonomie',
     reco:     '« Autonome dès la deuxième semaine. Je la reprends les yeux fermés. »',
     signee:   'Signé le 3 septembre · tu ne peux pas le modifier',
     avantages: [
@@ -46,12 +55,12 @@ export const DATA: {
     ],
   },
 
-  // ── Les profils vus par l'entreprise (écran 2a) ────────────────────────
+  // ── Les membres en recherche, vus par le pro (écran 2a) ───────────────
   // Camille vient du design ; Yanis et Inès reprennent 1b, le reste de leur
   // face B est du remplissage à valider.
   talents: [
     {
-      id: 'camille', nom: 'Camille Roux', ecole: 'M1 Finance · Dauphine', note: 4.6,
+      id: 'camille', nom: 'Camille Roux', ecole: 'M1 Finance · Dauphine', qualificatif: 'Autonomie',
       parrain: 'Léa Ferrand', parrainRole: 'Maître de stage · BNP',
       reco: '« Autonome dès la deuxième semaine. Je la reprends les yeux fermés. »',
       cherche: 'Stage M&A / Corporate Finance',
@@ -63,7 +72,7 @@ export const DATA: {
       ],
     },
     {
-      id: 'yanis', nom: 'Yanis Bekkar', ecole: 'M2 Data · Dauphine', note: 4.9,
+      id: 'yanis', nom: 'Yanis Bekkar', ecole: 'M2 Data · Dauphine', qualificatif: 'Méthode',
       parrain: 'Marc Traoré', parrainRole: 'VP · Rothschild & Co',
       reco: "« Le meilleur stagiaire de l'équipe. »",
       cherche: 'Stage Data / Analytics',
@@ -73,7 +82,7 @@ export const DATA: {
       ],
     },
     {
-      id: 'ines', nom: 'Inès Marchal', ecole: 'M1 Audit · Dauphine', note: 4.3,
+      id: 'ines', nom: 'Inès Marchal', ecole: 'M1 Audit · Dauphine', qualificatif: 'Rigueur',
       parrain: 'Claire Duval', parrainRole: 'Manager · Deloitte',
       reco: '« Très bonne plume, sérieuse. »',
       cherche: 'Stage Audit / Transaction Services',
@@ -131,9 +140,8 @@ export const DATA: {
     },
   ],
 
-  // ── Les offres publiées par l'entreprise (écran 6a) ────────────────────
+  // ── Les offres publiées par le pro (écran 6a) ──────────────────────────
   offres: {
-    resume: '3 offres en ligne · 21 candidatures reçues',
     liste: [
       { meta: 'M&A · PARIS · 6 MOIS',    titre: 'Analyste M&A — stage de césure',
         recues: 12, pied: 'Publiée le 2 sept. · 4 non lues' },
@@ -153,13 +161,13 @@ export const DATA: {
 
   // ── Les événements (écran 3a) ──────────────────────────────────────────
   events: [
-    { jour: '12', mois: 'SEPT', cats: ['Sport'], meta: 'SPORT · 20H00',
-      titre: 'Foot en salle · Le Five Bercy', sous: 'Candidats et recruteurs mélangés',
+    { jour: '12', mois: 'SEPT', meta: 'SPORT · 20H00',
+      titre: 'Foot en salle · Le Five Bercy', sous: 'Membres et pros mélangés',
       pied: '14 inscrits · 4 places', cta: 'Je viens', avatars: true },
-    { jour: '18', mois: 'SEPT', cats: ['Bar', 'Atelier'], meta: 'BAR · ATELIER · 19H30',
+    { jour: '18', mois: 'SEPT', meta: 'BAR · ATELIER · 19H30',
       titre: 'Refais ton CV · Chez Jeannette', sous: 'Une bière, un CV relu par un recruteur',
       pied: '31 inscrits · complet', cta: "Liste d'attente" },
-    { jour: '02', mois: 'OCT', cats: ['Bar'], meta: 'SOIRÉE STIPS · 20H00',
+    { jour: '02', mois: 'OCT', meta: 'SOIRÉE STIPS · 20H00',
       titre: 'Rentrée Stips · Rooftop Marais', sous: 'Toute la promo, 12 boîtes présentes',
       pied: 'Ouvre le 20 sept.', cta: 'Me prévenir', dark: true },
   ],

@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════════════════════════════════
    ÉCRAN D'ENTRÉE — pas un onglet · design 5a2
    L'invitation nominative envoyée par le parrain. C'est la première chose
-   qu'un candidat voit, avant même d'avoir un compte.
+   qu'un futur membre voit, avant même d'avoir un compte.
 
    Le parrainage en 3 temps (5a) a été retiré : accepter l'invitation mène
    directement à l'app.
@@ -35,10 +35,8 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
           </div>
 
           <Card>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <Mono>CE QU'IL/ELLE A DÉJÀ ÉCRIT SUR TOI</Mono>
-              <div style={{ font: `400 26px/1 ${F.serif}`, color: C.ink }}>{inv.note}</div>
-            </div>
+            <Mono>CE QU'IL/ELLE A DÉJÀ ÉCRIT SUR TOI</Mono>
+            <div style={{ marginTop: 8, font: `400 26px/1.15 ${F.serif}`, color: C.ink }}>{inv.qualificatif}</div>
             <div style={{
               marginTop: 10, font: `italic 400 17px/1.45 ${F.serif}`,
               color: C.ink2, textWrap: 'pretty',

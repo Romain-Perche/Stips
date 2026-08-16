@@ -2,17 +2,17 @@
    APP — le routeur
 
    Deux axes d'état, comme sur le web :
-     · role     : 'candidat' | 'entreprise'  → décide de la liste d'onglets
+     · role     : 'membre' | 'pro'  → décide de la liste d'onglets
      · horsNav  : un écran affiché seul, sans nav ('invitation' | null)
                   — c'est le seul écran qui précède la création de compte.
 
    Au-dessus des deux : le verrou de version, qui passe devant tout, y
    compris l'invitation (voir src/config/miseAJour.ts).
 
-   Le sélecteur candidat/entreprise n'est plus une barre de dev cachée sous
+   Le sélecteur membre/pro n'est plus une barre de dev cachée sous
    le téléphone (comme sur le web à l'origine) : c'est un bandeau visible en
-   haut de l'app, tant qu'il n'y a pas deux comptes distincts (voir "À
-   trancher" dans la description du projet).
+   haut de l'app. Échafaudage de démo — dans l'app réelle le rôle vient du
+   compte et ne se bascule pas.
 
    La liste d'onglets par rôle reste la SEULE source de vérité pour la nav :
    chaque écran porte son propre `.tab = { id, label }`, lu directement par
@@ -34,7 +34,7 @@ import { InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic } from '@
 import { Outfit_400Regular, Outfit_500Medium, Outfit_600SemiBold } from '@expo-google-fonts/outfit';
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 
-import { C } from '@stips/core';
+import { C, ROLES } from '@stips/core';
 import type { Role } from '@stips/core';
 import { F } from './src/tokens';
 import ScreenChercher from './src/screens/ScreenChercher';
@@ -42,20 +42,25 @@ import ScreenStagesCandidat from './src/screens/ScreenStagesCandidat';
 import ScreenEvents from './src/screens/ScreenEvents';
 import ScreenForum from './src/screens/ScreenForum';
 import ScreenProfil from './src/screens/ScreenProfil';
-import ScreenTalents from './src/screens/ScreenTalents';
 import ScreenOffres from './src/screens/ScreenOffres';
 import ScreenInvitation from './src/screens/ScreenInvitation';
 import ScreenMiseAJour from './src/screens/ScreenMiseAJour';
 import { useVerrouVersion } from './src/config/miseAJour';
+import { RoleCtx } from './src/role';
 import { capturer, enregistrerNavigation, envelopper } from './src/observabilite/sentry';
 import type { TabScreen } from './src/types';
 
+/* Cinq onglets de chaque côté, un seul écran de différence : le membre a
+   « Stages » là où le pro a « Offres ». Ce qui sépare vraiment les deux
+   rôles n'est pas la nav mais ce que chaque écran montre — l'annuaire
+   s'arrête à la partie 1 des profils, et les recos ne se lisent que dans
+   le deck de l'onglet Offres. Voir `Description projet.md` § les deux
+   rôles, et garder cette liste identique à celle du web.
+
+   ScreenTalents n'est plus un onglet — son deck vit dans ScreenOffres. */
 const TABS: Record<Role, TabScreen[]> = {
-  candidat: [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],
-  // Vue entreprise volontairement restreinte : la recherche de candidats
-  // potentiels (Talents) et la gestion des offres. Pas d'Agenda ni de
-  // Forum côté entreprise pour l'instant.
-  entreprise: [ScreenTalents, ScreenOffres],
+  membre: [ScreenChercher, ScreenStagesCandidat, ScreenEvents, ScreenForum, ScreenProfil],
+  pro:    [ScreenChercher, ScreenOffres,         ScreenEvents, ScreenForum, ScreenProfil],
 };
 
 const Tab = createBottomTabNavigator<ParamListBase>();
@@ -106,14 +111,14 @@ function Tabs({ role }: { role: Role }) {
   );
 }
 
-/** Le choix candidat / entreprise : bandeau plein, en haut de l'app,
-    toujours visible. Provisoire tant que le compte entreprise n'est pas
-    distinct du compte candidat (voir "À trancher" §2). */
+/** Le choix membre / pro : bandeau plein, en haut de l'app, toujours
+    visible. Échafaudage de démo. Les libellés sont ceux de `ROLES` en
+    capitales, jamais deux mots pour le même rôle. */
 function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   return (
     <View style={{ backgroundColor: C.ink, paddingTop: 14, paddingBottom: 10, paddingHorizontal: 16 }}>
       <View style={{ flexDirection: 'row', backgroundColor: 'rgba(255,255,255,.12)', borderRadius: 14, padding: 4 }}>
-        {(['candidat', 'entreprise'] as const).map(r => {
+        {(['membre', 'pro'] as const).map(r => {
           const on = r === role;
           return (
             <Pressable key={r} onPress={() => onChange(r)} style={{
@@ -123,7 +128,7 @@ function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => v
               <Text style={{
                 fontFamily: F.uiSemiBold, fontSize: 15, letterSpacing: 0.6,
                 color: on ? C.ink : C.creamMut,
-              }}>{r === 'candidat' ? 'CANDIDAT' : 'ENTREPRISE'}</Text>
+              }}>{ROLES[r].libelle.toUpperCase()}</Text>
             </Pressable>
           );
         })}
@@ -147,7 +152,11 @@ function VueApp({ role, onChangerRole }: { role: Role; onChangerRole: (r: Role) 
         ref={conteneurNav}
         onReady={() => enregistrerNavigation(conteneurNav)}
       >
-        <Tabs role={role} key={role} />
+        {/* Le rôle par contexte : React Navigation ne transmet aux écrans
+            que ses propres props (voir src/role.ts). */}
+        <RoleCtx.Provider value={role}>
+          <Tabs role={role} key={role} />
+        </RoleCtx.Provider>
       </NavigationContainer>
     </View>
   );
@@ -159,7 +168,7 @@ function App() {
     Outfit_400Regular, Outfit_500Medium, Outfit_600SemiBold,
     JetBrainsMono_500Medium,
   });
-  const [role, setRole] = useState<Role>('candidat');
+  const [role, setRole] = useState<Role>('membre');
   const [horsNav, setHorsNav] = useState<'invitation' | null>('invitation');
   // Avec les autres hooks, au-dessus du retour anticipé : en dessous, le
   // `return null` des polices casserait l'ordre des hooks au montage suivant.
