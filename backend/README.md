@@ -113,10 +113,10 @@ maquette » plus bas).
 
 | Table | Ce qu'elle porte |
 |---|---|
-| `personne` | identité, `role`, `admin`, partie 1 du profil, partie 2 nullable (dont `niveau_experience`) + `en_recherche`, `auth_user_id` |
+| `personne` | identité, `role`, `admin`, partie 1 du profil, partie 2 nullable + `en_recherche`, `auth_user_id` |
 | `entreprise` | nom, secteur, domaine e-mail |
 | `experience` | `personne_id` × `entreprise_id`, intitulé, `debut`, `fin` |
-| `parrainage` | la reco : note, commentaire, statut, origine, identités en attente |
+| `parrainage` | la reco : qualificatif, commentaire, statut, origine, identités en attente |
 | `abonnement` | les 100 €/an : période, `stripe_customer_id` |
 | `forum` | `slug`, libellé |
 | `fil` | `forum_id`, `auteur_id`, titre, corps, `score` |
@@ -140,12 +140,6 @@ de `personne`, `parrainage` et `experience`. C'est une route (`GET /v1/talents`)
 entité. Une table `carte` serait une vue déguisée, c'est-à-dire la forme d'un écran gravée dans
 le schéma, fausse au premier redesign.
 
-**`niveau_experience` est déclaré, pas déduit** — tranché ainsi, contre ma recommandation. La
-conséquence à connaître : il peut contredire les lignes d'`experience` affichées juste en
-dessous sur le profil complet. C'est un choix de produit assumé — le membre résume lui-même son
-niveau — et pas une incohérence à corriger ; mais le jour où les deux divergent visiblement,
-c'est là qu'il faut regarder.
-
 ### Les valeurs qu'on ne stocke pas
 
 Elles sont toutes dans `DATA` aujourd'hui, en colonne ou fondues dans une chaîne :
@@ -156,21 +150,21 @@ Elles sont toutes dans `DATA` aujourd'hui, en colonne ou fondues dans une chaîn
 | `pied: '31 inscrits · complet'` | « complet » se déduit du compte et de la capacité |
 | `heures: 2`, `duree: '6 mois'` | des timestamps et des dates |
 | `jour: '12'` + `mois: 'SEPT'` | un `timestamptz` |
-| `note: 4.6` sur le talent | une note par `parrainage`, la globale est une moyenne |
+| `qualificatif: 'Autonomie'` sur le talent | `parrainage.qualificatif`, celui du parrainage le plus récent — pas un agrégat, on ne moyenne pas des mots |
 | `membresTotal: 128`, `passes: 4`, `parrains: 2` | des `COUNT(*)` |
 | `meta: 'stips/reco-cv · Léa F. · marraine · 5 h'` | trois clés étrangères et une date |
 
-**Une seule exception, et elle a une raison : les clés de tri.** `fil.score` et
+**Une seule exception, et elle a une raison : les clés de tri.** `fil.score`, `fil.rang` et
 `conversation.dernier_message_at` sont dérivées et pourtant stockées, parce que trier une
-liste sur un `COUNT(*)` ou un `MAX()` calculé en sous-requête ne peut pas utiliser d'index.
-Ce sont les deux seules. Le critère est « dérivé **et** clé de tri », pas « ça
+liste sur un `SUM()` ou un `MAX()` calculé en sous-requête ne peut pas utiliser d'index.
+Ce sont les trois seules. Le critère est « dérivé **et** clé de tri », pas « ça
 m'arrangerait ».
 
 `fil.score` mérite d'être relu, parce qu'il ressemble trait pour trait au `votes: 48` de la
 maquette que le tableau ci-dessus condamne. La différence est entière : **la source de vérité
 reste une ligne par vote** dans `vote`, et `score` n'en est qu'un cache de tri, recalculable
-par un `COUNT(*)` à tout moment. Un compteur seul, sans les lignes, ne saurait ni empêcher un
-double vote ni le retirer.
+par un `SUM(valeur)` à tout moment. Un compteur seul, sans les lignes, ne saurait ni empêcher
+un double vote ni le retirer.
 
 ### Ce que la base fait, et que le code ne refait pas
 
@@ -191,9 +185,9 @@ double vote ni le retirer.
 ### Deux projections d'une même personne, et jamais `select *`
 
 L'onglet Recherche ne montre que **la partie 1** du profil : photo et description. La partie 2
-— stage cherché, disponibilités, niveau d'expérience — et avec elle les notes, les commentaires
-de parrainage et le CV, n'apparaissent que dans l'onglet Offres des pros, pour les membres
-déclarés en recherche. **Une reco n'est donc jamais lue par un pair.**
+— stage cherché, disponibilités — et avec elle les notes, les commentaires de parrainage et le
+CV, n'apparaissent que dans l'onglet Offres des pros, pour les membres déclarés en recherche.
+**Une reco n'est donc jamais lue par un pair.**
 
 Ce n'est pas un filtre de lignes, c'est un **filtre de colonnes** : la même ligne `personne` se
 sert sous deux formes selon qui la demande. Deux conséquences :
@@ -218,9 +212,39 @@ retirer son vote devient possible. `valeur` vaut +1 ou −1 — l'écran porte b
 cliquer ▲ autant de fois qu'on veut. Avec une ligne par personne et par fil, un second clic
 modifie ou annule le vote au lieu de l'empiler.
 
-Les deux tris de l'écran retombent sur des colonnes indexées : « Populaire » sur `fil.score`,
+Les deux tris de l'écran retombent sur des colonnes indexées : « Populaire » sur `fil.rang`,
 « Récent » sur `fil.created_at`. Le vote ne porte que sur les fils, pas sur les réponses —
 c'est ce que fait l'écran, et une table suffit.
+
+**`rang` plutôt que `score` pour « Populaire »**, parce qu'un solde brut classe *de tous les
+temps* : les trois mêmes fils resteraient en tête indéfiniment et l'onglet mourrait. La
+formule est celle de Reddit — `sign(score) × log₁₀(max(|score|, 1)) + epoch(created_at) / τ` —
+avec **τ = 1 209 600 s (14 jours)**, c'est-à-dire le temps au bout duquel un fil doit avoir dix
+fois plus de votes pour tenir sa place. Reddit utilise 12,5 h ; à l'échelle d'un club de cent
+personnes qui postent quelques fois par semaine, ça viderait la page en deux jours. τ est la
+seule valeur à calibrer, et elle se règle en regardant le forum vivre, pas depuis un schéma :
+elle appartient à une constante nommée, jamais à un nombre écrit en dur dans une requête.
+
+`rang` est une **colonne générée** (`GENERATED ALWAYS AS … STORED`) : Postgres la recalcule à
+chaque écriture de `score`, donc aucun code applicatif ne peut oublier de la mettre à jour.
+
+```sql
+rang double precision GENERATED ALWAYS AS (
+  sign(score) * log(greatest(abs(score), 1))
+  + extract(epoch FROM (created_at AT TIME ZONE 'UTC')) / 1209600
+) STORED
+```
+
+⚠️ **Le fuseau s'écrit dans l'expression, il ne se règle pas sur la base.** Une colonne générée
+est calculée une fois puis stockée sur le disque : Postgres exige donc une expression
+`IMMUTABLE`, et refuse la création de la table sinon. Or `extract(epoch FROM timestamptz)` est
+classé `STABLE`, parce qu'extraire des champs d'un `timestamptz` passe par le réglage `TimeZone`
+de la session. Un `ALTER DATABASE … SET timezone` n'y change rien : la volatilité est une
+propriété statique de la fonction, pas une conséquence de la configuration. Passer le fuseau en
+argument littéral (`AT TIME ZONE 'UTC'`) supprime la dépendance et rend l'expression immutable —
+c'est le même contournement que pour un index sur une expression de date. L'aller-retour
+n'introduit aucun décalage, et de toute façon un décalage constant ne changerait pas un
+classement qui ne compare que des lignes entre elles.
 
 `forum` est une table de deux colonnes plutôt qu'un `CHECK` ou une énumération Postgres, et
 c'est la cible d'échelle qui tranche : à 10 000 membres la liste des forums bougera (par
@@ -281,10 +305,10 @@ lisible d'un coup d'œil :
   publique, fait trois choses : le formulaire arrive prérempli avec l'identité du stagiaire
   (moins de friction à l'endroit critique), on sait quel pro a été sollicité, et il n'existe
   aucun point d'entrée public à spammer.
-- **`attente_validation`** — le pro a rempli la note et le commentaire, sur une page web
-  servie par `frontend/`, sans compte et sans installer l'app. La création d'un compte pro est
-  proposée **après**, jamais comme préalable. Validation manuelle, et sans back-office : deux
-  liens à jeton dans l'e-mail de notification (valider / refuser) suffisent au volume actuel,
+- **`attente_validation`** — le pro a choisi le qualificatif et rempli le commentaire, sur une
+  page web servie par `frontend/`, sans compte et sans installer l'app. La création d'un compte
+  pro est proposée **après**, jamais comme préalable. Validation manuelle, et sans back-office :
+  deux liens à jeton dans l'e-mail de notification (valider / refuser) suffisent au volume actuel,
   à remplacer par un écran quand les liens deviendront pénibles.
 - **`attente_acceptation`** — **le chemin `pro_invite` démarre ici** : un pro déjà dans Stips
   est déjà vérifié, sa parole n'a pas à repasser par une validation.
@@ -431,10 +455,11 @@ quatre raisons distinctes.**
 - **L'article 16 ne parle pas de gentillesse, il parle d'exactitude.** « Autonome dès la
   deuxième semaine » peut être faux — mauvaise équipe, mauvaise durée, mauvais poste, homonyme
   — tout en étant flatteur. Élogieux et inexact ne s'excluent pas.
-- **La note est un classement, et un classement blesse même quand il est bon.** Le filtre
-  `4.5+` existe dans le design : un 4,3 est *absolument* excellent et *relativement*
-  éliminatoire. C'est bien une donnée qui pilote une décision défavorable concernant la
-  personne, indépendamment du commentaire.
+- **Le qualificatif trie encore, même sans chiffre.** Remplacer `4.6` par `Autonomie` supprime
+  l'*ordre* — il n'y a plus de 4,3 absolument excellent et relativement éliminatoire — mais pas
+  le tri : un recruteur qui ne retient que « Autonomie » écarte tous les autres mots. Ça reste
+  un mot choisi par un tiers pour résumer une personne, et qui pilote une décision défavorable
+  la concernant, indépendamment du commentaire.
 - **L'article 14 s'applique quoi qu'il arrive.** La donnée est collectée auprès d'un tiers, pas
   de l'intéressé : il faut l'informer de ce qui est stocké, par qui, et pour quoi. Cette
   obligation ne dépend d'aucune appréciation sur le contenu.
@@ -448,7 +473,7 @@ contestation à construire :
 
 | Article | Ce qu'il faut | Coût |
 |---|---|---|
-| 15 (accès) | le membre voit sa note, son commentaire et qui l'a écrit | déjà fait — c'est l'écran d'invitation |
+| 15 (accès) | le membre voit son qualificatif, son commentaire et qui l'a écrit | déjà fait — c'est l'écran d'invitation |
 | 14 (information) | le dire au moment de l'invitation | une phrase |
 | 16 (rectification) | un « signaler une erreur » qui remonte à un admin | **`signalement` avec `cible_type = 'parrainage'`** — la table existe déjà |
 
@@ -500,7 +525,7 @@ maintenue à trois endroits et diverge au premier oubli.
 ### `DATA` décrit une maquette, pas une base
 
 C'est la réserve à garder en s'en servant : ces objets ont été écrits pour alimenter un
-rendu, pas pour modéliser des données. Quatre écarts, tous présents aujourd'hui :
+rendu, pas pour modéliser des données. Trois écarts, tous présents aujourd'hui :
 
 - **Des chaînes déjà mises en forme.** `pied: '14 inscrits · 4 places'`,
   `dispo: 'Janv. → Juin 2027 · 6 mois'`, `meta: 'club/reco-cv · Léa F. · marraine · 5 h'`,
@@ -508,9 +533,6 @@ rendu, pas pour modéliser des données. Quatre écarts, tous présents aujourd'
   dans le serveur — et `pied: '31 inscrits · complet'` montre où ça mène : un compte et un
   état fondus dans la même chaîne, illisibles séparément. **Le serveur renvoie des nombres
   et des dates ; les apps écrivent les phrases.**
-- **Une incohérence de type déjà installée.** `Invitation.note` est une `string` (`'4.6'`),
-  `Talent.note` un `number` (`4.9`) — deux vérités pour la même notion, exactement ce qu'un
-  contrat unique élimine.
 - **Des liens par nom.** `Talent.parrain: 'Léa Ferrand'` désigne la même personne qu'une
   entrée de `membres`, sans clé étrangère ; il faudra des identifiants. Dans la même veine,
   `membresTotal: 128` est un compteur d'affichage désolidarisé de `membres.length`.
