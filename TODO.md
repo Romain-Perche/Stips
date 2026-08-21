@@ -43,7 +43,7 @@ d'en avoir besoin plutôt qu'après.
 | 13 | Trancher : in-app purchase ou paiement web | Romain |
 | 14 | Créer le compte Stripe (mode test d'abord) | Romain |
 | 15 | Brancher Stripe : Checkout + webhook `invoice.paid` | Claude |
-| 16 | Cocher la CI comme check requis sur `main` (GitHub → Settings → Rules) | Romain |
+| 16 | ~~Cocher la CI comme check requis sur `main`~~ ✅ 21 août 2026 | Romain |
 | 17 | Valider les données de remplissage des boîtes | Romain |
 | 18 | Trancher le nom d'un membre : « Stipeur » ou « Stiper » | Romain |
 
@@ -222,7 +222,7 @@ Mêmes numéros, mêmes trous : ce qui manque est une tâche de Claude.
 | 10 | Choisir le fournisseur d'e-mail (Resend, Postmark, Scaleway TEM) | décision + compte + DNS | 🟠 avant que de vraies personnes reçoivent des invitations |
 | 13 | Trancher IAP ou paiement web | décision business, 15 à 30 % de commission en jeu — et elle bloque la tâche 15, pas l'inverse | ⚪ avant la release qui introduit le paiement |
 | 14 | Créer le compte Stripe, en mode test | il faut un compte, un IBAN et une vérification d'identité ; le mode test suffit pour que je construise le flux | ⚪ après avoir tranché 13 |
-| 16 | Cocher la CI comme check requis sur `main` | ça vit dans les réglages GitHub, pas dans le repo | ⚪ quand tu veux |
+| 16 | ~~Cocher la CI comme check requis sur `main`~~ ✅ 21 août 2026 | ça vit dans les réglages GitHub, pas dans le repo | fait — un `git push origin main` direct est désormais refusé, tout passe par une PR dont `verifications` est vert |
 | 17 | Valider les boîtes de remplissage | Deloitte, BNP et Sia Partners sont inventées | ⚪ quand tu veux |
 | 18 | Trancher « Stipeur » ou « Stiper » | c'est un nom de marque, pas une décision technique — j'ai mis « Stipeur » en attendant, c'est une ligne de `ROLES` dans `packages/core/src/tokens.ts` et rien d'autre | ⚪ quand tu veux |
 
