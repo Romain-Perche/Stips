@@ -28,6 +28,10 @@ composant ; ne pas chercher à tout faire monter dans `core`.
 Pour développer sans exposer : un feature flag (`mobile/src/config/flags.ts`) ou un profil
 de build EAS, pas une branche longue.
 
+`TODO.md` ne se modifie **que dans sa propre PR** (`docs: …`), jamais dans une branche de
+fonctionnalité — y compris pour cocher la tâche qu'on vient de finir. Le fichier n'existe
+ainsi qu'en une seule version, celle de `main`, et ne peut pas diverger entre branches.
+
 ## Tags
 
 - Un tag **annoté** par release, préfixé par composant : `mobile-v0.2`, `web-v0.5.0`,
