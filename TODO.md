@@ -1,13 +1,23 @@
 # TODO — Stips
 
-**Une seule numérotation, de 1 à 18, valable pour tout le fichier.** Les sections ne font que
+**Une seule numérotation, de 1 à 20, valable pour tout le fichier.** Les sections ne font que
 regrouper — par urgence, puis par qui fait quoi (Romain, ou Claude dans une discussion dédiée :
 voir `AGENTS.md`, une étape par conversation). Le numéro, lui, donne l'ordre à suivre de bout en
 bout ; ce qui peut se recouvrir est dit en fin de fichier.
 
-**Objectif actuel : une app de démo**, pas une mise en production. Ce qui bloque une vraie
-mise en ligne est parqué dans [`backend/README.md`](backend/README.md) § avant la mise en
-ligne réelle, et n'apparaît pas ici.
+**Objectif actuel : le site web d'abord** (décidé le 20 septembre 2026), l'app store plus
+tard. Le site est *mobile-first* : on retire le cadre téléphone de `frontend/`, l'app remplit
+l'écran sur un téléphone et devient une colonne centrée sur ordinateur (comme threads.net).
+Pas de refonte desktop des huit écrans — seules les pages du pro (invitation, talents)
+pourront s'élargir plus tard, quand on saura qu'elles sont ouvertes depuis un bureau.
+
+Pourquoi : le lent n'est pas les écrans, qui existent déjà des deux côtés, mais la chaîne
+store (EAS, TestFlight, Play Console, revue) et le backend. Le web supprime la première et
+garde la seconde, qui est de toute façon commune. `mobile/` reste dans le repo, en pause :
+rien à y supprimer, rien à y porter tant que le site n'a pas de vrais utilisateurs.
+
+Ce qui bloque une vraie mise en ligne est parqué dans [`backend/README.md`](backend/README.md)
+§ avant la mise en ligne réelle, et n'apparaît pas ici.
 
 ---
 
@@ -15,12 +25,13 @@ ligne réelle, et n'apparaît pas ici.
 
 | # | Tâche | Qui | Débloque |
 |---|---|---|---|
+| 19 | **Retirer le cadre téléphone du site** | Claude | le site est un vrai site |
 | 1 | **Écrire le schéma Drizzle** | Claude | tout le backend |
 | 2 | Créer le projet Supabase (région **UE**) | Romain | l'auth et le stockage des CV |
-| 3 | Prendre le nom de domaine | Romain | rien tout de suite, mais c'est le seul point qui a une horloge |
+| 3 | Prendre le nom de domaine | Romain | la mise en ligne du site (20) |
 
-Le domaine gèle le bundle id à la première TestFlight externe — 10 à 15 €/an, à prendre avant
-d'en avoir besoin plutôt qu'après.
+Le domaine sert d'abord au site ; il gèlera aussi le bundle id le jour d'une TestFlight
+externe — 10 à 15 €/an, à prendre avant d'en avoir besoin plutôt qu'après.
 
 ## 🟠 Ensuite
 
@@ -33,13 +44,14 @@ d'en avoir besoin plutôt qu'après.
 | 8 | Corriger le type `Offre` | Claude |
 | 9 | Créer le projet Railway, région **EU West** | Romain |
 | 10 | Choisir le fournisseur d'e-mail | Romain |
+| 20 | Mettre le site en ligne (hébergement statique + domaine) | Romain |
 
 ## ⚪ Plus tard
 
 | # | Tâche | Qui |
 |---|---|---|
 | 11 | Auth par lien magique + flux de parrainage complet | Claude |
-| 12 | Brancher les écrans sur l'API (retirer `DATA`) | Claude |
+| 12 | Brancher les écrans sur l'API (retirer `DATA`) — `frontend/` d'abord, `mobile/` quand il reprendra | Claude |
 | 13 | Trancher : in-app purchase ou paiement web | Romain |
 | 14 | Créer le compte Stripe (mode test d'abord) | Romain |
 | 15 | Brancher Stripe : Checkout + webhook `invoice.paid` | Claude |
@@ -53,6 +65,26 @@ d'en avoir besoin plutôt qu'après.
 
 Les numéros sont ceux des tableaux ci-dessus, d'où les trous : ce qui manque est une tâche de
 Romain. Chaque bloc dit l'enjeu, ce qu'il faut lire avant, et le piège.
+
+### 19. Retirer le cadre téléphone du site
+
+**Enjeu.** Le site devient un vrai site : plein écran sur un téléphone, colonne centrée
+(~480 px) sur un ordinateur. C'est la seule différence entre la maquette et le produit web.
+
+**Ce qu'il y a à faire.** Le cadre tient dans une règle CSS, `.ph` dans
+`frontend/src/styles.css` (380 × 800, rayon, ombre). La remplacer par `width: min(100vw, 480px)`
+et `height: 100dvh`, sans rayon ni ombre ; retirer le `padding` et le centrage vertical de
+`body`. Les huit écrans ne connaissent pas le cadre : ils remplissent la boîte qu'on leur
+donne, rien à toucher dedans.
+
+**Les pièges.**
+- `DevChrome` (la barre de dev sous le téléphone) n'a plus de place sous un écran de
+  `100dvh` : la passer en flottant, ou la supprimer si l'entrée « invitation » a un lien
+  d'ici là.
+- Ne **pas** en profiter pour élargir les écrans : la DA validée est mobile, et on ne sait pas
+  encore quelles pages sont ouvertes depuis un bureau. Une colonne, point.
+- Vérifier sur un vrai téléphone : `100dvh`, pas `100vh`, sinon la barre d'onglets passe sous
+  la barre d'adresse de Safari.
 
 ### 1. Écrire le schéma Drizzle
 
@@ -217,9 +249,10 @@ Mêmes numéros, mêmes trous : ce qui manque est une tâche de Claude.
 | # | Tâche | Pourquoi c'est toi | Quand |
 |---|---|---|---|
 | 2 | Créer le projet Supabase, région UE | il faut un compte et une carte | 🔴 maintenant |
-| 3 | Prendre le nom de domaine | pareil, et le bundle id en dépend | 🔴 maintenant |
+| 3 | Prendre le nom de domaine | pareil, et le site (20) comme le bundle id en dépendent | 🔴 maintenant |
 | 9 | Créer le projet **Railway**, région **EU West** (elle ne l'est pas par défaut) | il faut un compte | 🟠 avant le premier build sur un téléphone qui n'est pas le tien |
 | 10 | Choisir le fournisseur d'e-mail (Resend, Postmark, Scaleway TEM) | décision + compte + DNS | 🟠 avant que de vraies personnes reçoivent des invitations |
+| 20 | Mettre le site en ligne — hébergement statique du build Vite (Vercel, Netlify ou Cloudflare Pages), branché sur le domaine | il faut un compte et le DNS ; `GET /config` et l'API iront chez Railway (9), le site statique n'a pas besoin de serveur | 🟠 dès que 19 et 3 sont faits — un site en ligne avec des données factices est déjà une démo qu'on peut envoyer |
 | 13 | Trancher IAP ou paiement web | décision business, 15 à 30 % de commission en jeu — et elle bloque la tâche 15, pas l'inverse | ⚪ avant la release qui introduit le paiement |
 | 14 | Créer le compte Stripe, en mode test | il faut un compte, un IBAN et une vérification d'identité ; le mode test suffit pour que je construise le flux | ⚪ après avoir tranché 13 |
 | 16 | ~~Cocher la CI comme check requis sur `main`~~ ✅ 21 août 2026 | ça vit dans les réglages GitHub, pas dans le repo | fait — un `git push origin main` direct est désormais refusé, tout passe par une PR dont `verifications` est vert |
@@ -230,13 +263,15 @@ Mêmes numéros, mêmes trous : ce qui manque est une tâche de Claude.
 
 ## Ce qui peut avancer en parallèle
 
-L'ordre 1 → 18 est une file d'attente sûre, pas une contrainte : trois chantiers sont
+L'ordre 1 → 20 est une file d'attente sûre, pas une contrainte : trois chantiers sont
 indépendants, donc oui, ça se recouvre.
 
 - **Pendant que j'écris le schéma Drizzle (1)**, tu peux créer le projet Supabase (2) et prendre
   le domaine (3). Aucun des deux ne me bloque, et les deux me débloqueront pour la tâche 11.
 - **`GET /config` (4) ne dépend de rien** — ni base, ni auth, ni schéma. Il peut se faire avant,
   pendant ou après le schéma, dans n'importe quel ordre.
+- **Le cadre téléphone (19)** est une règle CSS, indépendant de tout : à faire en premier,
+  c'est ce qui rend le site montrable.
 - **La correction d'`Offre` (8)** est du travail front, sans aucun lien avec le backend (comme
   l'étaient 6 et 7, faites). Elle peut s'intercaler n'importe où.
 
