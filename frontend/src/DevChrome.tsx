@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════
-   DevChrome — barre de navigation de développement, HORS du téléphone.
+   DevChrome — barre de navigation de développement, HORS de l'app (flottante).
 
    Ce n'est pas de l'app : c'est un échafaudage pour atteindre le seul
    point d'entrée qui n'a pas encore de lien dans le design (l'écran

@@ -56,7 +56,7 @@ function ScreenOffres({ nav }: { nav: ReactNode }) {
           <Mono style={{ marginTop: 7 }}>{offre.meta}</Mono>
         </div>
 
-        <div className="body">
+        <div>
           <div style={{ padding: '16px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <Mono>{recues.length} CANDIDATURE{recues.length > 1 ? 'S' : ''}</Mono>
             {recues.map(c => <CandidatureCard key={c.talent} c={c} />)}
@@ -85,7 +85,7 @@ function ScreenOffres({ nav }: { nav: ReactNode }) {
       </ScreenHead>
 
       {section === 'Talents' ? <TalentDeck /> : (
-        <div className="body">
+        <div>
           <div style={{ padding: '16px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
             {DATA.offres.map(o => (
               <OffreCard key={o.titre} o={o} onVoir={() => setOuverte(o.titre)} />

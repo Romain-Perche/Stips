@@ -15,7 +15,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
   const inv = DATA.invitation;
   return (
     <Screen>
-      <div className="body">
+      <div>
         <div style={{ padding: '26px 22px 140px', display: 'flex', flexDirection: 'column', gap: 18 }}>
 
           <div>

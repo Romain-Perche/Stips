@@ -37,7 +37,7 @@ function ScreenStagesCandidat({ nav }: { nav: ReactNode }) {
         sous={`${DATA.offres.length} offres ouvertes, publiées par les pros de Stips`} />
       <Pills items={['Tout', 'Mes candidatures']} active={filtre} onChange={setFiltre} />
 
-      <div className="body">
+      <div>
         <div style={{ padding: '16px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {liste.map(o => (
             <OffreCard key={o.titre} o={o}
