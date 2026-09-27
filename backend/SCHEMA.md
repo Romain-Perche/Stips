@@ -1,6 +1,7 @@
 # Le schéma de Stips, en images
 
-Le *pourquoi* de chaque choix est dans [`README.md`](./README.md) ; ce fichier est la carte.
+Le *pourquoi* de chaque choix est dans [`README.md`](./README.md) ; ce fichier est la carte,
+et [`src/db/schema.ts`](./src/db/schema.ts) le territoire — c'est lui qui fait foi.
 Dix-huit tables, découpées en cinq domaines parce qu'un seul diagramme de dix-huit tables ne
 se lit pas.
 
@@ -30,6 +31,7 @@ erDiagram
         text dispo "partie 2, nullable"
         text cv_chemin "cle d-objet, pas une URL, partie 2, nullable"
         uuid auth_user_id FK "Supabase, nullable"
+        text stripe_customer_id "client Stripe, unique, nullable"
         timestamptz created_at
     }
     entreprise {
@@ -65,7 +67,6 @@ erDiagram
         uuid personne_id FK
         date debut
         date fin
-        text stripe_customer_id
     }
 
     personne   ||--o{ experience  : "est passe par"
@@ -333,6 +334,7 @@ Table personne {
   dispo text [note: 'disponibilite declaree, partie 2, nullable']
   cv_chemin text [note: 'chemin de l-objet dans le bucket prive (cv/personne_id/uuid.pdf), l-URL signee se mint a la lecture, partie 2, nullable']
   auth_user_id uuid [note: 'lien vers le compte Supabase Auth, nullable tant que la personne n-a pas de compte']
+  stripe_customer_id text [unique, note: 'client Stripe (cus_...), identifie la personne a vie et non une periode payee, nullable']
   created_at timestamptz [note: 'date de creation du profil']
 }
 
@@ -371,8 +373,7 @@ Table abonnement {
   id uuid [pk, note: 'identifiant unique']
   personne_id uuid [note: 'qui cotise']
   debut date [note: 'debut de la periode couverte']
-  fin date [note: 'fin de la periode couverte']
-  stripe_customer_id text [note: 'client Stripe correspondant, 100 euros par an']
+  fin date [note: 'fin de la periode couverte, 100 euros par an']
 }
 
 Ref: experience.personne_id > personne.id // est passe par

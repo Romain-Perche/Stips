@@ -113,11 +113,11 @@ maquette » plus bas).
 
 | Table | Ce qu'elle porte |
 |---|---|
-| `personne` | identité, `role`, `admin`, partie 1 du profil, partie 2 nullable + `en_recherche`, `auth_user_id` |
+| `personne` | identité, `role`, `admin`, partie 1 du profil, partie 2 nullable + `en_recherche`, `auth_user_id`, `stripe_customer_id` |
 | `entreprise` | nom, secteur, domaine e-mail |
 | `experience` | `personne_id` × `entreprise_id`, intitulé, `debut`, `fin` |
 | `parrainage` | la reco : qualificatif, commentaire, statut, origine, identités en attente |
-| `abonnement` | les 100 €/an : période, `stripe_customer_id` |
+| `abonnement` | les 100 €/an : une ligne par période payée |
 | `forum` | `slug`, libellé |
 | `fil` | `forum_id`, `auteur_id`, titre, corps, `score` |
 | `reponse` | `fil_id`, `auteur_id`, corps |
