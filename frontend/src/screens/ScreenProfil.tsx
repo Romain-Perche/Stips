@@ -16,9 +16,8 @@
 import { useState, type ReactNode } from 'react';
 import { C, DATA, type MoiProfile } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Avatar, Stk, ScreenHead, Screen } from '../atoms';
+import { Mono, Avatar, Stk, ScreenHead, Screen, RondPiece } from '../atoms';
 import { useRole } from '../role';
-import type { TabScreen } from '../types';
 
 function ScreenProfil({ nav }: { nav: ReactNode }) {
   const role = useRole();
@@ -60,7 +59,7 @@ function Form({ membre, profil }: { membre: boolean; profil: MoiProfile }) {
         <div>
           <Mono>EN DEUX LIGNES</Mono>
           <div style={{
-            marginTop: 7, background: C.card, border: '1px solid rgba(0,0,0,.12)',
+            marginTop: 7, background: C.card, border: `1px solid ${C.fieldLineSoft}`,
             borderRadius: 11, padding: 13,
           }}>
             <textarea className="bare" rows={3} value={p.bio}
@@ -89,7 +88,7 @@ function Form({ membre, profil }: { membre: boolean; profil: MoiProfile }) {
               <div style={{ marginTop: 7, display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {(p.experiences ?? []).map(e => (
                   <div key={e.titre} style={{
-                    background: C.card, border: '1px solid rgba(0,0,0,.12)', borderRadius: 11,
+                    background: C.card, border: `1px solid ${C.fieldLineSoft}`, borderRadius: 11,
                     padding: '12px 13px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   }}>
                     <span style={{ font: `500 14px ${F.ui}`, color: C.ink }}>
@@ -105,8 +104,8 @@ function Form({ membre, profil }: { membre: boolean; profil: MoiProfile }) {
 
         {/* Pièces (partie 2) + enregistrer */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 2 }}>
-          {membre && <RondPiece code="CV" tooltip="Remplacer mon CV" />}
-          {membre && <RondPiece code="IN" tooltip="Lier LinkedIn" />}
+          {membre && <RondPiece size={60} tooltip="Remplacer mon CV">CV</RondPiece>}
+          {membre && <RondPiece size={60} tooltip="Lier LinkedIn">IN</RondPiece>}
           <div style={{
             marginLeft: 'auto', padding: '13px 22px', borderRadius: 99,
             background: C.ink, color: C.cream, font: `600 14px ${F.ui}`, cursor: 'pointer',
@@ -123,7 +122,7 @@ function Champ({ label, valeur }: { label: string; valeur: string }) {
     <div>
       <Mono>{label}</Mono>
       <div style={{
-        marginTop: 7, background: C.card, border: '1px solid rgba(0,0,0,.12)',
+        marginTop: 7, background: C.card, border: `1px solid ${C.fieldLineSoft}`,
         borderRadius: 11, padding: 13, display: 'flex',
         justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer',
       }}>
@@ -134,24 +133,6 @@ function Champ({ label, valeur }: { label: string; valeur: string }) {
   );
 }
 
-function RondPiece({ code, tooltip }: { code: string; tooltip: string }) {
-  return (
-    <div className="stk" style={{
-      position: 'relative', width: 60, height: 60, borderRadius: '50%',
-      border: '1px solid rgba(0,0,0,.16)', color: C.ink,
-      display: 'grid', placeItems: 'center', font: `500 11px ${F.mono}`, cursor: 'pointer',
-    }}>
-      {code}
-      <span style={{
-        position: 'absolute', bottom: 'calc(100% + 9px)', left: '50%',
-        transform: 'translateX(-50%)', whiteSpace: 'nowrap', padding: '5px 10px',
-        borderRadius: 5, background: C.ink, color: C.cream, font: `500 11px ${F.ui}`,
-        opacity: 0, pointerEvents: 'none', transition: 'opacity .18s',
-      }}>{tooltip}</span>
-    </div>
-  );
-}
+ScreenProfil.tab = { id: 'profil', label: 'Qui suis-je ?' };
 
-(ScreenProfil as TabScreen).tab = { id: 'profil', label: 'Qui suis-je ?' };
-
-export default ScreenProfil as TabScreen;
+export default ScreenProfil;

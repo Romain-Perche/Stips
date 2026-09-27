@@ -20,10 +20,14 @@ export const C = {
   cream:     '#f7f5ef',   // texte sur fond noir
   creamMut:  '#a5a296',
   creamFai:  '#8d8a7e',
-  line:      'rgba(0,0,0,.1)',
+  line:      'rgba(0,0,0,.1)',     // bord d'une carte
+  lineStrong:'rgba(0,0,0,.09)',    // haut de la barre d'onglets, filet de la carte talent
+  divider:   'rgba(0,0,0,.08)',    // filet interne d'une carte, bas d'un en-tête
   lineSoft:  'rgba(0,0,0,.07)',
   lineFaint: 'rgba(0,0,0,.06)',
-  fieldLine: 'rgba(0,0,0,.14)',
+  stroke:    'rgba(0,0,0,.16)',    // contour d'un bouton (Stk, RondPiece)
+  fieldLine: 'rgba(0,0,0,.14)',    // champ de recherche
+  fieldLineSoft: 'rgba(0,0,0,.12)', // champs de « Qui suis-je ? »
   wash:      'rgba(0,0,0,.05)',
 } as const;
 
@@ -66,4 +70,6 @@ export const TEINTES_VARIANTE = {
     frontend/src/tokens.ts) ; mobile les passe à un <Pattern> SVG
     (<Hatch>, dans mobile/src/atoms.tsx). */
 export const HATCH_COLORS = { a: '#e6e1d3', b: '#efebdf' } as const;
+/** Variante plus claire, pour la pièce jointe d'un fil du forum. */
+export const HATCH_PIECE = { a: '#efebdf', b: '#f6f3ea' } as const;
 export const HATCH_STRIPE = 5;

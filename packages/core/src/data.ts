@@ -13,7 +13,7 @@ export const DATA: {
   membres: Membre[];
   membresTotal: number;
   boites: Boite[];
-  offres: { liste: Offre[] };
+  offres: Offre[];
   candidatures: Candidature[];
   events: EventItem[];
   fils: Fil[];
@@ -141,14 +141,12 @@ export const DATA: {
   ],
 
   // ── Les offres publiées par le pro (écran 6a) ──────────────────────────
-  offres: {
-    liste: [
-      { meta: 'M&A · PARIS · 6 MOIS',    titre: 'Analyste M&A — stage de césure',
-        recues: 12, pied: 'Publiée le 2 sept. · 4 non lues' },
-      { meta: 'DATA · REMOTE · 4 MOIS',  titre: 'Data analyst junior — été 2027',
-        recues: 7,  pied: 'Publiée le 28 août' },
-    ],
-  },
+  offres: [
+    { meta: 'M&A · PARIS · 6 MOIS',    titre: 'Analyste M&A — stage de césure',
+      pied: 'Publiée le 2 sept. · 4 non lues' },
+    { meta: 'DATA · REMOTE · 4 MOIS',  titre: 'Data analyst junior — été 2027',
+      pied: 'Publiée le 28 août' },
+  ],
 
   // ── Les candidatures reçues, vues par le pro (onglet Offres) ───────────
   // `heures` plutôt qu'une chaîne « il y a 3 h » : c'est l'écran qui écrit

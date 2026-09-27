@@ -1,7 +1,6 @@
 // Étend le socle racine (../.oxlintrc.json) : plugins + rules-of-hooks.
 // only-export-components est propre à frontend — elle cible le Fast Refresh
-// de Vite. Sur mobile, le même idiome (cast `as unknown as TabScreen` sur
-// l'export d'écran) la fait se déclencher sans raison ; voir
+// de Vite. Mobile ne l'active pas encore, à cause d'App.tsx ; voir
 // mobile/.oxlintrc.json.
 {
   "$schema": "../node_modules/oxlint/configuration_schema.json",

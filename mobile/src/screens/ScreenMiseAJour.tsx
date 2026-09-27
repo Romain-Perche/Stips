@@ -42,7 +42,7 @@ export default function ScreenMiseAJour({ url, message }: { url?: string; messag
       {url && (
         <View style={{
           paddingHorizontal: 22, paddingTop: 16, paddingBottom: 22 + insets.bottom,
-          borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,.08)',
+          borderTopWidth: 1, borderTopColor: C.divider,
         }}>
           <BoutonPlein onPress={() => void Linking.openURL(url)}>Mettre à jour</BoutonPlein>
         </View>

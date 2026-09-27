@@ -72,7 +72,7 @@ function AppTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
     <View style={{
       flexDirection: 'row', backgroundColor: C.card,
-      borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,.09)',
+      borderTopWidth: 1, borderTopColor: C.lineStrong,
       paddingTop: 12, paddingBottom: insets.bottom || 12,
     }}>
       {state.routes.map((route, index) => {

@@ -10,8 +10,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { C, DATA } from '@stips/core';
 import type { Boite } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Card, PersonRow, SearchField, Segmented, Screen } from '../atoms';
-import type { TabScreen } from '../types';
+import { Mono, Card, PersonRow, SearchField, Segmented, Screen, ScreenHead } from '../atoms';
 
 function ScreenChercher() {
   const [onglet, setOnglet] = useState<'Personnes' | 'Boîtes'>('Personnes');
@@ -35,20 +34,14 @@ function ScreenChercher() {
 
   return (
     <Screen>
-      <View style={{ flexShrink: 0, paddingHorizontal: 22, paddingTop: 16, paddingBottom: 14 }}>
-        <Text style={{ fontFamily: F.serif, fontSize: 32, lineHeight: 34, color: C.ink }}>
-          {personnes ? "Trouver quelqu'un" : 'Trouver une boîte'}
-        </Text>
-        {!personnes && (
-          <Text style={{ fontFamily: F.uiRegular, fontSize: 13, color: C.muted, marginTop: 4 }}>
-            Vois qui de Stips y est passé avant de postuler
-          </Text>
-        )}
+      <ScreenHead border={false} padBas={14}
+        titre={personnes ? "Trouver quelqu'un" : 'Trouver une boîte'}
+        sous={personnes ? undefined : 'Vois qui de Stips y est passé avant de postuler'}>
         <SearchField value={q} onChange={setQ}
           placeholder={personnes ? 'Une boîte, un métier, une école…' : 'Le nom d’une boîte…'} />
         <Segmented items={['Personnes', 'Boîtes']} active={onglet}
           onChange={t => { setOnglet(t as 'Personnes' | 'Boîtes'); setQ(''); }} />
-      </View>
+      </ScreenHead>
 
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
         {personnes ? (
@@ -106,6 +99,6 @@ function BoiteBloc({ b }: { b: Boite }) {
   );
 }
 
-(ScreenChercher as unknown as TabScreen).tab = { id: 'chercher', label: 'Chercher' };
+ScreenChercher.tab = { id: 'chercher', label: 'Chercher' };
 
-export default ScreenChercher as unknown as TabScreen;
+export default ScreenChercher;

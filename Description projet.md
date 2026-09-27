@@ -147,7 +147,7 @@ Cette symétrie n'est pas cosmétique : elle veut dire que la liste d'onglets pa
   appartiennent à une offre, donc elles vivent derrière le « Voir » de cette offre — un niveau
   de profondeur, pas un onglet. Le deck n'y est pas recopié : `ScreenTalents.tsx` n'exporte
   plus qu'un `TalentDeck`, que cette section monte. Et les compteurs de candidatures y sont
-  **calculés** depuis `DATA.candidatures`, jamais lus dans `Offre.recues` — sinon la carte
+  **calculés** depuis `DATA.candidatures`, jamais stockés dans `Offre` — sinon la carte
   annonce 12 et le détail en montre 2.
 - **Agenda** — « A vos agendas ». Chaque événement porte sa date en gros, le nombre
   d'inscrits, les places restantes, et une action (« Je viens », « Liste d'attente »,

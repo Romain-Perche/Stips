@@ -105,7 +105,7 @@ function TalentFaceA({ t }: { t: Talent }) {
       <Text style={{ fontFamily: F.uiSemiBold, fontSize: 26, lineHeight: 30, color: C.ink, marginTop: 18 }}>{t.nom}</Text>
       <Text style={{ fontFamily: F.uiRegular, fontSize: 14, color: C.muted, marginTop: 3 }}>{t.ecole}</Text>
 
-      <View style={{ marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,.09)' }}>
+      <View style={{ marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: C.lineStrong }}>
         <Mono>PARRAINÉ(E) PAR</Mono>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 }}>
           <Avatar size={32} />
