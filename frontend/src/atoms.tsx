@@ -57,14 +57,16 @@ export function StatusBar({ color = C.ink }: { color?: string }) {
   );
 }
 
-/** Titre d'écran en Instrument Serif, avec sous-titre optionnel */
-export function ScreenHead({ titre, sous, right, border = true, pad = '16px 22px 12px' }: {
-  titre: string; sous?: string; right?: ReactNode; border?: boolean; pad?: string;
+/** Titre d'écran en Instrument Serif, avec sous-titre optionnel. `children`
+    se pose sous le titre : champ de recherche, bascule de section. */
+export function ScreenHead({ titre, sous, right, border = true, padBas = 12, children }: {
+  titre: string; sous?: string; right?: ReactNode; border?: boolean; padBas?: number;
+  children?: ReactNode;
 }) {
   return (
     <div style={{
-      flex: 'none', padding: pad,
-      borderBottom: border ? `1px solid rgba(0,0,0,.08)` : 'none',
+      flex: 'none', padding: `16px 22px ${padBas}px`,
+      borderBottom: border ? `1px solid ${C.divider}` : 'none',
       display: right ? 'flex' : 'block',
       alignItems: 'flex-end', justifyContent: 'space-between',
     }}>
@@ -75,6 +77,7 @@ export function ScreenHead({ titre, sous, right, border = true, pad = '16px 22px
         )}
       </div>
       {right}
+      {children}
     </div>
   );
 }
@@ -95,7 +98,7 @@ export function Stk({ children, onClick, size = 12, pad = '8px 14px', style }: {
 }) {
   return (
     <div className="stk" onClick={onClick} style={{
-      padding: pad, borderRadius: 99, border: '1px solid rgba(0,0,0,.16)',
+      padding: pad, borderRadius: 99, border: `1px solid ${C.stroke}`,
       color: C.ink, font: `600 ${size}px ${F.ui}`, cursor: 'pointer', flex: 'none',
       ...style,
     }}>
@@ -239,6 +242,54 @@ export function Card({ children, style, dark, radius = 16, pad = 18 }: {
   );
 }
 
+/** Carte noire d'appel à l'action, en bas d'une liste : « Publier une
+    offre », « Être vu par les pros ». */
+export function CarteAction({ titre, sous, icone, tailleIcone }: {
+  titre: string; sous: ReactNode; icone: string; tailleIcone: number;
+}) {
+  return (
+    <Card dark style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      gap: 12, cursor: 'pointer',
+    }}>
+      <div>
+        <div style={{ font: `600 17px ${F.ui}`, color: C.cream }}>{titre}</div>
+        <div style={{ font: `400 12px ${F.ui}`, color: C.creamMut, marginTop: 4 }}>{sous}</div>
+      </div>
+      <div style={{
+        width: 44, height: 44, borderRadius: '50%', background: C.cream, color: C.ink,
+        display: 'grid', placeItems: 'center', font: `300 ${tailleIcone}px ${F.ui}`, flex: 'none',
+      }}>{icone}</div>
+    </Card>
+  );
+}
+
+/** Bouton rond avec info-bulle au survol (CV, LinkedIn, lettre de reco…).
+    Même nom et même rôle que le RondPiece de mobile. */
+export function RondPiece({ children, tooltip, size = 48, font = `500 11px ${F.mono}` }: {
+  children: ReactNode; tooltip?: string | null; size?: number; font?: string;
+}) {
+  return (
+    <div className="stk" style={{
+      position: 'relative', width: size, height: size, borderRadius: '50%',
+      border: `1px solid ${C.stroke}`, color: C.ink,
+      display: 'grid', placeItems: 'center', cursor: 'pointer',
+      font, letterSpacing: '.04em',
+    }}>
+      {children}
+      {tooltip && (
+        <span style={{
+          position: 'absolute', bottom: 'calc(100% + 9px)', left: '50%',
+          transform: 'translateX(-50%)', whiteSpace: 'nowrap',
+          padding: '5px 10px', borderRadius: 5, background: C.ink, color: C.cream,
+          font: `500 11px ${F.ui}`, opacity: 0, pointerEvents: 'none',
+          transition: 'opacity .18s',
+        }}>{tooltip}</span>
+      )}
+    </div>
+  );
+}
+
 /** État vide, pour les écrans pas encore dessinés */
 export function Placeholder({ label, texte }: { label: string; texte: string }) {
   return (
@@ -268,7 +319,7 @@ export function TabBar({ screens, active, onChange }: {
   return (
     <div style={{
       position: 'absolute', bottom: 0, left: 0, right: 0, height: 74,
-      background: C.card, borderTop: '1px solid rgba(0,0,0,.09)',
+      background: C.card, borderTop: `1px solid ${C.lineStrong}`,
       display: 'flex', alignItems: 'flex-start', paddingTop: 12,
     }}>
       {screens.map(Ecran => {

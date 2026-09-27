@@ -5,11 +5,10 @@
 
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { C, DATA } from '@stips/core';
+import { C, DATA, HATCH_PIECE } from '@stips/core';
 import type { Fil } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, ScreenHead, Pills, Screen, Hatch } from '../atoms';
-import type { TabScreen } from '../types';
 
 function ScreenForum() {
   const [filtre, setFiltre] = useState('Populaire');
@@ -79,7 +78,7 @@ function FilCard({ f, votes, onVote }: { f: Fil; votes: number; onVote: (n: numb
 
         {f.piece && (
           <View style={{ marginTop: 10, height: 96, borderRadius: 9, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
-            <Hatch style={{ position: 'absolute', inset: 0 }} stripe={6} colors={{ a: '#efebdf', b: '#f6f3ea' }} />
+            <Hatch style={{ position: 'absolute', inset: 0 }} stripe={6} colors={HATCH_PIECE} />
             <Text style={{ fontFamily: F.monoMedium, fontSize: 11, color: C.muted2 }}>{f.piece}</Text>
           </View>
         )}
@@ -94,6 +93,6 @@ function FilCard({ f, votes, onVote }: { f: Fil; votes: number; onVote: (n: numb
   );
 }
 
-(ScreenForum as unknown as TabScreen).tab = { id: 'forum', label: 'Forum' };
+ScreenForum.tab = { id: 'forum', label: 'Forum' };
 
-export default ScreenForum as unknown as TabScreen;
+export default ScreenForum;

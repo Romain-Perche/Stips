@@ -13,7 +13,7 @@
    recopié — même découpage que côté web.
 
    Les compteurs de candidatures sont **calculés** depuis
-   `DATA.candidatures`, jamais lus dans `Offre.recues` — sinon la carte
+   `DATA.candidatures`, jamais stockés dans `Offre` — sinon la carte
    annonce 12 et le détail en montre 2. Voir `backend/README.md` § les
    valeurs qu'on ne stocke pas.
    ══════════════════════════════════════════════════════════════════════ */
@@ -23,9 +23,8 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { C, DATA } from '@stips/core';
 import type { Candidature, Offre } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Card, Stk, Avatar, Segmented, Screen } from '../atoms';
+import { Mono, Card, Stk, Avatar, Segmented, Screen, ScreenHead, CarteAction } from '../atoms';
 import { TalentDeck } from './ScreenTalents';
-import type { TabScreen } from '../types';
 
 const SECTIONS = ['Offres', 'Talents'] as const;
 type Section = (typeof SECTIONS)[number];
@@ -40,7 +39,7 @@ function ScreenOffres() {
   const [section, setSection] = useState<Section>('Offres');
   const [ouverte, setOuverte] = useState<string | null>(null);
 
-  const offre = DATA.offres.liste.find(o => o.titre === ouverte);
+  const offre = DATA.offres.find(o => o.titre === ouverte);
 
   // ── Le détail d'une offre : ses candidatures ────────────────────────
   if (offre) {
@@ -71,46 +70,28 @@ function ScreenOffres() {
   // ── La liste, ou le deck ────────────────────────────────────────────
   const entetes: Record<Section, [string, string]> = {
     Offres: ['Mes offres',
-      `${DATA.offres.liste.length} offres en ligne · ${DATA.candidatures.length} candidatures reçues`],
+      `${DATA.offres.length} offres en ligne · ${DATA.candidatures.length} candidatures reçues`],
     Talents: ['Les talents', 'Les membres qui se sont déclarés en recherche'],
   };
   const [titre, sous] = entetes[section];
 
   return (
     <Screen>
-      <View style={{ flexShrink: 0, paddingHorizontal: 22, paddingTop: 16, paddingBottom: 14 }}>
-        <Text style={{ fontFamily: F.serif, fontSize: 32, lineHeight: 34, color: C.ink }}>{titre}</Text>
-        <Text style={{ fontFamily: F.uiRegular, fontSize: 13, color: C.muted, marginTop: 4 }}>{sous}</Text>
+      <ScreenHead titre={titre} sous={sous} border={false} padBas={14}>
         <Segmented items={[...SECTIONS]} active={section}
           onChange={s => setSection(s as Section)} />
-      </View>
+      </ScreenHead>
 
       {section === 'Talents' ? <TalentDeck /> : (
         <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
           <View style={{ paddingHorizontal: 22, paddingTop: 16, paddingBottom: 96, gap: 12 }}>
-            {DATA.offres.liste.map(o => (
+            {DATA.offres.map(o => (
               <OffreCard key={o.titre} o={o} onVoir={() => setOuverte(o.titre)} />
             ))}
 
-            {/* Publier une offre */}
-            <Pressable>
-              <Card dark style={{
-                flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-              }}>
-                <View>
-                  <Text style={{ fontFamily: F.uiSemiBold, fontSize: 17, color: C.cream }}>Publier une offre</Text>
-                  <Text style={{ fontFamily: F.uiRegular, fontSize: 12, color: C.creamMut, marginTop: 4 }}>
-                    Visible par les {DATA.membresTotal} profils parrainés
-                  </Text>
-                </View>
-                <View style={{
-                  width: 44, height: 44, borderRadius: 22, backgroundColor: C.cream,
-                  alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                }}>
-                  <Text style={{ fontFamily: F.uiRegular, fontWeight: '300', fontSize: 24, color: C.ink, marginTop: -2 }}>+</Text>
-                </View>
-              </Card>
-            </Pressable>
+            <CarteAction titre="Publier une offre"
+              sous={`Visible par les ${DATA.membresTotal} profils parrainés`}
+              icone="+" tailleIcone={24} />
           </View>
         </ScrollView>
       )}
@@ -140,7 +121,7 @@ function OffreCard({ o, onVoir }: { o: Offre; onVoir: () => void }) {
       </View>
 
       <View style={{
-        marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,.08)',
+        marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: C.divider,
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Text style={{ fontFamily: F.uiRegular, fontSize: 12, color: C.muted }}>
@@ -182,7 +163,7 @@ function CandidatureCard({ c }: { c: Candidature }) {
       </View>
 
       <View style={{
-        marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,.08)',
+        marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: C.divider,
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Text style={{ fontFamily: F.uiRegular, fontSize: 12, color: C.muted }}>{ilYA(c.heures)}</Text>
@@ -192,6 +173,6 @@ function CandidatureCard({ c }: { c: Candidature }) {
   );
 }
 
-(ScreenOffres as unknown as TabScreen).tab = { id: 'offres', label: 'Offres' };
+ScreenOffres.tab = { id: 'offres', label: 'Offres' };
 
-export default ScreenOffres as unknown as TabScreen;
+export default ScreenOffres;

@@ -60,14 +60,16 @@ export function AppHeader({ color = C.ink }: { color?: string }) {
   );
 }
 
-/** Titre d'écran en Instrument Serif, avec sous-titre optionnel */
-export function ScreenHead({ titre, sous, right, border = true, pad = 16 }: {
-  titre: string; sous?: string; right?: ReactNode; border?: boolean; pad?: number;
+/** Titre d'écran en Instrument Serif, avec sous-titre optionnel. `children`
+    se pose sous le titre : champ de recherche, bascule de section. */
+export function ScreenHead({ titre, sous, right, border = true, padBas = 12, children }: {
+  titre: string; sous?: string; right?: ReactNode; border?: boolean; padBas?: number;
+  children?: ReactNode;
 }) {
   return (
     <View style={{
-      flexShrink: 0, paddingHorizontal: 22, paddingTop: pad, paddingBottom: 12,
-      borderBottomWidth: border ? 1 : 0, borderBottomColor: 'rgba(0,0,0,.08)',
+      flexShrink: 0, paddingHorizontal: 22, paddingTop: 16, paddingBottom: padBas,
+      borderBottomWidth: border ? 1 : 0, borderBottomColor: C.divider,
       // Avec `right`, titre et action côte à côte, alignés par le bas.
       // Sans `right`, on reste en colonne et surtout SANS alignItems :
       // en colonne l'axe transversal est horizontal, donc un
@@ -87,6 +89,7 @@ export function ScreenHead({ titre, sous, right, border = true, pad = 16 }: {
         )}
       </View>
       {right}
+      {children}
     </View>
   );
 }
@@ -130,7 +133,7 @@ export function Stk({ children, onPress, size = 12, padV = 8, padH = 14, style }
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [{
       paddingVertical: padV, paddingHorizontal: padH, borderRadius: 99,
-      borderWidth: 1, borderColor: pressed ? C.ink : 'rgba(0,0,0,.16)',
+      borderWidth: 1, borderColor: pressed ? C.ink : C.stroke,
       backgroundColor: pressed ? C.ink : 'transparent', alignSelf: 'flex-start',
     }, style]}>
       {({ pressed }) => (
@@ -272,6 +275,31 @@ export function Card({ children, style, dark, radius = 16, pad = 18 }: {
   );
 }
 
+/** Carte noire d'appel à l'action, en bas d'une liste : « Publier une
+    offre », « Être vu par les pros ». */
+export function CarteAction({ titre, sous, icone, tailleIcone }: {
+  titre: string; sous: ReactNode; icone: string; tailleIcone: number;
+}) {
+  return (
+    <Pressable>
+      <Card dark style={{
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+      }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontFamily: F.uiSemiBold, fontSize: 17, color: C.cream }}>{titre}</Text>
+          <Text style={{ fontFamily: F.uiRegular, fontSize: 12, color: C.creamMut, marginTop: 4 }}>{sous}</Text>
+        </View>
+        <View style={{
+          width: 44, height: 44, borderRadius: 22, backgroundColor: C.cream,
+          alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+        }}>
+          <Text style={{ fontFamily: F.uiRegular, fontSize: tailleIcone, color: C.ink }}>{icone}</Text>
+        </View>
+      </Card>
+    </Pressable>
+  );
+}
+
 /** État vide, pour les écrans pas encore dessinés */
 export function Placeholder({ label, texte }: { label: string; texte: string }) {
   return (
@@ -302,7 +330,7 @@ export function RondPiece({ children, tooltip, size = 48, fontSize = 11, fontFam
   return (
     <Pressable onPress={onPress} onPressIn={() => setPressed(true)} onPressOut={() => setPressed(false)} style={{
       width: size, height: size, borderRadius: size / 2,
-      borderWidth: 1, borderColor: pressed ? C.ink : 'rgba(0,0,0,.16)',
+      borderWidth: 1, borderColor: pressed ? C.ink : C.stroke,
       backgroundColor: pressed ? C.ink : 'transparent',
       alignItems: 'center', justifyContent: 'center',
     }}>

@@ -42,7 +42,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
               color: C.ink2, textWrap: 'pretty',
             }}>{inv.reco}</div>
             <div style={{
-              marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(0,0,0,.08)',
+              marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.divider}`,
               font: `400 12px ${F.ui}`, color: C.muted2,
             }}>{inv.signee}</div>
           </Card>
@@ -66,7 +66,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
       <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0,
         padding: '16px 22px 22px', background: C.bg,
-        borderTop: '1px solid rgba(0,0,0,.08)',
+        borderTop: `1px solid ${C.divider}`,
       }}>
         <div onClick={onAccepter} style={{
           padding: 15, borderRadius: 99, background: C.ink, color: C.cream,

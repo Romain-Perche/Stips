@@ -4,11 +4,10 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState, type ReactNode } from 'react';
-import { C, DATA } from '@stips/core';
+import { C, DATA, HATCH_PIECE } from '@stips/core';
 import type { Fil } from '@stips/core';
-import { F } from '../tokens';
+import { F, hatch } from '../tokens';
 import { Mono, Card, ScreenHead, Pills, Screen } from '../atoms';
-import type { TabScreen } from '../types';
 
 function ScreenForum({ nav }: { nav: ReactNode }) {
   const [filtre, setFiltre] = useState('Populaire');
@@ -79,7 +78,7 @@ function FilCard({ f, votes, onVote }: { f: Fil; votes: number; onVote: (n: numb
         {f.piece && (
           <div style={{
             marginTop: 10, height: 96, borderRadius: 9,
-            background: 'repeating-linear-gradient(45deg,#efebdf,#efebdf 6px,#f6f3ea 6px,#f6f3ea 12px)',
+            background: hatch(6, HATCH_PIECE),
             display: 'grid', placeItems: 'center',
             font: `500 11px ${F.mono}`, color: C.muted2,
           }}>{f.piece}</div>
@@ -96,6 +95,6 @@ function FilCard({ f, votes, onVote }: { f: Fil; votes: number; onVote: (n: numb
   );
 }
 
-(ScreenForum as TabScreen).tab = { id: 'forum', label: 'Forum' };
+ScreenForum.tab = { id: 'forum', label: 'Forum' };
 
-export default ScreenForum as TabScreen;
+export default ScreenForum;

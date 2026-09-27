@@ -19,8 +19,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { C, DATA } from '@stips/core';
 import type { Offre } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Card, Stk, ScreenHead, Pills, Screen } from '../atoms';
-import type { TabScreen } from '../types';
+import { Mono, Card, Stk, ScreenHead, Pills, Screen, CarteAction } from '../atoms';
 
 function ScreenStagesCandidat({ nav }: { nav: ReactNode }) {
   const [filtre, setFiltre] = useState('Tout');
@@ -28,14 +27,14 @@ function ScreenStagesCandidat({ nav }: { nav: ReactNode }) {
 
   const liste = useMemo(() => (
     filtre === 'Mes candidatures'
-      ? DATA.offres.liste.filter(o => envoyees.includes(o.titre))
-      : DATA.offres.liste
+      ? DATA.offres.filter(o => envoyees.includes(o.titre))
+      : DATA.offres
   ), [filtre, envoyees]);
 
   return (
     <Screen nav={nav}>
       <ScreenHead titre="Stages"
-        sous={`${DATA.offres.liste.length} offres ouvertes, publiées par les pros de Stips`} />
+        sous={`${DATA.offres.length} offres ouvertes, publiées par les pros de Stips`} />
       <Pills items={['Tout', 'Mes candidatures']} active={filtre} onChange={setFiltre} />
 
       <div className="body">
@@ -54,21 +53,9 @@ function ScreenStagesCandidat({ nav }: { nav: ReactNode }) {
 
           {/* Le pendant du « Publier une offre » du pro : ce qui rend un
               membre visible, c'est la partie 2 de « Qui suis-je ? ». */}
-          <Card dark style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            gap: 12, cursor: 'pointer',
-          }}>
-            <div>
-              <div style={{ font: `600 17px ${F.ui}`, color: C.cream }}>Être vu par les pros</div>
-              <div style={{ font: `400 12px ${F.ui}`, color: C.creamMut, marginTop: 4 }}>
-                Remplis « Qui suis-je ? » pour entrer dans leurs recherches
-              </div>
-            </div>
-            <div style={{
-              width: 44, height: 44, borderRadius: '50%', background: C.cream, color: C.ink,
-              display: 'grid', placeItems: 'center', font: `300 20px ${F.ui}`, flex: 'none',
-            }}>→</div>
-          </Card>
+          <CarteAction titre="Être vu par les pros"
+            sous="Remplis « Qui suis-je ? » pour entrer dans leurs recherches"
+            icone="→" tailleIcone={20} />
         </div>
       </div>
     </Screen>
@@ -87,7 +74,7 @@ function OffreCard({ o, envoyee, onPostuler }: {
       <div style={{ font: `600 18px/1.25 ${F.ui}`, color: C.ink, marginTop: 6 }}>{o.titre}</div>
 
       <div style={{
-        marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(0,0,0,.08)',
+        marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.divider}`,
         display: 'flex', alignItems: 'center',
         justifyContent: envoyee ? 'space-between' : 'flex-end',
       }}>
@@ -102,6 +89,6 @@ function OffreCard({ o, envoyee, onPostuler }: {
   );
 }
 
-(ScreenStagesCandidat as TabScreen).tab = { id: 'stages', label: 'Stages' };
+ScreenStagesCandidat.tab = { id: 'stages', label: 'Stages' };
 
-export default ScreenStagesCandidat as TabScreen;
+export default ScreenStagesCandidat;

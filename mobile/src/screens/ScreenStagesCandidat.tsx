@@ -16,12 +16,11 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { C, DATA } from '@stips/core';
 import type { Offre } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Card, Stk, ScreenHead, Pills, Screen } from '../atoms';
-import type { TabScreen } from '../types';
+import { Mono, Card, Stk, ScreenHead, Pills, Screen, CarteAction } from '../atoms';
 
 function ScreenStagesCandidat() {
   const [filtre, setFiltre] = useState('Tout');
@@ -29,14 +28,14 @@ function ScreenStagesCandidat() {
 
   const liste = useMemo(() => (
     filtre === 'Mes candidatures'
-      ? DATA.offres.liste.filter(o => envoyees.includes(o.titre))
-      : DATA.offres.liste
+      ? DATA.offres.filter(o => envoyees.includes(o.titre))
+      : DATA.offres
   ), [filtre, envoyees]);
 
   return (
     <Screen>
       <ScreenHead titre="Stages"
-        sous={`${DATA.offres.liste.length} offres ouvertes, publiées par les pros de Stips`} />
+        sous={`${DATA.offres.length} offres ouvertes, publiées par les pros de Stips`} />
       <Pills items={['Tout', 'Mes candidatures']} active={filtre} onChange={setFiltre} />
 
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
@@ -55,24 +54,9 @@ function ScreenStagesCandidat() {
 
           {/* Le pendant du « Publier une offre » du pro : ce qui rend un
               membre visible, c'est la partie 2 de « Qui suis-je ? ». */}
-          <Pressable>
-            <Card dark style={{
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-            }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: F.uiSemiBold, fontSize: 17, color: C.cream }}>Être vu par les pros</Text>
-                <Text style={{ fontFamily: F.uiRegular, fontSize: 12, color: C.creamMut, marginTop: 4 }}>
-                  Remplis « Qui suis-je ? » pour entrer dans leurs recherches
-                </Text>
-              </View>
-              <View style={{
-                width: 44, height: 44, borderRadius: 22, backgroundColor: C.cream,
-                alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              }}>
-                <Text style={{ fontFamily: F.uiRegular, fontSize: 20, color: C.ink }}>→</Text>
-              </View>
-            </Card>
-          </Pressable>
+          <CarteAction titre="Être vu par les pros"
+            sous="Remplis « Qui suis-je ? » pour entrer dans leurs recherches"
+            icone="→" tailleIcone={20} />
         </View>
       </ScrollView>
     </Screen>
@@ -93,7 +77,7 @@ function OffreCard({ o, envoyee, onPostuler }: {
       }}>{o.titre}</Text>
 
       <View style={{
-        marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,.08)',
+        marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: C.divider,
         flexDirection: 'row', alignItems: 'center',
         justifyContent: envoyee ? 'space-between' : 'flex-end',
       }}>
@@ -108,6 +92,6 @@ function OffreCard({ o, envoyee, onPostuler }: {
   );
 }
 
-(ScreenStagesCandidat as unknown as TabScreen).tab = { id: 'stages', label: 'Stages' };
+ScreenStagesCandidat.tab = { id: 'stages', label: 'Stages' };
 
-export default ScreenStagesCandidat as unknown as TabScreen;
+export default ScreenStagesCandidat;

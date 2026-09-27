@@ -14,7 +14,7 @@
    que cette section.
 
    Les compteurs de candidatures sont **calculés** depuis
-   `DATA.candidatures`, jamais lus dans `Offre.recues` — sinon la carte
+   `DATA.candidatures`, jamais stockés dans `Offre` — sinon la carte
    annonce 12 et le détail en montre 2. Voir `backend/README.md` § les
    valeurs qu'on ne stocke pas.
    ══════════════════════════════════════════════════════════════════════ */
@@ -23,9 +23,8 @@ import { useState, type ReactNode } from 'react';
 import { C, DATA } from '@stips/core';
 import type { Candidature, Offre } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Card, Stk, Avatar, Segmented, Screen } from '../atoms';
+import { Mono, Card, Stk, Avatar, Segmented, Screen, ScreenHead, CarteAction } from '../atoms';
 import { TalentDeck } from './ScreenTalents';
-import type { TabScreen } from '../types';
 
 const SECTIONS = ['Offres', 'Talents'] as const;
 type Section = (typeof SECTIONS)[number];
@@ -40,7 +39,7 @@ function ScreenOffres({ nav }: { nav: ReactNode }) {
   const [section, setSection] = useState<Section>('Offres');
   const [ouverte, setOuverte] = useState<string | null>(null);
 
-  const offre = DATA.offres.liste.find(o => o.titre === ouverte);
+  const offre = DATA.offres.find(o => o.titre === ouverte);
 
   // ── Le détail d'une offre : ses candidatures ────────────────────────
   if (offre) {
@@ -73,47 +72,29 @@ function ScreenOffres({ nav }: { nav: ReactNode }) {
   // ── La liste, ou le deck ────────────────────────────────────────────
   const entetes: Record<Section, [string, string]> = {
     Offres: ['Mes offres',
-      `${DATA.offres.liste.length} offres en ligne · ${DATA.candidatures.length} candidatures reçues`],
+      `${DATA.offres.length} offres en ligne · ${DATA.candidatures.length} candidatures reçues`],
     Talents: ['Les talents', 'Les membres qui se sont déclarés en recherche'],
   };
   const [titre, sous] = entetes[section];
 
   return (
     <Screen nav={nav}>
-      <div style={{ flex: 'none', padding: '16px 22px 14px' }}>
-        <div style={{ font: `400 32px/1 ${F.serif}`, color: C.ink }}>{titre}</div>
-        <div style={{ font: `400 13px ${F.ui}`, color: C.muted, marginTop: 4 }}>{sous}</div>
+      <ScreenHead titre={titre} sous={sous} border={false} padBas={14}>
         <Segmented items={[...SECTIONS]} active={section}
           onChange={s => setSection(s as Section)} />
-      </div>
+      </ScreenHead>
 
       {section === 'Talents' ? <TalentDeck /> : (
-        <>
-          <div className="body">
-            <div style={{ padding: '16px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {DATA.offres.liste.map(o => (
-                <OffreCard key={o.titre} o={o} onVoir={() => setOuverte(o.titre)} />
-              ))}
-
-              {/* Publier une offre */}
-              <Card dark style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                gap: 12, cursor: 'pointer',
-              }}>
-                <div>
-                  <div style={{ font: `600 17px ${F.ui}`, color: C.cream }}>Publier une offre</div>
-                  <div style={{ font: `400 12px ${F.ui}`, color: C.creamMut, marginTop: 4 }}>
-                    Visible par les {DATA.membresTotal} profils parrainés
-                  </div>
-                </div>
-                <div style={{
-                  width: 44, height: 44, borderRadius: '50%', background: C.cream, color: C.ink,
-                  display: 'grid', placeItems: 'center', font: `300 24px ${F.ui}`, flex: 'none',
-                }}>+</div>
-              </Card>
-            </div>
+        <div className="body">
+          <div style={{ padding: '16px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {DATA.offres.map(o => (
+              <OffreCard key={o.titre} o={o} onVoir={() => setOuverte(o.titre)} />
+            ))}
+            <CarteAction titre="Publier une offre"
+              sous={`Visible par les ${DATA.membresTotal} profils parrainés`}
+              icone="+" tailleIcone={24} />
           </div>
-        </>
+        </div>
       )}
     </Screen>
   );
@@ -139,7 +120,7 @@ function OffreCard({ o, onVoir }: { o: Offre; onVoir: () => void }) {
       </div>
 
       <div style={{
-        marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(0,0,0,.08)',
+        marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.divider}`,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ font: `400 12px ${F.ui}`, color: C.muted }}>
@@ -180,7 +161,7 @@ function CandidatureCard({ c }: { c: Candidature }) {
       </div>
 
       <div style={{
-        marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(0,0,0,.08)',
+        marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.divider}`,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ font: `400 12px ${F.ui}`, color: C.muted }}>{ilYA(c.heures)}</div>
@@ -190,6 +171,6 @@ function CandidatureCard({ c }: { c: Candidature }) {
   );
 }
 
-(ScreenOffres as TabScreen).tab = { id: 'offres', label: 'Offres' };
+ScreenOffres.tab = { id: 'offres', label: 'Offres' };
 
-export default ScreenOffres as TabScreen;
+export default ScreenOffres;

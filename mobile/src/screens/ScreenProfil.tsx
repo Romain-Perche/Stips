@@ -19,7 +19,6 @@ import { C, DATA, type MoiProfile } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Avatar, Stk, ScreenHead, Screen, RondPiece } from '../atoms';
 import { useRole } from '../role';
-import type { TabScreen } from '../types';
 
 function ScreenProfil() {
   const role = useRole();
@@ -61,7 +60,7 @@ function Form({ membre, profil }: { membre: boolean; profil: MoiProfile }) {
         <View>
           <Mono>EN DEUX LIGNES</Mono>
           <View style={{
-            marginTop: 7, backgroundColor: C.card, borderWidth: 1, borderColor: 'rgba(0,0,0,.12)',
+            marginTop: 7, backgroundColor: C.card, borderWidth: 1, borderColor: C.fieldLineSoft,
             borderRadius: 11, padding: 13,
           }}>
             <TextInput
@@ -92,7 +91,7 @@ function Form({ membre, profil }: { membre: boolean; profil: MoiProfile }) {
               <View style={{ marginTop: 7, gap: 7 }}>
                 {(p.experiences ?? []).map(e => (
                   <View key={e.titre} style={{
-                    backgroundColor: C.card, borderWidth: 1, borderColor: 'rgba(0,0,0,.12)', borderRadius: 11,
+                    backgroundColor: C.card, borderWidth: 1, borderColor: C.fieldLineSoft, borderRadius: 11,
                     paddingVertical: 12, paddingHorizontal: 13, flexDirection: 'row',
                     justifyContent: 'space-between', alignItems: 'center',
                   }}>
@@ -129,7 +128,7 @@ function Champ({ label, valeur }: { label: string; valeur: string }) {
     <View>
       <Mono>{label}</Mono>
       <Pressable style={{
-        marginTop: 7, backgroundColor: C.card, borderWidth: 1, borderColor: 'rgba(0,0,0,.12)',
+        marginTop: 7, backgroundColor: C.card, borderWidth: 1, borderColor: C.fieldLineSoft,
         borderRadius: 11, padding: 13, flexDirection: 'row',
         justifyContent: 'space-between', alignItems: 'center',
       }}>
@@ -140,6 +139,6 @@ function Champ({ label, valeur }: { label: string; valeur: string }) {
   );
 }
 
-(ScreenProfil as unknown as TabScreen).tab = { id: 'profil', label: 'Qui suis-je ?' };
+ScreenProfil.tab = { id: 'profil', label: 'Qui suis-je ?' };
 
-export default ScreenProfil as unknown as TabScreen;
+export default ScreenProfil;

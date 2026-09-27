@@ -12,7 +12,6 @@ import { C, DATA } from '@stips/core';
 import type { EventItem } from '@stips/core';
 import { F, hatch } from '../tokens';
 import { Mono, Card, Stk, ScreenHead, Screen } from '../atoms';
-import type { TabScreen } from '../types';
 
 function ScreenEvents({ nav }: { nav: ReactNode }) {
   return (
@@ -47,15 +46,15 @@ function EventCard({ e }: { e: EventItem }) {
 
       <div style={{
         marginTop: d ? 12 : 14, paddingTop: d ? 12 : 14,
-        borderTop: `1px solid ${d ? 'rgba(255,255,255,.14)' : 'rgba(0,0,0,.08)'}`,
+        borderTop: `1px solid ${d ? 'rgba(255,255,255,.14)' : C.divider}`,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {e.avatars && (
             <div style={{ display: 'flex' }}>
-              <div style={{ width: 24, height: 24, borderRadius: '50%', background: hatch(4), border: '1.5px solid #fff' }} />
-              <div style={{ width: 24, height: 24, borderRadius: '50%', background: C.muted2, border: '1.5px solid #fff', marginLeft: -8 }} />
-              <div style={{ width: 24, height: 24, borderRadius: '50%', background: C.ink, border: '1.5px solid #fff', marginLeft: -8 }} />
+              <div style={{ width: 24, height: 24, borderRadius: '50%', background: hatch(4), border: `1.5px solid ${C.card}` }} />
+              <div style={{ width: 24, height: 24, borderRadius: '50%', background: C.muted2, border: `1.5px solid ${C.card}`, marginLeft: -8 }} />
+              <div style={{ width: 24, height: 24, borderRadius: '50%', background: C.ink, border: `1.5px solid ${C.card}`, marginLeft: -8 }} />
             </div>
           )}
           <div style={{ font: `400 12px ${F.ui}`, color: d ? C.creamMut : C.muted }}>{e.pied}</div>
@@ -74,6 +73,6 @@ function EventCard({ e }: { e: EventItem }) {
   );
 }
 
-(ScreenEvents as TabScreen).tab = { id: 'events', label: 'Agenda' };
+ScreenEvents.tab = { id: 'events', label: 'Agenda' };
 
-export default ScreenEvents as TabScreen;
+export default ScreenEvents;

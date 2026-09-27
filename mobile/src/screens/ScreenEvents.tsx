@@ -12,7 +12,6 @@ import { C, DATA } from '@stips/core';
 import type { EventItem } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, Stk, ScreenHead, Screen, Hatch } from '../atoms';
-import type { TabScreen } from '../types';
 
 function ScreenEvents() {
   return (
@@ -47,17 +46,17 @@ function EventCard({ e }: { e: EventItem }) {
 
       <View style={{
         marginTop: d ? 12 : 14, paddingTop: d ? 12 : 14,
-        borderTopWidth: 1, borderTopColor: d ? 'rgba(255,255,255,.14)' : 'rgba(0,0,0,.08)',
+        borderTopWidth: 1, borderTopColor: d ? 'rgba(255,255,255,.14)' : C.divider,
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {e.avatars && (
             <View style={{ flexDirection: 'row' }}>
-              <View style={{ width: 24, height: 24, borderRadius: 12, overflow: 'hidden', borderWidth: 1.5, borderColor: '#fff' }}>
+              <View style={{ width: 24, height: 24, borderRadius: 12, overflow: 'hidden', borderWidth: 1.5, borderColor: C.card }}>
                 <Hatch stripe={4} />
               </View>
-              <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: C.muted2, borderWidth: 1.5, borderColor: '#fff', marginLeft: -8 }} />
-              <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: C.ink, borderWidth: 1.5, borderColor: '#fff', marginLeft: -8 }} />
+              <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: C.muted2, borderWidth: 1.5, borderColor: C.card, marginLeft: -8 }} />
+              <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: C.ink, borderWidth: 1.5, borderColor: C.card, marginLeft: -8 }} />
             </View>
           )}
           <Text style={{ fontFamily: F.uiRegular, fontSize: 12, color: d ? C.creamMut : C.muted }}>{e.pied}</Text>
@@ -77,6 +76,6 @@ function EventCard({ e }: { e: EventItem }) {
   );
 }
 
-(ScreenEvents as unknown as TabScreen).tab = { id: 'events', label: 'Agenda' };
+ScreenEvents.tab = { id: 'events', label: 'Agenda' };
 
-export default ScreenEvents as unknown as TabScreen;
+export default ScreenEvents;

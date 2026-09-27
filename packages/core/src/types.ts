@@ -64,10 +64,12 @@ export interface Boite {
   gens: Membre[];
 }
 
+/** Pas de compteur de candidatures ici : il se calcule depuis
+    `DATA.candidatures`, jamais stocké à côté — sinon la carte annonce 12
+    et le détail en montre 2. Voir `backend/README.md`. */
 export interface Offre {
   meta: string;
   titre: string;
-  recues: number;
   pied: string;
 }
 

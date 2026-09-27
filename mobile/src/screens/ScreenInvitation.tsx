@@ -45,7 +45,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
               marginTop: 10, fontFamily: F.serifItalic, fontSize: 17, lineHeight: 25, color: C.ink2,
             }}>{inv.reco}</Text>
             <Text style={{
-              marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,.08)',
+              marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: C.divider,
               fontFamily: F.uiRegular, fontSize: 12, color: C.muted2,
             }}>{inv.signee}</Text>
           </Card>
@@ -69,7 +69,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
       <View style={{
         position: 'absolute', bottom: 0, left: 0, right: 0,
         paddingHorizontal: 22, paddingTop: 16, paddingBottom: 22 + insets.bottom, backgroundColor: C.bg,
-        borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,.08)',
+        borderTopWidth: 1, borderTopColor: C.divider,
       }}>
         <BoutonPlein onPress={onAccepter}>Accepter l'invitation</BoutonPlein>
         {/* ⚠ Cette ligne change quel que soit l'arbitrage IAP / paiement web

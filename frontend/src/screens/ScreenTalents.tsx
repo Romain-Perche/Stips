@@ -10,11 +10,11 @@
    n'exporte plus que `TalentDeck`, monté par `ScreenOffres.tsx`.
    ══════════════════════════════════════════════════════════════════════ */
 
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { C, DATA } from '@stips/core';
 import type { Talent } from '@stips/core';
 import { F } from '../tokens';
-import { Mono, Avatar } from '../atoms';
+import { Mono, Avatar, RondPiece } from '../atoms';
 
 /** Une carte par talent, à la suite, qu'on parcourt en scrollant — pas de
     filtres ni de pagination par bouton. */
@@ -63,7 +63,7 @@ function TalentFaceA({ t }: { t: Talent }) {
       <div style={{ marginTop: 18, font: `600 26px/1.15 ${F.ui}`, color: C.ink }}>{t.nom}</div>
       <div style={{ font: `400 14px ${F.ui}`, color: C.muted, marginTop: 3 }}>{t.ecole}</div>
 
-      <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(0,0,0,.09)' }}>
+      <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${C.lineStrong}` }}>
         <Mono>PARRAINÉ(E) PAR</Mono>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
           <Avatar size={32} r={4} />
@@ -88,26 +88,6 @@ function TalentFaceA({ t }: { t: Talent }) {
 
 /** Face B : stage recherché, disponibilités, expériences + accès aux pièces */
 function TalentFaceB({ t, onRetourner }: { t: Talent; onRetourner: () => void }) {
-  const rond = (contenu: ReactNode, tooltip: string | null, font?: string) => (
-    <div className="stk" style={{
-      position: 'relative', width: 48, height: 48, borderRadius: '50%',
-      border: '1px solid rgba(0,0,0,.16)', color: C.ink,
-      display: 'grid', placeItems: 'center', cursor: 'pointer',
-      font: font || `500 11px ${F.mono}`, letterSpacing: '.04em',
-    }}>
-      {contenu}
-      {tooltip && (
-        <span style={{
-          position: 'absolute', bottom: 'calc(100% + 9px)', left: '50%',
-          transform: 'translateX(-50%)', whiteSpace: 'nowrap',
-          padding: '5px 10px', borderRadius: 5, background: C.ink, color: C.cream,
-          font: `500 11px ${F.ui}`, opacity: 0, pointerEvents: 'none',
-          transition: 'opacity .18s',
-        }}>{tooltip}</span>
-      )}
-    </div>
-  );
-
   return (
     <div className="face back" style={FACE}>
       <Mono>CE QU'IL/ELLE CHERCHE</Mono>
@@ -131,12 +111,12 @@ function TalentFaceB({ t, onRetourner }: { t: Talent; onRetourner: () => void })
       </div>
 
       <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-        {rond('CV', 'Voir le CV')}
-        {rond('IN', 'LinkedIn')}
-        {rond('℞', 'Lettre de reco du parrain', `400 17px ${F.serif}`)}
+        <RondPiece tooltip="Voir le CV">CV</RondPiece>
+        <RondPiece tooltip="LinkedIn">IN</RondPiece>
+        <RondPiece tooltip="Lettre de reco du parrain" font={`400 17px ${F.serif}`}>℞</RondPiece>
         <div onClick={e => { e.stopPropagation(); onRetourner(); }}
           style={{ marginLeft: 'auto' }}>
-          {rond('↻', null, `400 15px ${F.ui}`)}
+          <RondPiece font={`400 15px ${F.ui}`}>↻</RondPiece>
         </div>
       </div>
     </div>
