@@ -20,7 +20,7 @@ import { Mono, Avatar, RondPiece } from '../atoms';
     filtres ni de pagination par bouton. */
 export function TalentDeck() {
   return (
-    <div className="body">
+    <div>
       <div style={{
         padding: '18px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12,
       }}>

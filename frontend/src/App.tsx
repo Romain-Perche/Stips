@@ -73,9 +73,11 @@ export default function App() {
   return (
     <>
       <div className="ph">
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
+        {/* `key` : changer d'onglet repart en haut de page, pas au niveau de
+            défilement de l'onglet précédent. */}
+        <div className="defile" key={horsNav ?? tab}>
           {horsNav !== 'invitation' && <RoleSwitcher role={role} onChange={changerRole} />}
-          <div style={{ flex: 1, position: 'relative' }}>{ecran}</div>
+          {ecran}
         </div>
       </div>
       <DevChrome horsNav={horsNav} onHorsNav={setHorsNav} />

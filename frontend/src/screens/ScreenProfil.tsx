@@ -40,7 +40,7 @@ function Form({ membre, profil }: { membre: boolean; profil: MoiProfile }) {
     setP(o => ({ ...o, [k]: v }));
 
   return (
-    <div className="body">
+    <div>
       <div style={{ padding: '18px 22px 96px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
         {/* Photo */}

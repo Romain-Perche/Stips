@@ -18,10 +18,13 @@ body {
   background: #f7f5ef;
 }
 
-/* Zone scrollable d'un écran */
-.body { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
-.body::-webkit-scrollbar { width: 0; height: 0; }
-.body { scrollbar-width: none; }
+/* Zone scrollable : tout l'écran sauf ce qui est collé en bas. L'en-tête
+   défile avec le contenu. Elle n'est pas positionnée, exprès : les éléments
+   collés en bas (barre d'onglets, bouton flottant, CTA) prennent .ph pour
+   repère, et restent donc en place pendant le défilement. */
+.defile { height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.defile::-webkit-scrollbar { width: 0; height: 0; }
+.defile { scrollbar-width: none; }
 
 /* ── Carte flip ──────────────────────────────────────────────────────── */
 .flip { perspective: 1400px; cursor: pointer; }

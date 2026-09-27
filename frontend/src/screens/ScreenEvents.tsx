@@ -18,7 +18,7 @@ function ScreenEvents({ nav }: { nav: ReactNode }) {
     <Screen nav={nav}>
       <ScreenHead titre="A vos agendas" />
 
-      <div className="body">
+      <div>
         <div style={{ padding: '14px 22px 96px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {DATA.events.map(e => <EventCard key={e.titre} e={e} />)}
           {DATA.events.length === 0 && <Mono>AUCUN ÉVÉNEMENT</Mono>}
