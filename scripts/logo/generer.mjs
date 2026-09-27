@@ -5,7 +5,7 @@
        node scripts/logo/generer.mjs
 
    Un seul dessin, décrit une fois ici, décliné en tout ce que les deux
-   applications consomment : contours partagés, SVG du web, PNG d'Expo.
+   applications consomment : SVG du web, PNG d'Expo.
    Régénérer est idempotent — relancer sans rien changer ne modifie aucun
    fichier. Les sorties sont committées : ni le site ni un build EAS ne
    lancent ce script.
@@ -21,7 +21,7 @@
    supposer Outfit présente ; un logo qui retombe sur la sans-serif du
    système n'est plus le logo. Dans l'app en revanche la police EST
    chargée (App.tsx, useFonts) : l'en-tête d'écran compose le wordmark en
-   <Text>, pas avec ces contours. Voir packages/core/src/logo.ts.
+   <Text>, pas avec ces contours.
    ══════════════════════════════════════════════════════════════════════ */
 
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
@@ -220,8 +220,7 @@ function wordmark(largeur, teinte) {
 const n = (v) => String(Number(v.toFixed(3)));
 
 /** Le wordmark en SVG. Les `d` restent dans les unités de la police et
-    c'est le `transform` qui les met à l'échelle : le même texte que dans
-    logo-contours.ts, donc un seul dessin à vérifier. */
+    c'est le `transform` qui les met à l'échelle. */
 function svgMot(largeur, teinte, couleurTips) {
   const k = largeur / ENCRE_MOT.largeur;
   const hauteur = Number((ENCRE_MOT.hauteur * k).toFixed(3));
@@ -245,41 +244,7 @@ function svgFavicon(taille, fond) {
     + `</svg>\n`;
 }
 
-/** packages/core/src/logo-contours.ts — la donnée partagée. */
-function contours() {
-  const boite = (b) => `{ x: ${n(b.x)}, y: ${n(b.y)}, largeur: ${n(b.largeur)}, hauteur: ${n(b.hauteur)} }`;
-  return `/* ══════════════════════════════════════════════════════════════════════
-   GÉNÉRÉ par scripts/logo/generer.mjs — ne pas éditer à la main.
-
-   Les deux moitiés du wordmark converties en contours, à une taille de
-   police de ${EM}. « S » en Outfit 800, « tips » en Outfit 500 avec
-   l'interlettrage de ${INTERLETTRAGE} em déjà intégré au tracé : les deux
-   sont dans le MÊME repère, il suffit de les dessiner l'un après l'autre.
-
-   Voir ./logo.ts pour la forme, et l'en-tête du générateur pour le
-   pourquoi des contours plutôt que du texte.
-   ══════════════════════════════════════════════════════════════════════ */
-
-import type { ContoursLogo } from './logo';
-
-export const LOGO_CONTOURS: ContoursLogo = {
-  em: ${EM},
-  s: {
-    d: '${versD(MOT.s)}',
-    encre: ${boite(ENCRE_S)},
-  },
-  tips: {
-    d: '${versD(MOT.tips)}',
-    encre: ${boite(ENCRE_TIPS)},
-  },
-  encre: ${boite(ENCRE_MOT)},
-};
-`;
-}
-
 /* ── Exécution ────────────────────────────────────────────────────────── */
-
-ecrire('packages/core/src/logo-contours.ts', contours());
 
 // iOS : une icône par variante, parce qu'iOS ne sait pas teinter une
 // icône par configuration. Android s'en passe (voir plus bas).
