@@ -150,8 +150,8 @@ modification du dessin ou d'une teinte :
 npm run logo        # node scripts/logo/generer.mjs
 ```
 
-Il produit `packages/core/src/logo-contours.ts`, les PNG de `mobile/assets/` (icônes,
-écrans de démarrage, premier plan Android, favicon) et les SVG de `frontend/public/`.
+Il produit les PNG de `mobile/assets/` (icônes, écrans de démarrage, premier plan
+Android, favicon) et les SVG de `frontend/public/`.
 **Ne pas éditer ces fichiers à la main** : le prochain passage les écrase. Le script est
 idempotent — le relancer sans rien changer ne modifie aucun fichier — et il refuse de
 tourner si les trois teintes ont divergé entre `packages/core/src/tokens.ts`
