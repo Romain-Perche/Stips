@@ -176,7 +176,7 @@ un second clic sur ▲ le modifie ou l'annule au lieu de l'empiler comme aujourd
 `'membre' | 'pro'`, les deux rôles ont les cinq mêmes onglets à un écran près,
 `ScreenTalents.tsx` n'est plus un onglet mais le `TalentDeck` monté par `ScreenOffres.tsx`,
 la partie 2 de « Qui suis-je ? » ne s'affiche que pour un membre, et `DATA` a perdu ses
-`cats`. Reste la correction du type `Offre` (voir `TODO.md`).
+`cats`. Le type `Offre` porte l'employeur et la date de clôture depuis le 30 septembre 2026.
 
 ---
 

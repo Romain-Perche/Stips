@@ -142,10 +142,10 @@ export const DATA: {
 
   // ── Les offres publiées par le pro (écran 6a) ──────────────────────────
   offres: [
-    { meta: 'M&A · PARIS · 6 MOIS',    titre: 'Analyste M&A — stage de césure',
-      pied: 'Publiée le 2 sept. · 4 non lues' },
-    { meta: 'DATA · REMOTE · 4 MOIS',  titre: 'Data analyst junior — été 2027',
-      pied: 'Publiée le 28 août' },
+    { titre: 'Analyste M&A — stage de césure', entreprise: 'BNP Paribas',
+      lieu: 'Paris',  dureeMois: 6, publieeLe: '2026-09-02', clotureeLe: '2026-10-15' },
+    { titre: 'Data analyst junior — été 2027', entreprise: 'BNP Paribas',
+      lieu: 'Remote', dureeMois: 4, publieeLe: '2026-08-28' },
   ],
 
   // ── Les candidatures reçues, vues par le pro (onglet Offres) ───────────

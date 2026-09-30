@@ -171,10 +171,8 @@ erDiagram
     personne   ||--o{ candidature : "postule"
 ```
 
-⚠️ `entreprise_id`, `lieu`, `duree_mois` et `cloturee_le` n'existent pas dans les données
-factices d'aujourd'hui : `Offre` n'a qu'une chaîne `meta` et pas d'employeur du tout. Ça ne se
-voyait pas tant que seul le pro regardait ses propres offres — l'écran Stages du membre l'a
-révélé.
+Le type `Offre` de `packages/core` porte les mêmes champs (`entreprise`, `lieu`, `dureeMois`,
+`publieeLe`, `clotureeLe`), l'entreprise par son nom faute de clé.
 
 ---
 

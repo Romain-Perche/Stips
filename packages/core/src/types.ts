@@ -64,13 +64,21 @@ export interface Boite {
   gens: Membre[];
 }
 
-/** Pas de compteur de candidatures ici : il se calcule depuis
-    `DATA.candidatures`, jamais stocké à côté — sinon la carte annonce 12
-    et le détail en montre 2. Voir `backend/README.md`. */
+/** Pas de compteur de candidatures ni de non-lues ici : ils se calculent
+    depuis `DATA.candidatures`, jamais stockés à côté — sinon la carte
+    annonce 12 et le détail en montre 2. Voir `backend/README.md`.
+    `entreprise` renvoie à `Boite.nom`, lien par valeur comme dans
+    `Candidature`. Les dates sont en ISO `AAAA-MM-JJ` : c'est l'écran qui
+    écrit « 2 sept. » (`dateCourte`). Mêmes champs que la table `offre`
+    (`backend/SCHEMA.md` § recrutement). */
 export interface Offre {
-  meta: string;
   titre: string;
-  pied: string;
+  entreprise: string;
+  lieu: string;
+  dureeMois: number;
+  publieeLe: string;
+  /** Date limite pour postuler ; absente = pas de limite annoncée. */
+  clotureeLe?: string;
 }
 
 /** Une candidature reçue sur une offre. `talent` et `offre` renvoient à
