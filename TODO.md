@@ -38,7 +38,7 @@ externe — 10 à 15 €/an, à prendre avant d'en avoir besoin plutôt qu'aprè
 | # | Tâche | Qui |
 |---|---|---|
 | 4 | ~~Serveur Fastify + `GET /config`~~ ✅ 3 octobre 2026 | Claude |
-| 5 | `packages/api` — schémas zod et client HTTP | Claude |
+| 5 | ~~`packages/api` — schémas zod et client HTTP~~ ✅ 3 octobre 2026 | Claude |
 | 6 | ~~Renommer le modèle de rôles dans le code~~ ✅ 16 août 2026 | Claude |
 | 7 | ~~Porter les deux écrans en React Native~~ ✅ 16 août 2026 | Claude |
 | 8 | Corriger le type `Offre` | Claude |
@@ -104,22 +104,16 @@ vaut `0.0.0` : ne bloque personne. `packages/core` est passé en `"type": "modul
 backend (résolution `nodenext`) puisse lire ses types. Vérifié en local : `/config` répond 200,
 `/v1/config` 404. Reste à brancher le mobile, une fois l'URL Railway connue (tâche 9).
 
-### 5. `packages/api` — schémas zod et client HTTP
+### 5. ~~`packages/api` — schémas zod et client HTTP~~ · fait le 3 octobre 2026
 
-**Enjeu.** C'est la frontière entre le backend et les deux apps. Une seule déclaration par
-forme de réponse, et la validation à l'exécution vient avec.
-
-**À lire d'abord.** [`backend/README.md`](backend/README.md) § d'où viennent les types, et
-§ deux projections d'une même personne.
-
-**Les pièges.**
-- **Les types Drizzle ne sont pas le contrat.** Renvoyer un type de ligne recolle le format de
-  fil à la forme des tables, ce qui est exactement ce qu'on refuse un niveau plus bas.
-- **Deux schémas distincts** pour une personne : `PersonneAnnuaire` (partie 1) et
-  `PersonneRecrutement` (partie 2 + notes + recos + CV). Le jour où une route d'annuaire renvoie
-  le second, les recos fuient. C'est le risque de fuite principal de tout le produit.
-- Va dans `packages/api`, **pas** dans `packages/core` : core est pur, sans dépendance runtime,
-  `fetch` n'y est même pas typé.
+Tout est dans `packages/api/src/index.ts` : les schémas zod, les types inférés, et
+`creerClient`, qui valide chaque réponse contre son schéma (`ErreurApi`, avec le statut HTTP —
+426 compris). `PersonneAnnuaire` (partie 1) et `PersonneRecrutement` (+ partie 2, recos, URL
+signée du CV) sont deux déclarations ; `z.object` retire les clés non déclarées, donc une route
+d'annuaire qui parse une ligne complète n'en laisse sortir que la partie 1 — un test le garde.
+zod vient de `zod/v4` (déjà installé par Expo, rien de téléchargé). Pas de « notes » : le
+qualificatif les remplace. Pas de photo : aucune colonne en base. Expériences et en-tête d'auth
+viendront avec la première route qui les sert. Personne ne l'importe encore.
 
 ### 6. ~~Renommer le modèle de rôles dans le code~~ · fait le 16 août 2026
 
