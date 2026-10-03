@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "module": "nodenext",
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    // Même recette que packages/core : Node 24 retire les types lui-même, donc
+    // pas de build, `node src/….ts` directement. D'où l'extension explicite à
+    // l'import et l'absence d'émission.
+    "erasableSyntaxOnly": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "drizzle.config.ts"]
+}

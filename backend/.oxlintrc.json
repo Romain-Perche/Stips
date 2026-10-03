@@ -1,0 +1,6 @@
+// Étend le socle racine (../.oxlintrc.json). Pas de React ici : le plugin est
+// chargé mais n'a rien à signaler sur du code serveur.
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../.oxlintrc.json"]
+}

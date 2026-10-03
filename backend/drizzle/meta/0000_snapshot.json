@@ -1,0 +1,1894 @@
+{
+  "id": "193087e5-a5c0-48a9-b0a4-a4d4520e01ab",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.abonnement": {
+      "name": "abonnement",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "personne_id": {
+          "name": "personne_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "debut": {
+          "name": "debut",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fin": {
+          "name": "fin",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "abonnement_personne_idx": {
+          "name": "abonnement_personne_idx",
+          "columns": [
+            {
+              "expression": "personne_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "fin",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "abonnement_personne_id_personne_id_fk": {
+          "name": "abonnement_personne_id_personne_id_fk",
+          "tableFrom": "abonnement",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "personne_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "abonnement_fin_apres_debut": {
+          "name": "abonnement_fin_apres_debut",
+          "value": "\"abonnement\".\"fin\" > \"abonnement\".\"debut\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.abonnement_forum": {
+      "name": "abonnement_forum",
+      "schema": "",
+      "columns": {
+        "personne_id": {
+          "name": "personne_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "forum_id": {
+          "name": "forum_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "abonnement_forum_forum_idx": {
+          "name": "abonnement_forum_forum_idx",
+          "columns": [
+            {
+              "expression": "forum_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "abonnement_forum_personne_id_personne_id_fk": {
+          "name": "abonnement_forum_personne_id_personne_id_fk",
+          "tableFrom": "abonnement_forum",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "personne_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "abonnement_forum_forum_id_forum_id_fk": {
+          "name": "abonnement_forum_forum_id_forum_id_fk",
+          "tableFrom": "abonnement_forum",
+          "tableTo": "forum",
+          "columnsFrom": [
+            "forum_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "abonnement_forum_personne_id_forum_id_pk": {
+          "name": "abonnement_forum_personne_id_forum_id_pk",
+          "columns": [
+            "personne_id",
+            "forum_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.blocage": {
+      "name": "blocage",
+      "schema": "",
+      "columns": {
+        "bloqueur_id": {
+          "name": "bloqueur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bloque_id": {
+          "name": "bloque_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "blocage_bloque_idx": {
+          "name": "blocage_bloque_idx",
+          "columns": [
+            {
+              "expression": "bloque_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "blocage_bloqueur_id_personne_id_fk": {
+          "name": "blocage_bloqueur_id_personne_id_fk",
+          "tableFrom": "blocage",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "bloqueur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "blocage_bloque_id_personne_id_fk": {
+          "name": "blocage_bloque_id_personne_id_fk",
+          "tableFrom": "blocage",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "bloque_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "blocage_bloqueur_id_bloque_id_pk": {
+          "name": "blocage_bloqueur_id_bloque_id_pk",
+          "columns": [
+            "bloqueur_id",
+            "bloque_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "blocage_pas_soi_meme": {
+          "name": "blocage_pas_soi_meme",
+          "value": "\"blocage\".\"bloqueur_id\" <> \"blocage\".\"bloque_id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.candidature": {
+      "name": "candidature",
+      "schema": "",
+      "columns": {
+        "offre_id": {
+          "name": "offre_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "personne_id": {
+          "name": "personne_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "lu_at": {
+          "name": "lu_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "candidature_personne_idx": {
+          "name": "candidature_personne_idx",
+          "columns": [
+            {
+              "expression": "personne_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "candidature_offre_id_offre_id_fk": {
+          "name": "candidature_offre_id_offre_id_fk",
+          "tableFrom": "candidature",
+          "tableTo": "offre",
+          "columnsFrom": [
+            "offre_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "candidature_personne_id_personne_id_fk": {
+          "name": "candidature_personne_id_personne_id_fk",
+          "tableFrom": "candidature",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "personne_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "candidature_offre_id_personne_id_pk": {
+          "name": "candidature_offre_id_personne_id_pk",
+          "columns": [
+            "offre_id",
+            "personne_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.conversation": {
+      "name": "conversation",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "a_id": {
+          "name": "a_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_id": {
+          "name": "b_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dernier_message_at": {
+          "name": "dernier_message_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "conversation_paire_idx": {
+          "name": "conversation_paire_idx",
+          "columns": [
+            {
+              "expression": "a_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "b_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "conversation_b_idx": {
+          "name": "conversation_b_idx",
+          "columns": [
+            {
+              "expression": "b_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "conversation_a_id_personne_id_fk": {
+          "name": "conversation_a_id_personne_id_fk",
+          "tableFrom": "conversation",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "a_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "conversation_b_id_personne_id_fk": {
+          "name": "conversation_b_id_personne_id_fk",
+          "tableFrom": "conversation",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "b_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "conversation_paire_ordonnee": {
+          "name": "conversation_paire_ordonnee",
+          "value": "\"conversation\".\"a_id\" < \"conversation\".\"b_id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.entreprise": {
+      "name": "entreprise",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nom": {
+          "name": "nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "secteur": {
+          "name": "secteur",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domaine_email": {
+          "name": "domaine_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "entreprise_nom_unique": {
+          "name": "entreprise_nom_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nom"
+          ]
+        },
+        "entreprise_domaineEmail_unique": {
+          "name": "entreprise_domaineEmail_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "domaine_email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.evenement": {
+      "name": "evenement",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "titre": {
+          "name": "titre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lieu": {
+          "name": "lieu",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "debut": {
+          "name": "debut",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "capacite": {
+          "name": "capacite",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ouverture_inscriptions": {
+          "name": "ouverture_inscriptions",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "evenement_capacite": {
+          "name": "evenement_capacite",
+          "value": "\"evenement\".\"capacite\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.experience": {
+      "name": "experience",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "personne_id": {
+          "name": "personne_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entreprise_id": {
+          "name": "entreprise_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "intitule": {
+          "name": "intitule",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "debut": {
+          "name": "debut",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fin": {
+          "name": "fin",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "experience_personne_idx": {
+          "name": "experience_personne_idx",
+          "columns": [
+            {
+              "expression": "personne_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "experience_entreprise_idx": {
+          "name": "experience_entreprise_idx",
+          "columns": [
+            {
+              "expression": "entreprise_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "experience_personne_id_personne_id_fk": {
+          "name": "experience_personne_id_personne_id_fk",
+          "tableFrom": "experience",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "personne_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "experience_entreprise_id_entreprise_id_fk": {
+          "name": "experience_entreprise_id_entreprise_id_fk",
+          "tableFrom": "experience",
+          "tableTo": "entreprise",
+          "columnsFrom": [
+            "entreprise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "experience_fin_apres_debut": {
+          "name": "experience_fin_apres_debut",
+          "value": "\"experience\".\"fin\" IS NULL OR \"experience\".\"fin\" >= \"experience\".\"debut\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.fil": {
+      "name": "fil",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "forum_id": {
+          "name": "forum_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auteur_id": {
+          "name": "auteur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "titre": {
+          "name": "titre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "corps": {
+          "name": "corps",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "rang": {
+          "name": "rang",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "as": "sign(score) * log(greatest(abs(score), 1)) + extract(epoch FROM (created_at AT TIME ZONE 'UTC')) / 1209600",
+            "type": "stored"
+          }
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "fil_populaire_idx": {
+          "name": "fil_populaire_idx",
+          "columns": [
+            {
+              "expression": "forum_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "rang",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "fil_recent_idx": {
+          "name": "fil_recent_idx",
+          "columns": [
+            {
+              "expression": "forum_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "fil_auteur_idx": {
+          "name": "fil_auteur_idx",
+          "columns": [
+            {
+              "expression": "auteur_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "fil_forum_id_forum_id_fk": {
+          "name": "fil_forum_id_forum_id_fk",
+          "tableFrom": "fil",
+          "tableTo": "forum",
+          "columnsFrom": [
+            "forum_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "fil_auteur_id_personne_id_fk": {
+          "name": "fil_auteur_id_personne_id_fk",
+          "tableFrom": "fil",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "auteur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.forum": {
+      "name": "forum",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "libelle": {
+          "name": "libelle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "forum_slug_unique": {
+          "name": "forum_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.inscription": {
+      "name": "inscription",
+      "schema": "",
+      "columns": {
+        "evenement_id": {
+          "name": "evenement_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "personne_id": {
+          "name": "personne_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "inscription_ordre_idx": {
+          "name": "inscription_ordre_idx",
+          "columns": [
+            {
+              "expression": "evenement_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "inscription_personne_idx": {
+          "name": "inscription_personne_idx",
+          "columns": [
+            {
+              "expression": "personne_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "inscription_evenement_id_evenement_id_fk": {
+          "name": "inscription_evenement_id_evenement_id_fk",
+          "tableFrom": "inscription",
+          "tableTo": "evenement",
+          "columnsFrom": [
+            "evenement_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "inscription_personne_id_personne_id_fk": {
+          "name": "inscription_personne_id_personne_id_fk",
+          "tableFrom": "inscription",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "personne_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "inscription_evenement_id_personne_id_pk": {
+          "name": "inscription_evenement_id_personne_id_pk",
+          "columns": [
+            "evenement_id",
+            "personne_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.message": {
+      "name": "message",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expediteur_id": {
+          "name": "expediteur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "corps": {
+          "name": "corps",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "lu_at": {
+          "name": "lu_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "message_conversation_idx": {
+          "name": "message_conversation_idx",
+          "columns": [
+            {
+              "expression": "conversation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "message_expediteur_idx": {
+          "name": "message_expediteur_idx",
+          "columns": [
+            {
+              "expression": "expediteur_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "message_conversation_id_conversation_id_fk": {
+          "name": "message_conversation_id_conversation_id_fk",
+          "tableFrom": "message",
+          "tableTo": "conversation",
+          "columnsFrom": [
+            "conversation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "message_expediteur_id_personne_id_fk": {
+          "name": "message_expediteur_id_personne_id_fk",
+          "tableFrom": "message",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "expediteur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.offre": {
+      "name": "offre",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "pro_id": {
+          "name": "pro_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entreprise_id": {
+          "name": "entreprise_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "intitule": {
+          "name": "intitule",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lieu": {
+          "name": "lieu",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "duree_mois": {
+          "name": "duree_mois",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "publiee_le": {
+          "name": "publiee_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "cloturee_le": {
+          "name": "cloturee_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "offre_pro_idx": {
+          "name": "offre_pro_idx",
+          "columns": [
+            {
+              "expression": "pro_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "offre_entreprise_idx": {
+          "name": "offre_entreprise_idx",
+          "columns": [
+            {
+              "expression": "entreprise_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "offre_pro_id_personne_id_fk": {
+          "name": "offre_pro_id_personne_id_fk",
+          "tableFrom": "offre",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "pro_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "offre_entreprise_id_entreprise_id_fk": {
+          "name": "offre_entreprise_id_entreprise_id_fk",
+          "tableFrom": "offre",
+          "tableTo": "entreprise",
+          "columnsFrom": [
+            "entreprise_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "offre_duree_mois": {
+          "name": "offre_duree_mois",
+          "value": "\"offre\".\"duree_mois\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.parrainage": {
+      "name": "parrainage",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "parrain_id": {
+          "name": "parrain_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "filleul_id": {
+          "name": "filleul_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parrain_nom": {
+          "name": "parrain_nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parrain_email": {
+          "name": "parrain_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "filleul_nom": {
+          "name": "filleul_nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "filleul_email": {
+          "name": "filleul_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "qualificatif": {
+          "name": "qualificatif",
+          "type": "qualificatif",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "commentaire": {
+          "name": "commentaire",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "statut": {
+          "name": "statut",
+          "type": "statut_parrainage",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "origine": {
+          "name": "origine",
+          "type": "origine_parrainage",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expire_le": {
+          "name": "expire_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "parrainage_filleul_idx": {
+          "name": "parrainage_filleul_idx",
+          "columns": [
+            {
+              "expression": "filleul_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "parrainage_parrain_idx": {
+          "name": "parrainage_parrain_idx",
+          "columns": [
+            {
+              "expression": "parrain_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "parrainage_parrain_id_personne_id_fk": {
+          "name": "parrainage_parrain_id_personne_id_fk",
+          "tableFrom": "parrainage",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "parrain_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "parrainage_filleul_id_personne_id_fk": {
+          "name": "parrainage_filleul_id_personne_id_fk",
+          "tableFrom": "parrainage",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "filleul_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "parrainage_rempli_si_avance": {
+          "name": "parrainage_rempli_si_avance",
+          "value": "\"parrainage\".\"statut\" = 'attente_pro' OR (\"parrainage\".\"qualificatif\" IS NOT NULL AND \"parrainage\".\"commentaire\" IS NOT NULL)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.personne": {
+      "name": "personne",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nom": {
+          "name": "nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prenom": {
+          "name": "prenom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "admin": {
+          "name": "admin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "accord": {
+          "name": "accord",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "en_recherche": {
+          "name": "en_recherche",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "cherche": {
+          "name": "cherche",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dispo": {
+          "name": "dispo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cv_chemin": {
+          "name": "cv_chemin",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "auth_user_id": {
+          "name": "auth_user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripe_customer_id": {
+          "name": "stripe_customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "personne_deck_idx": {
+          "name": "personne_deck_idx",
+          "columns": [
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "en_recherche",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "personne_authUserId_unique": {
+          "name": "personne_authUserId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "auth_user_id"
+          ]
+        },
+        "personne_stripeCustomerId_unique": {
+          "name": "personne_stripeCustomerId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "stripe_customer_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.reponse": {
+      "name": "reponse",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "fil_id": {
+          "name": "fil_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auteur_id": {
+          "name": "auteur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "corps": {
+          "name": "corps",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "reponse_fil_idx": {
+          "name": "reponse_fil_idx",
+          "columns": [
+            {
+              "expression": "fil_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "reponse_auteur_idx": {
+          "name": "reponse_auteur_idx",
+          "columns": [
+            {
+              "expression": "auteur_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "reponse_fil_id_fil_id_fk": {
+          "name": "reponse_fil_id_fil_id_fk",
+          "tableFrom": "reponse",
+          "tableTo": "fil",
+          "columnsFrom": [
+            "fil_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reponse_auteur_id_personne_id_fk": {
+          "name": "reponse_auteur_id_personne_id_fk",
+          "tableFrom": "reponse",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "auteur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.signalement": {
+      "name": "signalement",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "auteur_id": {
+          "name": "auteur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cible_type": {
+          "name": "cible_type",
+          "type": "cible_signalement",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cible_id": {
+          "name": "cible_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "motif": {
+          "name": "motif",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "traite_le": {
+          "name": "traite_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "signalement_a_traiter_idx": {
+          "name": "signalement_a_traiter_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"signalement\".\"traite_le\" IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "signalement_auteur_id_personne_id_fk": {
+          "name": "signalement_auteur_id_personne_id_fk",
+          "tableFrom": "signalement",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "auteur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.vote": {
+      "name": "vote",
+      "schema": "",
+      "columns": {
+        "personne_id": {
+          "name": "personne_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fil_id": {
+          "name": "fil_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valeur": {
+          "name": "valeur",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "vote_fil_idx": {
+          "name": "vote_fil_idx",
+          "columns": [
+            {
+              "expression": "fil_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "vote_personne_id_personne_id_fk": {
+          "name": "vote_personne_id_personne_id_fk",
+          "tableFrom": "vote",
+          "tableTo": "personne",
+          "columnsFrom": [
+            "personne_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "vote_fil_id_fil_id_fk": {
+          "name": "vote_fil_id_fil_id_fk",
+          "tableFrom": "vote",
+          "tableTo": "fil",
+          "columnsFrom": [
+            "fil_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "vote_personne_id_fil_id_pk": {
+          "name": "vote_personne_id_fil_id_pk",
+          "columns": [
+            "personne_id",
+            "fil_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "vote_valeur": {
+          "name": "vote_valeur",
+          "value": "\"vote\".\"valeur\" IN (-1, 1)"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.cible_signalement": {
+      "name": "cible_signalement",
+      "schema": "public",
+      "values": [
+        "fil",
+        "reponse",
+        "message",
+        "parrainage"
+      ]
+    },
+    "public.origine_parrainage": {
+      "name": "origine_parrainage",
+      "schema": "public",
+      "values": [
+        "stagiaire_demande",
+        "pro_invite"
+      ]
+    },
+    "public.qualificatif": {
+      "name": "qualificatif",
+      "schema": "public",
+      "values": [
+        "autonomie",
+        "rigueur",
+        "curiosite",
+        "fiabilite",
+        "methode",
+        "tenacite",
+        "creativite",
+        "initiative"
+      ]
+    },
+    "public.role": {
+      "name": "role",
+      "schema": "public",
+      "values": [
+        "membre",
+        "pro"
+      ]
+    },
+    "public.statut_parrainage": {
+      "name": "statut_parrainage",
+      "schema": "public",
+      "values": [
+        "attente_pro",
+        "attente_validation",
+        "attente_acceptation",
+        "acceptee",
+        "refusee",
+        "expiree"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {
+    "public.inscription_rang": {
+      "columns": {
+        "evenement_id": {
+          "name": "evenement_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "personne_id": {
+          "name": "personne_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rang": {
+          "name": "rang",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "en_attente": {
+          "name": "en_attente",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "definition": "\n  SELECT r.evenement_id, r.personne_id, r.created_at, r.rang, r.rang > e.capacite AS en_attente\n  FROM (\n    SELECT evenement_id, personne_id, created_at,\n           (row_number() OVER (PARTITION BY evenement_id ORDER BY created_at, personne_id))::int AS rang\n    FROM inscription\n  ) r\n  JOIN evenement e ON e.id = r.evenement_id\n",
+      "name": "inscription_rang",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    }
+  },
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
