@@ -246,3 +246,20 @@ GitHub (Settings → Rules), une configuration qui vit côté GitHub et non dans
   sens à nom constant. Voir `backend/README.md`.
 - Modifier les réglages de protection de branche sur GitHub, ou désactiver/contourner un
   check requis.
+
+## Agent skills
+
+### Issue tracker
+
+Les tickets créés par les skills vivent dans les GitHub Issues du repo (`gh`). `TODO.md`
+reste le plan d'ensemble. Voir `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Les cinq labels par défaut : `needs-triage`, `needs-info`, `ready-for-agent`,
+`ready-for-human`, `wontfix`. Voir `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Un seul contexte : un `CONTEXT.md` et `docs/adr/` à la racine, communs à `backend/`,
+`frontend/` et `mobile/`. Voir `docs/agents/domain.md`.
