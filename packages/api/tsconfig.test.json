@@ -1,0 +1,10 @@
+// Même partage que packages/core : les types Node pour les seuls tests.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src/**/*.test.ts"],
+  "exclude": []
+}

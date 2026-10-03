@@ -1,0 +1,21 @@
+{
+  "name": "@stips/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "lint": "oxlint --deny-warnings src",
+    "test": "node --test \"src/**/*.test.ts\""
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.2",
+    "typescript": "~6.0.3",
+    "oxlint": "^1.77.0"
+  }
+}
