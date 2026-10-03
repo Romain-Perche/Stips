@@ -37,7 +37,7 @@ externe — 10 à 15 €/an, à prendre avant d'en avoir besoin plutôt qu'aprè
 
 | # | Tâche | Qui |
 |---|---|---|
-| 4 | Serveur Fastify + `GET /config` | Claude |
+| 4 | ~~Serveur Fastify + `GET /config`~~ ✅ 3 octobre 2026 | Claude |
 | 5 | `packages/api` — schémas zod et client HTTP | Claude |
 | 6 | ~~Renommer le modèle de rôles dans le code~~ ✅ 16 août 2026 | Claude |
 | 7 | ~~Porter les deux écrans en React Native~~ ✅ 16 août 2026 | Claude |
@@ -116,24 +116,14 @@ choix.
 - Le rang de liste d'attente (`inscription`, sans rapport avec `fil.rang`) est une fonction
   fenêtre. Si Drizzle ne l'exprime pas, du SQL brut, pas un contournement en JavaScript.
 
-### 4. Serveur Fastify + `GET /config`
+### 4. ~~Serveur Fastify + `GET /config`~~ · fait le 3 octobre 2026
 
-**Enjeu.** La première route, et la seule dont le contrat est immortel : c'est elle qui dit aux
-vieux binaires d'aller se mettre à jour. Elle n'a besoin ni de base ni d'auth, donc elle peut
-partir avant tout le reste.
-
-**À lire d'abord.** [`backend/README.md`](backend/README.md) § `GET /config` et § versionner
-l'API. Le client existe déjà : `mobile/src/config/miseAJour.ts`, désactivé par un flag.
-
-**Les pièges.**
-- `/config` reste **à la racine**, jamais sous `/v1` — sinon `/v1` ne pourra jamais être éteint.
-  Sa forme est fixée par `ConfigDistante` dans `packages/core/src/version.ts` : on n'y retire
-  jamais un champ, on n'en change jamais le type.
-- **Écouter sur `0.0.0.0` et `process.env.PORT`** dès la première ligne, pas au moment du
-  déploiement : Fastify écoute `localhost` par défaut et Railway renverra un 502 sans rien
-  expliquer.
-- `backend/` devient un workspace npm : l'installation reste à la racine (hoisting), donc les
-  commandes Railway ciblent `-w backend`. Voir `backend/README.md` § Railway.
+Le serveur est dans `backend/src/serveur.ts`, lancé par `npm start -w backend` depuis la racine
+(Node 24 retire les types, pas de build). `/config` est à la racine, hors de `/v1`, typée par
+`ConfigDistante`. Écoute sur `0.0.0.0` et `process.env.PORT` (3000 en local). `versionMinimale`
+vaut `0.0.0` : ne bloque personne. `packages/core` est passé en `"type": "module"` pour que le
+backend (résolution `nodenext`) puisse lire ses types. Vérifié en local : `/config` répond 200,
+`/v1/config` 404. Reste à brancher le mobile, une fois l'URL Railway connue (tâche 9).
 
 ### 5. `packages/api` — schémas zod et client HTTP
 
