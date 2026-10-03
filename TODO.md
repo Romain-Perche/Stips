@@ -26,7 +26,7 @@ Ce qui bloque une vraie mise en ligne est parqué dans [`backend/README.md`](bac
 | # | Tâche | Qui | Débloque |
 |---|---|---|---|
 | 19 | **Retirer le cadre téléphone du site** | Claude | le site est un vrai site |
-| 1 | **Écrire le schéma Drizzle** | Claude | tout le backend |
+| 1 | ~~Écrire le schéma Drizzle~~ ✅ 3 octobre 2026 | Claude | tout le backend |
 | 2 | Créer le projet Supabase (région **UE**) | Romain | l'auth et le stockage des CV |
 | 3 | Prendre le nom de domaine | Romain | la mise en ligne du site (20) |
 
@@ -86,35 +86,14 @@ donne, rien à toucher dedans.
 - Vérifier sur un vrai téléphone : `100dvh`, pas `100vh`, sinon la barre d'onglets passe sous
   la barre d'adresse de Safari.
 
-### 1. Écrire le schéma Drizzle
+### 1. ~~Écrire le schéma Drizzle~~ · fait le 3 octobre 2026
 
-**Enjeu.** C'est la traduction en code des dix-huit tables décidées. Une migration appliquée
-ne se défait pas : ce qui est mal nommé ou mal typé ici se paie pendant des mois.
-
-**À lire d'abord.** [`backend/SCHEMA.md`](backend/SCHEMA.md) pour la carte,
-[`backend/README.md`](backend/README.md) § le schéma pour le raisonnement derrière chaque
-choix.
-
-**Les pièges.**
-- Les contraintes doivent être **dans la base**, pas dans le code : clé primaire composite sur
-  `vote` et sur `inscription`, index unique sur la paire de `conversation`, `ON DELETE` différent
-  selon la table (voir la règle 5.1.1(v) dans le README).
-- Aucun compteur, sauf `fil.score`, `fil.rang` et `conversation.dernier_message_at` — et
-  seulement parce que ce sont des clés de tri.
-- **`fil.rang` est une colonne générée** (`GENERATED ALWAYS AS … STORED`), pas une valeur que le
-  code met à jour : c'est ce qui rend impossible de l'oublier après un vote. Index sur
-  `(forum_id, rang DESC)`. Le fuseau doit être **écrit dans l'expression**
-  (`created_at AT TIME ZONE 'UTC'`) et non réglé sur la base : une colonne générée exige une
-  expression `IMMUTABLE`, et `extract(epoch FROM timestamptz)` ne l'est pas tant que le fuseau
-  vient de la session. Voir le § du forum dans `backend/README.md`.
-- **Déplacer `stripe_customer_id` de `abonnement` vers `personne`** (`unique`, nullable). Un
-  `cus_…` identifie la personne à vie, pas une période payée : laissé sur `abonnement`, il se
-  recopie à chaque renouvellement. C'est maintenant qu'on le corrige, une migration appliquée
-  ne se défait pas. Voir la tâche 15.
-- Ne **pas** lancer la migration sur une base autre qu'une base locale jetable (`AGENTS.md`).
-  Écrire le fichier, oui ; l'appliquer, non.
-- Le rang de liste d'attente (`inscription`, sans rapport avec `fil.rang`) est une fonction
-  fenêtre. Si Drizzle ne l'exprime pas, du SQL brut, pas un contournement en JavaScript.
+Les dix-huit tables sont dans `backend/src/db/schema.ts`, la première migration dans
+`backend/drizzle/`, générée mais appliquée nulle part. Les contraintes vivent dans la base :
+clés composites, paire ordonnée et unique sur `conversation`, `CHECK` sur les votes et les
+dates, `ON DELETE` selon la règle 5.1.1(v). `fil.rang` est une colonne générée, fuseau écrit
+dans l'expression. Le rang de liste d'attente est la vue `inscription_rang`. Vérifié sur une
+base jetable : double vote refusé, liste d'attente qui promeut le suivant, cascades conformes.
 
 ### 4. Serveur Fastify + `GET /config`
 
@@ -232,10 +211,9 @@ répartition des secrets dans [`AGENTS.md`](AGENTS.md).
   appeler l'URL à la main. On insère la ligne `abonnement` sur `invoice.paid`, pas au retour.
 - **Vérifier la signature `Stripe-Signature`** avec le secret de webhook, sinon n'importe qui
   poste un faux `invoice.paid` et s'offre l'adhésion.
-- **`stripe_customer_id` est sur la mauvaise table** dans le schéma actuel : un `cus_…`
-  identifie la personne à vie, pas une période payée. Sur `abonnement`, il se recopie à chaque
-  renouvellement — autant d'occasions de diverger. À déplacer vers `personne` (`unique`,
-  nullable) **au moment d'écrire le schéma Drizzle** (tâche 1), pas après la première migration.
+- **`stripe_customer_id` est sur `personne`** (`unique`, nullable), déplacé dans la tâche 1 :
+  un `cus_…` identifie la personne à vie, pas une période payée. Le webhook retrouve la
+  personne par cette colonne, puis insère une ligne `abonnement` par période.
 - L'accès se teste en SQL local (`now() BETWEEN debut AND fin`), sans jamais rappeler l'API
   Stripe sur le chemin d'une requête.
 - `sk_…` et le secret de webhook restent côté serveur ; seule `pk_…` peut entrer dans l'app.
@@ -266,19 +244,17 @@ Mêmes numéros, mêmes trous : ce qui manque est une tâche de Claude.
 L'ordre 1 → 20 est une file d'attente sûre, pas une contrainte : trois chantiers sont
 indépendants, donc oui, ça se recouvre.
 
-- **Pendant que j'écris le schéma Drizzle (1)**, tu peux créer le projet Supabase (2) et prendre
-  le domaine (3). Aucun des deux ne me bloque, et les deux me débloqueront pour la tâche 11.
-- **`GET /config` (4) ne dépend de rien** — ni base, ni auth, ni schéma. Il peut se faire avant,
-  pendant ou après le schéma, dans n'importe quel ordre.
+- **Le schéma Drizzle (1) est fait.** Le projet Supabase (2) et le domaine (3) sont
+  maintenant ce qui me débloquera pour la tâche 11.
+- **`GET /config` (4) ne dépend de rien** — ni base, ni auth, ni schéma. Il peut se faire dans
+  n'importe quel ordre.
 - **Le cadre téléphone (19)** est une règle CSS, indépendant de tout : à faire en premier,
   c'est ce qui rend le site montrable.
 - **La correction d'`Offre` (8)** est du travail front, sans aucun lien avec le backend (comme
   l'étaient 6 et 7, faites). Elle peut s'intercaler n'importe où.
 
-En revanche, **5 attend 1** (les schémas zod décrivent le schéma), **11 attend 1 et 2**, et
-**12 attend 4, 5 et 11**.
+En revanche, **11 attend 2** (1 est fait), et **12 attend 4, 5 et 11**.
 
 **15 (Stripe) n'attend pas du code mais une décision** : tant que 13 (IAP ou paiement web) n'est
-pas tranché, l'écrire revient peut-être à l'écrire pour rien. Seul le déplacement de
-`stripe_customer_id` est à faire tout de suite, dans la tâche 1 — il ne dépend d'aucune des
-deux options.
+pas tranché, l'écrire revient peut-être à l'écrire pour rien. Le déplacement de
+`stripe_customer_id`, qui ne dépendait d'aucune des deux options, est déjà fait dans la tâche 1.
