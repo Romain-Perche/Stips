@@ -25,7 +25,7 @@ Ce qui bloque une vraie mise en ligne est parqué dans [`backend/README.md`](bac
 
 | # | Tâche | Qui | Débloque |
 |---|---|---|---|
-| 19 | **Retirer le cadre téléphone du site** | Claude | le site est un vrai site |
+| 19 | ~~Retirer le cadre téléphone du site~~ ✅ 27 sept. 2026 | Claude | le site est un vrai site |
 | 1 | ~~Écrire le schéma Drizzle~~ ✅ 3 octobre 2026 | Claude | tout le backend |
 | 2 | ~~Créer le projet Supabase (région **UE**)~~ ✅ 28 sept. 2026 | Romain | l'auth et le stockage des CV |
 | 3 | Prendre le nom de domaine | Romain | la mise en ligne du site (20) |
@@ -66,25 +66,15 @@ externe — 10 à 15 €/an, à prendre avant d'en avoir besoin plutôt qu'aprè
 Les numéros sont ceux des tableaux ci-dessus, d'où les trous : ce qui manque est une tâche de
 Romain. Chaque bloc dit l'enjeu, ce qu'il faut lire avant, et le piège.
 
-### 19. Retirer le cadre téléphone du site
+### 19. ~~Retirer le cadre téléphone du site~~ · fait le 27 septembre 2026
 
-**Enjeu.** Le site devient un vrai site : plein écran sur un téléphone, colonne centrée
-(~480 px) sur un ordinateur. C'est la seule différence entre la maquette et le produit web.
-
-**Ce qu'il y a à faire.** Le cadre tient dans une règle CSS, `.ph` dans
-`frontend/src/styles.css` (380 × 800, rayon, ombre). La remplacer par `width: min(100vw, 480px)`
-et `height: 100dvh`, sans rayon ni ombre ; retirer le `padding` et le centrage vertical de
-`body`. Les huit écrans ne connaissent pas le cadre : ils remplissent la boîte qu'on leur
-donne, rien à toucher dedans.
-
-**Les pièges.**
-- `DevChrome` (la barre de dev sous le téléphone) n'a plus de place sous un écran de
-  `100dvh` : la passer en flottant, ou la supprimer si l'entrée « invitation » a un lien
-  d'ici là.
-- Ne **pas** en profiter pour élargir les écrans : la DA validée est mobile, et on ne sait pas
-  encore quelles pages sont ouvertes depuis un bureau. Une colonne, point.
-- Vérifier sur un vrai téléphone : `100dvh`, pas `100vh`, sinon la barre d'onglets passe sous
-  la barre d'adresse de Safari.
+`.ph` dans `frontend/src/styles.css` vaut `width: min(100vw, 480px)` et `height: 100dvh`,
+sans rayon ni ombre : plein écran sur un téléphone, colonne centrée de 480 px sur un
+ordinateur. `DevChrome` est passé en flottant, l'entrée « invitation » n'ayant pas encore de
+lien. Un seul conteneur défile par écran (`.defile`), en-tête compris ; la barre d'onglets,
+le bouton flottant et le CTA restent collés en bas, `.ph` pour repère. Les écrans n'ont pas
+été élargis. Reste à vérifier sur un vrai iPhone que la barre d'onglets ne passe pas sous la
+barre d'adresse de Safari.
 
 ### 1. ~~Écrire le schéma Drizzle~~ · fait le 3 octobre 2026
 
@@ -234,10 +224,8 @@ indépendants, donc oui, ça se recouvre.
 
 - **Le schéma Drizzle (1) est fait, et appliqué sur le projet Supabase (2).** La tâche 11
   peut commencer ; le domaine (3) reste à prendre avant que de vraies personnes la voient.
-- **`GET /config` (4) ne dépend de rien** — ni base, ni auth, ni schéma. Il peut se faire dans
-  n'importe quel ordre.
-- **Le cadre téléphone (19)** est une règle CSS, indépendant de tout : à faire en premier,
-  c'est ce qui rend le site montrable.
+- **`GET /config` (4) et le cadre téléphone (19) sont faits.** Le site est montrable : la
+  mise en ligne (20) n'attend plus que le domaine (3).
 
 En revanche, **11 n'attend plus rien** (1 et 2 sont faits), et **12 attend 4, 5 et 11**.
 
