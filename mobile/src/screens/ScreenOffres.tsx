@@ -20,7 +20,7 @@
 
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { C, DATA } from '@stips/core';
+import { C, DATA, dateCourte } from '@stips/core';
 import type { Candidature, Offre } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, Stk, Avatar, Segmented, Screen, ScreenHead, CarteAction } from '../atoms';
@@ -53,7 +53,7 @@ function ScreenOffres() {
           <Text style={{
             fontFamily: F.serif, fontSize: 26, lineHeight: 30, color: C.ink, marginTop: 10,
           }}>{offre.titre}</Text>
-          <Mono style={{ marginTop: 7 }}>{offre.meta}</Mono>
+          <Mono style={{ marginTop: 7 }}>{`${offre.lieu} · ${offre.dureeMois} mois`.toUpperCase()}</Mono>
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
@@ -109,7 +109,7 @@ function OffreCard({ o, onVoir }: { o: Offre; onVoir: () => void }) {
     <Card>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <View style={{ flex: 1 }}>
-          <Mono>{o.meta}</Mono>
+          <Mono>{`${o.lieu} · ${o.dureeMois} mois`.toUpperCase()}</Mono>
           <Text style={{
             fontFamily: F.uiSemiBold, fontSize: 18, lineHeight: 22, color: C.ink, marginTop: 6,
           }}>{o.titre}</Text>
@@ -125,7 +125,7 @@ function OffreCard({ o, onVoir }: { o: Offre; onVoir: () => void }) {
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Text style={{ fontFamily: F.uiRegular, fontSize: 12, color: C.muted }}>
-          {nonLues > 0 ? `${nonLues} non lue${nonLues > 1 ? 's' : ''}` : 'Tout est lu'}
+          Publiée le {dateCourte(o.publieeLe)} · {nonLues > 0 ? `${nonLues} non lue${nonLues > 1 ? 's' : ''}` : 'tout est lu'}
         </Text>
         <Stk size={13} padV={9} padH={16} onPress={onVoir}>Voir</Stk>
       </View>

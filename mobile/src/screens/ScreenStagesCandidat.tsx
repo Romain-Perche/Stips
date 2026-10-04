@@ -6,18 +6,14 @@
    titre, filet, action en pilule — pour que les deux faces du même objet
    se ressemblent. Porté du web (`frontend/src/screens/ScreenStagesCandidat.tsx`).
 
-   ⚠️ Deux champs manquent à `Offre` pour cet écran, et ça se voit :
-   **l'employeur** et **la date limite**. `meta` ne porte que
-   « M&A · PARIS · 6 MOIS », et `pied` (« Publiée le 2 sept. · 4 non
-   lues ») mélange une date avec un compteur réservé au pro. Tant que
-   c'est le pro qui regarde ses propres offres, l'employeur est implicite ;
-   dès qu'un membre les parcourt, il manque. À reprendre côté schéma —
-   `offre.entreprise_id` et une date de clôture (`backend/README.md`).
+   Contrairement au pro, le membre voit **l'employeur** (dans le label) et
+   **la date limite** (dans le pied) : c'est lui qui parcourt des offres
+   qui ne sont pas les siennes.
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { C, DATA } from '@stips/core';
+import { C, DATA, dateCourte } from '@stips/core';
 import type { Offre } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, Stk, ScreenHead, Pills, Screen, CarteAction } from '../atoms';
@@ -71,17 +67,20 @@ function OffreCard({ o, envoyee, onPostuler }: {
 }) {
   return (
     <Card>
-      <Mono>{o.meta}</Mono>
+      <Mono>{`${o.entreprise} · ${o.lieu} · ${o.dureeMois} mois`.toUpperCase()}</Mono>
       <Text style={{
         fontFamily: F.uiSemiBold, fontSize: 18, lineHeight: 22, color: C.ink, marginTop: 6,
       }}>{o.titre}</Text>
 
       <View style={{
         marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: C.divider,
-        flexDirection: 'row', alignItems: 'center',
-        justifyContent: envoyee ? 'space-between' : 'flex-end',
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        {envoyee && <Mono color={C.ink}>CANDIDATURE ENVOYÉE ✓</Mono>}
+        {envoyee
+          ? <Mono color={C.ink}>CANDIDATURE ENVOYÉE ✓</Mono>
+          : <Text style={{ fontFamily: F.uiRegular, fontSize: 12, color: C.muted }}>
+              {o.clotureeLe ? `Clôture le ${dateCourte(o.clotureeLe)}` : ''}
+            </Text>}
         <Stk size={13} padV={9} padH={16}
           onPress={envoyee ? undefined : onPostuler}
           style={envoyee ? { opacity: 0.4 } : undefined}>
