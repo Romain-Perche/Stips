@@ -28,10 +28,10 @@ Ce qui bloque une vraie mise en ligne est parqué dans [`backend/README.md`](bac
 | 19 | **Retirer le cadre téléphone du site** | Claude | le site est un vrai site |
 | 1 | **Écrire le schéma Drizzle** | Claude | tout le backend |
 | 2 | Créer le projet Supabase (région **UE**) | Romain | l'auth et le stockage des CV |
-| 3 | Prendre le nom de domaine | Romain | la mise en ligne du site (20) |
+| 3 | ~~Prendre le nom de domaine~~ ✅ 4 octobre 2026 | Romain | la mise en ligne du site (20) |
 
-Le domaine sert d'abord au site ; il gèlera aussi le bundle id le jour d'une TestFlight
-externe — 10 à 15 €/an, à prendre avant d'en avoir besoin plutôt qu'après.
+Le domaine est `stips.club`, acheté chez Vercel (renouvellement automatique) et déjà rattaché
+au projet `le-club`. Le bundle id est passé à `club.stips.app` ; il se fige le jour d'une TestFlight externe.
 
 ## 🟠 Ensuite
 
@@ -249,7 +249,7 @@ Mêmes numéros, mêmes trous : ce qui manque est une tâche de Claude.
 | # | Tâche | Pourquoi c'est toi | Quand |
 |---|---|---|---|
 | 2 | Créer le projet Supabase, région UE | il faut un compte et une carte | 🔴 maintenant |
-| 3 | Prendre le nom de domaine | pareil, et le site (20) comme le bundle id en dépendent | 🔴 maintenant |
+| 3 | ~~Prendre le nom de domaine~~ ✅ 4 oct. 2026 | pareil, et le site (20) comme le bundle id en dépendent | fait — `stips.club`, chez Vercel |
 | 9 | Créer le projet **Railway**, région **EU West** (elle ne l'est pas par défaut) | il faut un compte | 🟠 avant le premier build sur un téléphone qui n'est pas le tien |
 | 10 | Choisir le fournisseur d'e-mail (Resend, Postmark, Scaleway TEM) | décision + compte + DNS | 🟠 avant que de vraies personnes reçoivent des invitations |
 | 20 | Mettre le site en ligne — hébergement statique du build Vite (Vercel, Netlify ou Cloudflare Pages), branché sur le domaine | il faut un compte et le DNS ; `GET /config` et l'API iront chez Railway (9), le site statique n'a pas besoin de serveur | 🟠 dès que 19 et 3 sont faits — un site en ligne avec des données factices est déjà une démo qu'on peut envoyer |
