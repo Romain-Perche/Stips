@@ -41,7 +41,7 @@ externe — 10 à 15 €/an, à prendre avant d'en avoir besoin plutôt qu'aprè
 | 5 | ~~`packages/api` — schémas zod et client HTTP~~ ✅ 3 octobre 2026 | Claude |
 | 6 | ~~Renommer le modèle de rôles dans le code~~ ✅ 16 août 2026 | Claude |
 | 7 | ~~Porter les deux écrans en React Native~~ ✅ 16 août 2026 | Claude |
-| 8 | Corriger le type `Offre` | Claude |
+| 8 | ~~Corriger le type `Offre`~~ ✅ 30 septembre 2026 | Claude |
 | 9 | Créer le projet Railway, région **EU West** | Romain |
 | 10 | Choisir le fournisseur d'e-mail | Romain |
 | 20 | Mettre le site en ligne (hébergement statique + domaine) | Romain |
@@ -134,17 +134,14 @@ connecté) est ce qui laisse l'écran d'invitation sans badge.
 calculés) et `ScreenStagesCandidat` (filtre, candidature) existent des deux côtés, avec le
 même découpage `TalentDeck` qu'en web.
 
-### 8. Corriger le type `Offre`
+### 8. ~~Corriger le type `Offre`~~ · fait le 30 septembre 2026
 
-**Enjeu.** `Offre` n'a **pas d'employeur** ni de date limite. Invisible tant que seul le pro
-regardait ses propres offres ; l'écran Stages du membre laisse un trou visible à la place.
-
-**Ce qu'il y a à faire.** Ajouter l'entreprise, le lieu, la durée en mois et une date de
-clôture ; arrêter de mélanger une date de publication et un compteur de non-lues dans `pied`.
-Puis reprendre les deux écrans qui l'affichent, web et mobile.
-
-**Le piège.** Ça touche `packages/core`, donc le hook pre-commit relance les vérifications sur
-`frontend` **et** `mobile` : les deux doivent compiler dans le même commit.
+`Offre` a perdu `meta` et `pied` pour les champs de la table `offre` : `entreprise` (par
+valeur, vers `Boite.nom`), `lieu`, `dureeMois`, `publieeLe`, `clotureeLe` (optionnelle), dates
+en ISO. Les non-lues restent comptées depuis `DATA.candidatures`. `dateCourte` (core) écrit
+« 2 sept. » à l'identique sur web et mobile. Le membre voit l'employeur et la date limite ; le
+pro garde l'employeur implicite et voit la date de publication. Une offre dont la clôture est
+passée reste affichée : aucune ne l'est dans les données factices.
 
 ### 11. Auth par lien magique + flux de parrainage
 
@@ -234,8 +231,6 @@ indépendants, donc oui, ça se recouvre.
   n'importe quel ordre.
 - **Le cadre téléphone (19)** est une règle CSS, indépendant de tout : à faire en premier,
   c'est ce qui rend le site montrable.
-- **La correction d'`Offre` (8)** est du travail front, sans aucun lien avec le backend (comme
-  l'étaient 6 et 7, faites). Elle peut s'intercaler n'importe où.
 
 En revanche, **11 attend 2** (1 est fait), et **12 attend 4, 5 et 11**.
 
