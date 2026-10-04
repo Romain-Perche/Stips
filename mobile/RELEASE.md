@@ -45,12 +45,12 @@ déjà soumise.
 
 ## 2. Ce qui fige quoi
 
-Une seule décision en attente en débloque quatre :
+Le domaine, `stips.club`, pris le 4 octobre 2026, en débloquait quatre :
 
 ```
-choisir le domaine
-   ├─→ bundle id définitif        (TODO(bundle-id) dans app.config.ts)
-   ├─→ apiUrl réel                (api.stips.club est un placeholder)
+stips.club
+   ├─→ bundle id définitif        club.stips.app (BASE_ID dans app.config.ts)
+   ├─→ apiUrl réel                api.stips.club — reste à le pointer vers Railway (tâche 9)
    ├─→ URL de politique + support (exigées à la soumission)
    └─→ fiche App Store Connect → ascAppId → eas.json submit.production
 ```
