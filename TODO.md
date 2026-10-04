@@ -27,7 +27,7 @@ Ce qui bloque une vraie mise en ligne est parqué dans [`backend/README.md`](bac
 |---|---|---|---|
 | 19 | **Retirer le cadre téléphone du site** | Claude | le site est un vrai site |
 | 1 | ~~Écrire le schéma Drizzle~~ ✅ 3 octobre 2026 | Claude | tout le backend |
-| 2 | Créer le projet Supabase (région **UE**) | Romain | l'auth et le stockage des CV |
+| 2 | ~~Créer le projet Supabase (région **UE**)~~ ✅ 28 sept. 2026 | Romain | l'auth et le stockage des CV |
 | 3 | Prendre le nom de domaine | Romain | la mise en ligne du site (20) |
 
 Le domaine sert d'abord au site ; il gèlera aussi le bundle id le jour d'une TestFlight
@@ -89,11 +89,16 @@ donne, rien à toucher dedans.
 ### 1. ~~Écrire le schéma Drizzle~~ · fait le 3 octobre 2026
 
 Les dix-huit tables sont dans `backend/src/db/schema.ts`, la première migration dans
-`backend/drizzle/`, générée mais appliquée nulle part. Les contraintes vivent dans la base :
+`backend/drizzle/`, appliquée sur la base Supabase le 4 octobre 2026. Les contraintes vivent dans la base :
 clés composites, paire ordonnée et unique sur `conversation`, `CHECK` sur les votes et les
 dates, `ON DELETE` selon la règle 5.1.1(v). `fil.rang` est une colonne générée, fuseau écrit
 dans l'expression. Le rang de liste d'attente est la vue `inscription_rang`. Vérifié sur une
 base jetable : double vote refusé, liste d'attente qui promeut le suivant, cascades conformes.
+
+Le client est `backend/src/db/client.ts` (driver `postgres`, même `casing` que le schéma) ;
+personne ne l'importe encore. La migration s'applique depuis `backend/` avec
+`node --env-file=.env ../node_modules/drizzle-kit/bin.cjs migrate` — `.env` n'est pas chargé
+par défaut, exprès : viser la vraie base doit rester un geste délibéré.
 
 ### 4. ~~Serveur Fastify + `GET /config`~~ · fait le 3 octobre 2026
 
@@ -160,6 +165,8 @@ puis [`Description projet.md`](Description%20projet.md) § entrée dans Stips.
 - Pas de login social, jamais : c'est ce qui dispense de « Sign in with Apple » (règle 4.8).
 - `parrainage` porte des identités en **texte** aux premières étapes, et `parrain_nom` ne
   s'efface jamais.
+- **La Data API de Supabase est coupée, et doit le rester.** Nos tables n'ont pas de RLS :
+  la rallumer rendrait toute la base lisible avec l'URL du projet et la clé publique.
 
 ### 12. Brancher les écrans sur l'API
 
@@ -207,7 +214,7 @@ Mêmes numéros, mêmes trous : ce qui manque est une tâche de Claude.
 
 | # | Tâche | Pourquoi c'est toi | Quand |
 |---|---|---|---|
-| 2 | Créer le projet Supabase, région UE | il faut un compte et une carte | 🔴 maintenant |
+| 2 | ~~Créer le projet Supabase, région UE~~ ✅ 28 sept. 2026 | il faut un compte et une carte | fait — plan gratuit, Data API coupée |
 | 3 | Prendre le nom de domaine | pareil, et le site (20) comme le bundle id en dépendent | 🔴 maintenant |
 | 9 | Créer le projet **Railway**, région **EU West** (elle ne l'est pas par défaut) | il faut un compte | 🟠 avant le premier build sur un téléphone qui n'est pas le tien |
 | 10 | Choisir le fournisseur d'e-mail (Resend, Postmark, Scaleway TEM) | décision + compte + DNS | 🟠 avant que de vraies personnes reçoivent des invitations |
@@ -225,14 +232,14 @@ Mêmes numéros, mêmes trous : ce qui manque est une tâche de Claude.
 L'ordre 1 → 20 est une file d'attente sûre, pas une contrainte : trois chantiers sont
 indépendants, donc oui, ça se recouvre.
 
-- **Le schéma Drizzle (1) est fait.** Le projet Supabase (2) et le domaine (3) sont
-  maintenant ce qui me débloquera pour la tâche 11.
+- **Le schéma Drizzle (1) est fait, et appliqué sur le projet Supabase (2).** La tâche 11
+  peut commencer ; le domaine (3) reste à prendre avant que de vraies personnes la voient.
 - **`GET /config` (4) ne dépend de rien** — ni base, ni auth, ni schéma. Il peut se faire dans
   n'importe quel ordre.
 - **Le cadre téléphone (19)** est une règle CSS, indépendant de tout : à faire en premier,
   c'est ce qui rend le site montrable.
 
-En revanche, **11 attend 2** (1 est fait), et **12 attend 4, 5 et 11**.
+En revanche, **11 n'attend plus rien** (1 et 2 sont faits), et **12 attend 4, 5 et 11**.
 
 **15 (Stripe) n'attend pas du code mais une décision** : tant que 13 (IAP ou paiement web) n'est
 pas tranché, l'écrire revient peut-être à l'écrire pour rien. Le déplacement de
