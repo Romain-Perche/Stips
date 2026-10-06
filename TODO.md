@@ -42,7 +42,7 @@ externe — 10 à 15 €/an, à prendre avant d'en avoir besoin plutôt qu'aprè
 | 6 | ~~Renommer le modèle de rôles dans le code~~ ✅ 16 août 2026 | Claude |
 | 7 | ~~Porter les deux écrans en React Native~~ ✅ 16 août 2026 | Claude |
 | 8 | Corriger le type `Offre` | Claude |
-| 9 | Créer le projet Railway, région **EU West** | Romain |
+| 9 | ~~Créer le projet Railway, région **EU West**~~ ✅ 6 octobre 2026 | Romain |
 | 10 | Choisir le fournisseur d'e-mail | Romain |
 | 20 | Mettre le site en ligne (hébergement statique + domaine) | Romain |
 
@@ -250,7 +250,7 @@ Mêmes numéros, mêmes trous : ce qui manque est une tâche de Claude.
 |---|---|---|---|
 | 2 | Créer le projet Supabase, région UE | il faut un compte et une carte | 🔴 maintenant |
 | 3 | Prendre le nom de domaine | pareil, et le site (20) comme le bundle id en dépendent | 🔴 maintenant |
-| 9 | Créer le projet **Railway**, région **EU West** (elle ne l'est pas par défaut) | il faut un compte | 🟠 avant le premier build sur un téléphone qui n'est pas le tien |
+| 9 | ~~Créer le projet **Railway**, région **EU West**~~ ✅ 6 oct. 2026 | il faut un compte | fait — projet `Stips`, vide : ni service ni URL tant qu'on n'a pas déployé (se génère dans Settings → Networking) |
 | 10 | Choisir le fournisseur d'e-mail (Resend, Postmark, Scaleway TEM) | décision + compte + DNS | 🟠 avant que de vraies personnes reçoivent des invitations |
 | 20 | Mettre le site en ligne — hébergement statique du build Vite (Vercel, Netlify ou Cloudflare Pages), branché sur le domaine | il faut un compte et le DNS ; `GET /config` et l'API iront chez Railway (9), le site statique n'a pas besoin de serveur | 🟠 dès que 19 et 3 sont faits — un site en ligne avec des données factices est déjà une démo qu'on peut envoyer |
 | 13 | Trancher IAP ou paiement web | décision business, 15 à 30 % de commission en jeu — et elle bloque la tâche 15, pas l'inverse | ⚪ avant la release qui introduit le paiement |
