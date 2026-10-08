@@ -24,7 +24,6 @@ Dans l'ordre où les prendre. Claude : une discussion par tâche (voir `AGENTS.m
 | # | Tâche | Qui | Attend | Quand |
 |---|---|---|---|---|
 | 20 | Mettre le site en ligne sur `stips.club` | Romain | — | 🟠 maintenant |
-| 10 | Choisir le fournisseur d'e-mail | Romain | — | 🟠 avant les premières vraies invitations |
 | 11 | Auth par lien magique + flux de parrainage complet | Claude | — | 🟠 maintenant |
 | 12 | Brancher les écrans sur l'API (retirer `DATA`) — `frontend/` d'abord, `mobile/` quand il reprendra | Claude | 11 | ⚪ ensuite |
 | 13 | Trancher : in-app purchase ou paiement web | Romain | — | ⚪ avant la release qui introduit le paiement |
@@ -33,8 +32,7 @@ Dans l'ordre où les prendre. Claude : une discussion par tâche (voir `AGENTS.m
 | 17 | Valider les données de remplissage des boîtes | Romain | — | ⚪ quand tu veux |
 | 18 | Trancher le nom d'un membre : « Stipeur » ou « Stiper » | Romain | — | ⚪ quand tu veux |
 
-**Ce qui se recouvre.** 20 et 11 sont indépendants et peuvent avancer en même temps. 10 doit
-être choisi avant que 11 envoie un e-mail à une vraie personne, pas avant d'écrire le code.
+**Ce qui se recouvre.** 20 et 11 sont indépendants et peuvent avancer en même temps.
 15 n'attend pas du code mais une décision (13) : l'écrire avant, c'est peut-être l'écrire pour
 rien.
 
@@ -63,6 +61,13 @@ puis [`Description projet.md`](Description%20projet.md) § entrée dans Stips.
   s'efface jamais.
 - **La Data API de Supabase est coupée, et doit le rester.** Nos tables n'ont pas de RLS :
   la rallumer rendrait toute la base lisible avec l'URL du projet et la clé publique.
+- **Le premier e-mail de test est tombé en spam chez Gmail**, avec SPF, DKIM et DMARC valides
+  (10). En cause : un domaine neuf en `.club`, le texte par défaut de Supabase en anglais, et
+  un lien vers `<projet>.supabase.co`. Les gabarits s'écrivent en français, et le lien pointe
+  vers une page de `stips.club` qui échange le `token_hash` — jamais vers le domaine Supabase.
+- Le backend envoie ses e-mails (demande au pro, notification de validation) avec **sa propre**
+  application IAM Scaleway, pas avec la clé de `supabase-auth` : une clé par usage, révocable
+  seule.
 
 ### 12. Brancher les écrans sur l'API
 
@@ -109,7 +114,6 @@ répartition des secrets dans [`AGENTS.md`](AGENTS.md).
 | # | Tâche | Pourquoi c'est toi, et ce qu'il faut savoir |
 |---|---|---|
 | 20 | Mettre le site en ligne | il faut un compte et le DNS. Le projet Vercel `le-club` construit déjà le site à chaque PR et porte déjà `stips.club` : reste sans doute à servir la production sur le domaine. Le site statique n'a pas besoin de serveur ; l'API ira chez Railway. Un site en ligne avec des données factices est déjà une démo qu'on peut envoyer |
-| 10 | Choisir le fournisseur d'e-mail (Resend, Postmark, Scaleway TEM) | décision + compte + DNS |
 | 13 | Trancher IAP ou paiement web | décision business, 15 à 30 % de commission en jeu — et elle bloque 15, pas l'inverse |
 | 14 | Créer le compte Stripe, en mode test | il faut un compte, un IBAN et une vérification d'identité ; le mode test suffit pour construire le flux |
 | 17 | Valider les boîtes de remplissage | Deloitte, BNP et Sia Partners sont inventées |
@@ -126,6 +130,12 @@ Petites choses laissées ouvertes par des tâches finies (numéro d'origine entr
 - [ ] Déployer le serveur sur Railway : le projet `Stips` est vide, l'URL se génère dans
   Settings → Networking (9). Puis pointer `api.stips.club` dessus (`mobile/RELEASE.md`).
 - [ ] Brancher le mobile sur `GET /config` une fois l'URL connue (4) — quand `mobile/` reprendra.
+- [ ] Renouveler la clé SMTP de `supabase-auth` avant le **8 oct. 2027** : elle expire au bout
+  d'un an (plafond de l'organisation Scaleway), et Supabase cesse alors d'envoyer les liens
+  magiques sans prévenir (10).
+- [ ] Tester la réception d'une invitation chez Outlook (10).
+- [ ] Passer le DMARC de `mail.stips.club` de `p=none` à `p=quarantine` après quelques semaines
+  d'envoi propre (10).
 
 ---
 
@@ -142,5 +152,6 @@ Petites choses laissées ouvertes par des tâches finies (numéro d'origine entr
 | 7 | Porter les deux écrans en React Native | 16 août 2026 | `ScreenOffres` et `ScreenStagesCandidat`, même découpage `TalentDeck` qu'en web |
 | 8 | Corriger le type `Offre` | 30 sept. 2026 | champs de la table `offre`, dates en ISO, `dateCourte` dans core |
 | 9 | Créer le projet Railway, région EU West | 6 oct. 2026 | projet `Stips`, vide (voir § Restes) |
+| 10 | Choisir le fournisseur d'e-mail | 8 oct. 2026 | **Scaleway TEM** (Paris, données en France), plan Essential, projet `production`. Domaine d'envoi `mail.stips.club` — un sous-domaine, pour qu'une mauvaise réputation ne touche pas `stips.club` — avec SPF, DKIM, DMARC et MX dans le DNS Vercel. Supabase Auth envoie par SMTP (`smtp.tem.scaleway.com`, expéditeur `bonjour@mail.stips.club`) avec la clé de l'application IAM `supabase-auth`, limitée à `TransactionalEmailEmailSmtpCreate`. Premier envoi en spam chez Gmail (voir 11) |
 | 16 | Cocher la CI comme check requis sur `main` | 21 août 2026 | un push direct sur `main` est refusé : tout passe par une PR dont `verifications` est vert |
 | 19 | Retirer le cadre téléphone du site | 27 sept. 2026 | `.ph` vaut `min(100vw, 480px)` × `100dvh` ; un seul conteneur défile par écran (`.defile`) ; écrans non élargis |
