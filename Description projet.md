@@ -183,7 +183,12 @@ la partie 2 de « Qui suis-je ? » ne s'affiche que pour un membre, et `DATA` a 
 ## Modèle économique
 
 - **Membres** : 100 €/an → accès à la plateforme + tous les événements (foot, ateliers,
-  soirées, bières incluses). C'est affiché tel quel à l'inscription.
+  soirées, bières incluses) — à terme.
+- **Bêta : gratuite pour tout le monde**, sans date de fin fixée. Le site affiche « Gratuit
+  pendant la bêta » à l'inscription, sans annoncer de prix. Rien à construire pour ça : pendant
+  la bêta, un parrainage accepté suffit, et l'accès ne regarde pas `abonnement`. À la fin, une
+  seule requête donne à chaque membre existant une ligne `abonnement` jusqu'à la date choisie,
+  puis le paiement (tâches 13 à 15 du `TODO.md`) s'active.
 - **Pros** : **gratuit**, et c'est désormais un choix assumé plutôt qu'une question ouverte.
   Un pro accède à presque tout sans payer : c'est la contrepartie du parrainage, qui est ce
   qui alimente le produit. Le revenu vient donc entièrement des membres, et une commission
