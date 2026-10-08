@@ -26,15 +26,19 @@ Dans l'ordre où les prendre. Claude : une discussion par tâche (voir `AGENTS.m
 | 20 | Mettre le site en ligne sur `stips.club` | Romain | — | 🟠 maintenant |
 | 11 | Auth par lien magique + flux de parrainage complet | Claude | — | 🟠 maintenant |
 | 12 | Brancher les écrans sur l'API (retirer `DATA`) — `frontend/` d'abord, `mobile/` quand il reprendra | Claude | 11 | ⚪ ensuite |
-| 13 | Trancher : in-app purchase ou paiement web | Romain | — | ⚪ avant la release qui introduit le paiement |
-| 14 | Créer le compte Stripe (mode test d'abord) | Romain | 13 | ⚪ |
-| 15 | Brancher Stripe : Checkout + webhook `invoice.paid` | Claude | 13, 14 | ⚪ |
+| 13 | Trancher : in-app purchase ou paiement web | Romain | — | ⏸ fin de la bêta |
+| 14 | Créer le compte Stripe (mode test d'abord) | Romain | 13 | ⏸ fin de la bêta |
+| 15 | Brancher Stripe : Checkout + webhook `invoice.paid` | Claude | 13, 14 | ⏸ fin de la bêta |
 | 17 | Valider les données de remplissage des boîtes | Romain | — | ⚪ quand tu veux |
 | 18 | Trancher le nom d'un membre : « Stipeur » ou « Stiper » | Romain | — | ⚪ quand tu veux |
 
 **Ce qui se recouvre.** 20 et 11 sont indépendants et peuvent avancer en même temps.
 15 n'attend pas du code mais une décision (13) : l'écrire avant, c'est peut-être l'écrire pour
 rien.
+
+**La bêta est gratuite, sans date de fin fixée** (décidé le 8 octobre 2026). 13, 14 et 15
+attendent sa fin : d'ici là, un parrainage accepté suffit et rien ne regarde `abonnement`. Voir
+[`Description projet.md`](Description%20projet.md) § modèle économique.
 
 ---
 
