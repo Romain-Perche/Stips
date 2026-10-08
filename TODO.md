@@ -23,7 +23,6 @@ Dans l'ordre où les prendre. Claude : une discussion par tâche (voir `AGENTS.m
 
 | # | Tâche | Qui | Attend | Quand |
 |---|---|---|---|---|
-| 20 | Mettre le site en ligne sur `stips.club` | Romain | — | 🟠 maintenant |
 | 11 | Auth par lien magique + flux de parrainage complet | Claude | — | 🟠 maintenant |
 | 12 | Brancher les écrans sur l'API (retirer `DATA`) — `frontend/` d'abord, `mobile/` quand il reprendra | Claude | 11 | ⚪ ensuite |
 | 13 | Trancher : in-app purchase ou paiement web | Romain | — | ⏸ fin de la bêta |
@@ -32,9 +31,8 @@ Dans l'ordre où les prendre. Claude : une discussion par tâche (voir `AGENTS.m
 | 17 | Valider les données de remplissage des boîtes | Romain | — | ⚪ quand tu veux |
 | 18 | Trancher le nom d'un membre : « Stipeur » ou « Stiper » | Romain | — | ⚪ quand tu veux |
 
-**Ce qui se recouvre.** 20 et 11 sont indépendants et peuvent avancer en même temps.
-15 n'attend pas du code mais une décision (13) : l'écrire avant, c'est peut-être l'écrire pour
-rien.
+**Ce qui se recouvre.** 15 n'attend pas du code mais une décision (13) : l'écrire avant,
+c'est peut-être l'écrire pour rien.
 
 **La bêta est gratuite, sans date de fin fixée** (décidé le 8 octobre 2026). 13, 14 et 15
 attendent sa fin : d'ici là, un parrainage accepté suffit et rien ne regarde `abonnement`. Voir
@@ -117,7 +115,6 @@ répartition des secrets dans [`AGENTS.md`](AGENTS.md).
 
 | # | Tâche | Pourquoi c'est toi, et ce qu'il faut savoir |
 |---|---|---|
-| 20 | Mettre le site en ligne | il faut un compte et le DNS. Le projet Vercel `le-club` construit déjà le site à chaque PR et porte déjà `stips.club` : reste sans doute à servir la production sur le domaine. Le site statique n'a pas besoin de serveur ; l'API ira chez Railway. Un site en ligne avec des données factices est déjà une démo qu'on peut envoyer |
 | 13 | Trancher IAP ou paiement web | décision business, 15 à 30 % de commission en jeu — et elle bloque 15, pas l'inverse |
 | 14 | Créer le compte Stripe, en mode test | il faut un compte, un IBAN et une vérification d'identité ; le mode test suffit pour construire le flux |
 | 17 | Valider les boîtes de remplissage | Deloitte, BNP et Sia Partners sont inventées |
@@ -159,3 +156,4 @@ Petites choses laissées ouvertes par des tâches finies (numéro d'origine entr
 | 10 | Choisir le fournisseur d'e-mail | 8 oct. 2026 | **Scaleway TEM** (Paris, données en France), plan Essential, projet `production`. Domaine d'envoi `mail.stips.club` — un sous-domaine, pour qu'une mauvaise réputation ne touche pas `stips.club` — avec SPF, DKIM, DMARC et MX dans le DNS Vercel. Supabase Auth envoie par SMTP (`smtp.tem.scaleway.com`, expéditeur `bonjour@mail.stips.club`) avec la clé de l'application IAM `supabase-auth`, limitée à `TransactionalEmailEmailSmtpCreate`. Premier envoi en spam chez Gmail (voir 11) |
 | 16 | Cocher la CI comme check requis sur `main` | 21 août 2026 | un push direct sur `main` est refusé : tout passe par une PR dont `verifications` est vert |
 | 19 | Retirer le cadre téléphone du site | 27 sept. 2026 | `.ph` vaut `min(100vw, 480px)` × `100dvh` ; un seul conteneur défile par écran (`.defile`) ; écrans non élargis |
+| 20 | Mettre le site en ligne | 8 oct. 2026 | `https://www.stips.club`, servi par le projet Vercel `le-club` ; `stips.club` redirige vers `www`. Chaque merge dans `main` part en production tout seul. Données factices : une démo, pas encore un vrai service |
