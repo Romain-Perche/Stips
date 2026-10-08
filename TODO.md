@@ -23,8 +23,8 @@ Dans l'ordre où les prendre. Claude : une discussion par tâche (voir `AGENTS.m
 
 | # | Tâche | Qui | Attend | Quand |
 |---|---|---|---|---|
-| 11 | Auth par lien magique + flux de parrainage complet | Claude | — | 🟠 maintenant |
-| 12 | Brancher les écrans sur l'API (retirer `DATA`) — `frontend/` d'abord, `mobile/` quand il reprendra | Claude | 11 | ⚪ ensuite |
+| 21 | Brancher le flux d'inscription : Supabase, Scaleway, Railway (`scripts/brancher-inscription.sh`) | Romain | — | 🟠 maintenant |
+| 12 | Brancher les écrans sur l'API (retirer `DATA`) — `frontend/` d'abord, `mobile/` quand il reprendra | Claude | 21 | ⚪ ensuite |
 | 13 | Trancher : in-app purchase ou paiement web | Romain | — | ⏸ fin de la bêta |
 | 14 | Créer le compte Stripe (mode test d'abord) | Romain | 13 | ⏸ fin de la bêta |
 | 15 | Brancher Stripe : Checkout + webhook `invoice.paid` | Claude | 13, 14 | ⏸ fin de la bêta |
@@ -43,33 +43,6 @@ attendent sa fin : d'ici là, un parrainage accepté suffit et rien ne regarde `
 ## Pour Claude
 
 Chaque bloc dit l'enjeu, ce qu'il faut lire avant, et le piège.
-
-### 11. Auth par lien magique + flux de parrainage
-
-**Enjeu.** La plus grosse pièce, et le cœur du produit : on n'entre que parrainé. Deux origines,
-une seule table, une machine à états, et un formulaire web pour un pro qui n'a pas de compte.
-
-**À lire d'abord.** [`backend/README.md`](backend/README.md) § le flux d'inscription et § auth,
-puis [`Description projet.md`](Description%20projet.md) § entrée dans Stips.
-
-**Les pièges.**
-- **Le formulaire du pro est une page web** dans `frontend/`, jamais l'app ni un PDF : c'est le
-  point de conversion le plus critique du produit.
-- Le mécanisme du lien magique **ne s'écrit pas à la main** — celui de Supabase. Entropie,
-  usage unique, expiration, rejeu : le seul endroit de la pile où le faire soi-même est un
-  mauvais calcul.
-- Pas de login social, jamais : c'est ce qui dispense de « Sign in with Apple » (règle 4.8).
-- `parrainage` porte des identités en **texte** aux premières étapes, et `parrain_nom` ne
-  s'efface jamais.
-- **La Data API de Supabase est coupée, et doit le rester.** Nos tables n'ont pas de RLS :
-  la rallumer rendrait toute la base lisible avec l'URL du projet et la clé publique.
-- **Le premier e-mail de test est tombé en spam chez Gmail**, avec SPF, DKIM et DMARC valides
-  (10). En cause : un domaine neuf en `.club`, le texte par défaut de Supabase en anglais, et
-  un lien vers `<projet>.supabase.co`. Les gabarits s'écrivent en français, et le lien pointe
-  vers une page de `stips.club` qui échange le `token_hash` — jamais vers le domaine Supabase.
-- Le backend envoie ses e-mails (demande au pro, notification de validation) avec **sa propre**
-  application IAM Scaleway, pas avec la clé de `supabase-auth` : une clé par usage, révocable
-  seule.
 
 ### 12. Brancher les écrans sur l'API
 
@@ -117,6 +90,7 @@ répartition des secrets dans [`AGENTS.md`](AGENTS.md).
 |---|---|---|
 | 13 | Trancher IAP ou paiement web | décision business, 15 à 30 % de commission en jeu — et elle bloque 15, pas l'inverse |
 | 14 | Créer le compte Stripe, en mode test | il faut un compte, un IBAN et une vérification d'identité ; le mode test suffit pour construire le flux |
+| 21 | Brancher le flux d'inscription | tout est dans [`backend/README.md`](backend/README.md) § configurer Supabase Auth, et le script `scripts/brancher-inscription.sh` ouvre chaque page et écrit `backend/.env`. En bref : Site URL + Redirect URLs, deux gabarits d'e-mail en français, OTP à 24 h ; une application IAM Scaleway pour le backend ; le serveur sur Railway (EU West, `npm ci` à la racine, `npm start -w backend`, les variables de `backend/.env.example`) sous `api.stips.club` ; vérifier que la racine du projet Vercel est `frontend/`, sinon `vercel.json` n'est pas lu |
 | 17 | Valider les boîtes de remplissage | Deloitte, BNP et Sia Partners sont inventées |
 | 18 | Trancher « Stipeur » ou « Stiper » | c'est un nom de marque. « Stipeur » en attendant : une ligne de `ROLES` dans `packages/core/src/tokens.ts`, rien d'autre |
 
@@ -154,6 +128,7 @@ Petites choses laissées ouvertes par des tâches finies (numéro d'origine entr
 | 8 | Corriger le type `Offre` | 30 sept. 2026 | champs de la table `offre`, dates en ISO, `dateCourte` dans core |
 | 9 | Créer le projet Railway, région EU West | 6 oct. 2026 | projet `Stips`, vide (voir § Restes) |
 | 10 | Choisir le fournisseur d'e-mail | 8 oct. 2026 | **Scaleway TEM** (Paris, données en France), plan Essential, projet `production`. Domaine d'envoi `mail.stips.club` — un sous-domaine, pour qu'une mauvaise réputation ne touche pas `stips.club` — avec SPF, DKIM, DMARC et MX dans le DNS Vercel. Supabase Auth envoie par SMTP (`smtp.tem.scaleway.com`, expéditeur `bonjour@mail.stips.club`) avec la clé de l'application IAM `supabase-auth`, limitée à `TransactionalEmailEmailSmtpCreate`. Premier envoi en spam chez Gmail (voir 11) |
+| 11 | Auth par lien magique + flux de parrainage | 9 oct. 2026 | `backend/src/routes/`, `frontend/src/pages/`. Deux origines, une table, une machine à états ; le pro remplit une page web sans compte ; l'admin valide par deux liens à jeton HMAC ; l'invitation est le lien magique de Supabase ; cookie de session signé, site et API sous une seule origine (`/api` réécrit). Vérifié sur une base jetable PGlite ; reste à brancher pour de vrai (21) |
 | 16 | Cocher la CI comme check requis sur `main` | 21 août 2026 | un push direct sur `main` est refusé : tout passe par une PR dont `verifications` est vert |
 | 19 | Retirer le cadre téléphone du site | 27 sept. 2026 | `.ph` vaut `min(100vw, 480px)` × `100dvh` ; un seul conteneur défile par écran (`.defile`) ; écrans non élargis |
 | 20 | Mettre le site en ligne | 8 oct. 2026 | `https://www.stips.club`, servi par le projet Vercel `le-club` ; `stips.club` redirige vers `www`. Chaque merge dans `main` part en production tout seul. Données factices : une démo, pas encore un vrai service |
