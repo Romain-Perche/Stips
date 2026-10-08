@@ -73,7 +73,7 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
           font: `600 15px ${F.ui}`, textAlign: 'center', cursor: 'pointer',
         }}>Accepter l'invitation</div>
         <div style={{ textAlign: 'center', font: `400 12px ${F.ui}`, color: C.muted, marginTop: 10 }}>
-          100 € / an, tout compris · <span style={{ color: C.ink, textDecoration: 'underline', cursor: 'pointer' }}>C'est quoi Stips ?</span>
+          Gratuit pendant la bêta · <span style={{ color: C.ink, textDecoration: 'underline', cursor: 'pointer' }}>C'est quoi Stips ?</span>
         </div>
       </div>
     </Screen>
