@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ErreurApi, PersonneAnnuaire, PersonneRecrutement, creerClient } from './index.ts';
+import { Demande, ErreurApi, PersonneAnnuaire, PersonneRecrutement, Vide, creerClient } from './index.ts';
 
 const recrutement: PersonneRecrutement = {
   id: '0b8a2c1e-5f3d-4a6b-9c7e-1d2f3a4b5c6d',
@@ -62,4 +62,21 @@ test('le client remonte le statut HTTP (426 : binaire trop vieux)', async () => 
     client(426, {}).lire('/v1/x', PersonneRecrutement),
     (e) => e instanceof ErreurApi && e.statut === 426,
   );
+});
+
+test("le client affiche la phrase du serveur, pas le code HTTP", async () => {
+  await assert.rejects(
+    client(410, { message: 'Ce lien a expiré.' }).ecrire('/v1/x', {}, Vide),
+    (e) => e instanceof ErreurApi && e.statut === 410 && e.message === 'Ce lien a expiré.',
+  );
+});
+
+test('les e-mails sont normalisés avant de servir de clé', () => {
+  const d = Demande.parse({
+    filleulPrenom: ' Camille ', filleulNom: 'Roux', filleulEmail: 'Camille@Example.org ',
+    parrainNom: 'Léa Ferrand', parrainEmail: 'LEA@bnp.example',
+  });
+  assert.equal(d.filleulEmail, 'camille@example.org');
+  assert.equal(d.parrainEmail, 'lea@bnp.example');
+  assert.equal(d.filleulPrenom, 'Camille');
 });

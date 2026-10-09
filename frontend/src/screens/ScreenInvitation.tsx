@@ -5,14 +5,19 @@
 
    Le parrainage en 3 temps (5a) a été retiré : accepter l'invitation mène
    directement à l'app.
+
+   `inv` vient de l'API (App.tsx la compose depuis `InvitationRecue`) ou de
+   `DATA.invitation` en mode démo : l'écran ne fait pas la différence.
    ══════════════════════════════════════════════════════════════════════ */
 
-import { C, DATA } from '@stips/core';
+import { C } from '@stips/core';
+import type { Invitation } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Avatar, Card, Screen } from '../atoms';
 
-export default function ScreenInvitation({ onAccepter }: { onAccepter: () => void }) {
-  const inv = DATA.invitation;
+export default function ScreenInvitation({ inv, onAccepter, enCours, erreur }: {
+  inv: Invitation; onAccepter: () => void; enCours?: boolean; erreur?: string | null;
+}) {
   return (
     <Screen>
       <div>
@@ -68,12 +73,12 @@ export default function ScreenInvitation({ onAccepter }: { onAccepter: () => voi
         padding: '16px 22px 22px', background: C.bg,
         borderTop: `1px solid ${C.divider}`,
       }}>
-        <div onClick={onAccepter} style={{
-          padding: 15, borderRadius: 99, background: C.ink, color: C.cream,
+        <div onClick={enCours ? undefined : onAccepter} style={{
+          padding: 15, borderRadius: 99, background: C.ink, color: C.cream, opacity: enCours ? .5 : 1,
           font: `600 15px ${F.ui}`, textAlign: 'center', cursor: 'pointer',
-        }}>Accepter l'invitation</div>
-        <div style={{ textAlign: 'center', font: `400 12px ${F.ui}`, color: C.muted, marginTop: 10 }}>
-          Gratuit pendant la bêta · <span style={{ color: C.ink, textDecoration: 'underline', cursor: 'pointer' }}>C'est quoi Stips ?</span>
+        }}>{enCours ? 'Un instant…' : "Accepter l'invitation"}</div>
+        <div style={{ textAlign: 'center', font: `400 12px ${F.ui}`, color: erreur ? '#b3382c' : C.muted, marginTop: 10 }}>
+          {erreur ?? <>Gratuit pendant la bêta · <span style={{ color: C.ink, textDecoration: 'underline', cursor: 'pointer' }}>C'est quoi Stips ?</span></>}
         </div>
       </div>
     </Screen>
