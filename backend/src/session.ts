@@ -3,8 +3,10 @@
 // rien à cacher dedans, seulement à rendre infalsifiable. HttpOnly : le JS
 // de la page ne le lit pas, il ne fait que des requêtes qui l'emportent.
 //
-// ponytail: pas de révocation — un cookie reste valable 30 jours même si la
-// personne supprime son compte ; une table de sessions le jour où ça compte.
+// ponytail: pas de révocation, et les 30 jours ne sont tenus que par le
+// navigateur — le contenu signé ne porte pas d'échéance, une copie du cookie
+// reste valable indéfiniment ; une table de sessions (« déconnecter tous mes
+// appareils ») le jour où ça compte.
 
 import '@fastify/cookie'
 import type { FastifyReply, FastifyRequest } from 'fastify'

@@ -364,7 +364,8 @@ rien stocker de plus.
 | `POST /v1/invitation/accepter` | l'écran d'entrée | `attente_acceptation` → `acceptee`, crée la `personne` |
 | `POST /v1/auth/lien` | la page `/connexion` | Supabase envoie un lien magique |
 
-Le cookie de session (`src/session.ts`) est signé par `SECRET`, HttpOnly, 30 jours. Le site
+Le cookie de session (`src/session.ts`) est signé par `SECRET`, HttpOnly, 30 jours depuis la
+dernière ouverture du site (`GET /v1/moi` le renouvelle) : un membre actif n'est jamais déconnecté. Le site
 et l'API sont servis sous la même origine (`frontend/vercel.json` réécrit `/api/*` vers
 `api.stips.club`, Vite fait pareil en local) : pas de CORS, un cookie de première partie.
 
