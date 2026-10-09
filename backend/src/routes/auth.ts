@@ -72,6 +72,9 @@ export async function routesAuth(app: FastifyInstance) {
   app.get('/v1/moi', async (request, reply) => {
     const s = session(request)
     if (!s) return reply.code(401).send({ message: 'Connecte-toi.' })
+    // Le site appelle /v1/moi à chaque ouverture : on y repart pour 30 jours,
+    // pour qu'un membre actif ne soit jamais déconnecté.
+    ouvrirSession(reply, s)
     return moi(s)
   })
 }
