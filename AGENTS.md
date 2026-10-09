@@ -12,6 +12,10 @@ les types de données, `DATA`, la palette — pour que ça ne puisse plus diverg
 Ce qui reste propre à chaque plateforme (polices, composants RN vs DOM) reste dans son
 composant ; ne pas chercher à tout faire monter dans `core`.
 
+`packages/api` (`@stips/api`) porte le contrat réseau : les schémas zod des réponses et le
+client HTTP. Séparé de `core` parce que `core` reste pur, sans dépendance runtime ni I/O.
+Les types Drizzle n'y entrent pas — voir `backend/README.md` § d'où viennent les types.
+
 ## Branches
 
 - **`main` est la seule branche longue.** Elle doit toujours passer `typecheck` et `lint`
@@ -174,8 +178,8 @@ npm run test      --workspaces --if-present
 ```
 
 (équivalent à lancer `npm run typecheck && npm run lint && npm run test` dans `mobile/`,
-`frontend/` et `packages/core/` séparément.) Seul `packages/core` a des tests aujourd'hui ;
-`--if-present` fait que la commande sort en 0 sur les deux autres, sans qu'il faille toucher
+`frontend/`, `packages/core/` et `packages/api/` séparément.) Seuls les deux paquets ont des
+tests aujourd'hui ; `--if-present` fait que la commande sort en 0 sur les deux apps, sans qu'il faille toucher
 au hook ou à la CI le jour où ils en auront.
 
 ### Les tests
@@ -246,3 +250,20 @@ GitHub (Settings → Rules), une configuration qui vit côté GitHub et non dans
   sens à nom constant. Voir `backend/README.md`.
 - Modifier les réglages de protection de branche sur GitHub, ou désactiver/contourner un
   check requis.
+
+## Agent skills
+
+### Issue tracker
+
+Les tickets créés par les skills vivent dans les GitHub Issues du repo (`gh`). `TODO.md`
+reste le plan d'ensemble. Voir `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Les cinq labels par défaut : `needs-triage`, `needs-info`, `ready-for-agent`,
+`ready-for-human`, `wontfix`. Voir `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Un seul contexte : un `CONTEXT.md` et `docs/adr/` à la racine, communs à `backend/`,
+`frontend/` et `mobile/`. Voir `docs/agents/domain.md`.

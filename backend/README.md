@@ -113,11 +113,11 @@ maquette » plus bas).
 
 | Table | Ce qu'elle porte |
 |---|---|
-| `personne` | identité, `role`, `admin`, partie 1 du profil, partie 2 nullable + `en_recherche`, `auth_user_id` |
+| `personne` | identité, `role`, `admin`, partie 1 du profil, partie 2 nullable + `en_recherche`, `auth_user_id`, `stripe_customer_id` |
 | `entreprise` | nom, secteur, domaine e-mail |
 | `experience` | `personne_id` × `entreprise_id`, intitulé, `debut`, `fin` |
 | `parrainage` | la reco : qualificatif, commentaire, statut, origine, identités en attente |
-| `abonnement` | les 100 €/an : période, `stripe_customer_id` |
+| `abonnement` | les 100 €/an : une ligne par période payée |
 | `forum` | `slug`, libellé |
 | `fil` | `forum_id`, `auteur_id`, titre, corps, `score` |
 | `reponse` | `fil_id`, `auteur_id`, corps |
@@ -345,6 +345,59 @@ exactement ce qu'exige la trace d'audit décrite plus bas.
 > ce statut — un filtre qu'on oublie une fois, et des gens qui n'ont rien accepté
 > apparaissent dans l'annuaire. Le mode de défaillance est pire que la duplication.
 
+### Les routes, et qui les appelle
+
+Tout est dans `src/routes/parrainages.ts` et `src/routes/auth.ts`. Chaque route n'accepte
+qu'un état d'entrée et n'en écrit qu'un : c'est ce qui rend chaque lien à usage unique sans
+rien stocker de plus.
+
+| Route | Qui | De → vers |
+|---|---|---|
+| `POST /v1/demandes` | le stagiaire, page `/demande` | — → `attente_pro`, e-mail au pro |
+| `GET /v1/parrainages/:id` | le pro, par le lien de l'e-mail | lecture |
+| `POST /v1/parrainages/:id/reco` | le pro, page `/parrainage/:id` | `attente_pro` → `attente_validation`, e-mail à `ADMIN_EMAIL` |
+| `GET`/`POST /v1/parrainages/:id/validation` | l'admin, lien à jeton HMAC (`src/jetons.ts`) | `attente_validation` → `attente_acceptation` (Supabase envoie l'invitation) ou `refusee` |
+| `POST /v1/parrainages/:id/compte-pro` | le pro, même page, après validation | crée la `personne` pro, Supabase envoie son lien |
+| `POST /v1/invitations` | un pro connecté (5 par mois) | — → `attente_acceptation`, Supabase envoie l'invitation |
+| `POST /v1/auth/verifier` | la page `/invitation?token_hash=…` | échange le jeton Supabase contre le cookie |
+| `GET /v1/moi` | l'app | la personne, et l'invitation en attente |
+| `POST /v1/invitation/accepter` | l'écran d'entrée | `attente_acceptation` → `acceptee`, crée la `personne` |
+| `POST /v1/auth/lien` | la page `/connexion` | Supabase envoie un lien magique |
+
+Le cookie de session (`src/session.ts`) est signé par `SECRET`, HttpOnly, 30 jours. Le site
+et l'API sont servis sous la même origine (`frontend/vercel.json` réécrit `/api/*` vers
+`api.stips.club`, Vite fait pareil en local) : pas de CORS, un cookie de première partie.
+
+### Configurer Supabase Auth
+
+Deux e-mails partent de Supabase, pas du backend : l'invitation et le lien de connexion.
+Les deux sont le même mécanisme (un `token_hash` à usage unique), seuls les gabarits
+diffèrent. Dans le dashboard, Authentication → :
+
+- **URL Configuration** : Site URL `https://stips.club`, et dans Redirect URLs
+  `https://stips.club/invitation` **et** `http://localhost:5173/invitation`. Le backend passe
+  `SITE_URL/invitation` à chaque envoi (`redirectTo`) : les mêmes gabarits servent au
+  serveur local et à la production, et Supabase refuse toute URL hors de cette liste.
+- **Emails → Templates**, en français, et le lien pointe vers **notre** page, jamais vers
+  `<projet>.supabase.co` (c'est ce qui a sorti le premier test du spam). Les deux gabarits
+  portent le même lien :
+
+  ```html
+  <a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=email">Ouvrir mon invitation</a>
+  ```
+
+  *Invite user* reçoit en plus `{{ .Data.prenom }}` et, pour un stagiaire, `{{ .Data.parrain }}`
+  (absent pour un pro qui crée son compte : `{{ if .Data.parrain }}…{{ end }}`). *Magic Link*
+  sert à la connexion, et à une invitation renvoyée après expiration du jeton.
+- **Settings → Email OTP expiration** : 86400 s (24 h, le maximum). Le jeton de Supabase
+  expire bien avant les 7 jours de l'invitation ; passé ce délai, le stagiaire demande un
+  nouveau lien sur `/connexion`, et retrouve son invitation.
+- **SMTP** : déjà Scaleway (TODO.md, tâche 10). L'expéditeur est `bonjour@mail.stips.club`.
+- **Data API** : coupée, et elle le reste.
+
+Le backend appelle `auth.admin.inviteUserByEmail` avec la clé secrète (`sb_secret_…`), qui
+ne quitte jamais le serveur ; `verifyOtp` avec `type: 'email'` vaut pour les deux gabarits.
+
 ## `GET /config` — la première route, et la seule qui ne casse jamais
 
 Le mobile embarque déjà son client (`mobile/src/config/miseAJour.ts`), désactivé par un flag
@@ -506,10 +559,12 @@ review.
 | À faire | Pourquoi ça bloque |
 |---|---|
 | Un compte de démo pour le reviewer Apple | app sur invitation *et* payante → rejet 2.1 « unable to review » sans identifiants fonctionnels |
-| Un plafond d'invitations par pro et par mois | seul garde-fou de la chaîne de confiance, une fois la validation manuelle sautée pour les pros inscrits |
 | Une limite de débit sur l'envoi de messages | tout le monde peut écrire à tout le monde : c'est le vecteur d'abus par défaut |
-| La divulgation dans le formulaire du pro | son nom reste attaché à la reco même s'il supprime son compte — ça se dit avant, pas après |
 | Quelqu'un qui relève les signalements sous un mois | c'est le seul recours sur une reco, et l'article 12.3 du RGPD fixe le délai |
+
+Déjà en place depuis le flux d'inscription : le plafond d'invitations par pro (5 par mois,
+`src/routes/parrainages.ts`) et la divulgation dans le formulaire du pro (son nom reste
+attaché à la reco, écrit sous le bouton d'envoi).
 
 ## D'où viennent les types
 

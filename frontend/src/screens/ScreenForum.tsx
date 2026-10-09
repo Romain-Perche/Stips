@@ -29,7 +29,7 @@ function ScreenForum({ nav }: { nav: ReactNode }) {
       <Pills items={['Populaire', 'Récent', 'Mes fils', '⚙']} active={filtre}
         onChange={p => p !== '⚙' && setFiltre(p)} />
 
-      <div className="body">
+      <div>
         <div style={{ padding: '14px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {liste.map(f => (
             <FilCard key={f.id} f={f} votes={votes[f.id]} onVote={n => voter(f.id, n)} />

@@ -46,7 +46,7 @@ function ScreenChercher({ nav }: { nav: ReactNode }) {
           onChange={t => { setOnglet(t as 'Personnes' | 'Boîtes'); setQ(''); }} />
       </ScreenHead>
 
-      <div className="body">
+      <div>
         {personnes ? (
           <div style={{ padding: '0 22px 96px' }}>
             <Mono style={{ marginBottom: 2 }}>

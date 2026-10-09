@@ -6,17 +6,13 @@
    titre, filet, action en pilule — pour que les deux faces du même objet
    se ressemblent.
 
-   ⚠️ Deux champs manquent à `Offre` pour cet écran, et ça se voit :
-   **l'employeur** et **la date limite**. `meta` ne porte que
-   « M&A · PARIS · 6 MOIS », et `pied` (« Publiée le 2 sept. · 4 non
-   lues ») mélange une date avec un compteur réservé au pro. Tant que
-   c'est le pro qui regarde ses propres offres, l'employeur est implicite ;
-   dès qu'un membre les parcourt, il manque. À reprendre côté schéma —
-   `offre.entreprise_id` et une date de clôture (`backend/README.md`).
+   Contrairement au pro, le membre voit **l'employeur** (dans le label) et
+   **la date limite** (dans le pied) : c'est lui qui parcourt des offres
+   qui ne sont pas les siennes.
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState, type ReactNode } from 'react';
-import { C, DATA } from '@stips/core';
+import { C, DATA, dateCourte } from '@stips/core';
 import type { Offre } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, Stk, ScreenHead, Pills, Screen, CarteAction } from '../atoms';
@@ -37,7 +33,7 @@ function ScreenStagesCandidat({ nav }: { nav: ReactNode }) {
         sous={`${DATA.offres.length} offres ouvertes, publiées par les pros de Stips`} />
       <Pills items={['Tout', 'Mes candidatures']} active={filtre} onChange={setFiltre} />
 
-      <div className="body">
+      <div>
         <div style={{ padding: '16px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {liste.map(o => (
             <OffreCard key={o.titre} o={o}
@@ -70,15 +66,18 @@ function OffreCard({ o, envoyee, onPostuler }: {
 }) {
   return (
     <Card>
-      <Mono>{o.meta}</Mono>
+      <Mono>{`${o.entreprise} · ${o.lieu} · ${o.dureeMois} mois`.toUpperCase()}</Mono>
       <div style={{ font: `600 18px/1.25 ${F.ui}`, color: C.ink, marginTop: 6 }}>{o.titre}</div>
 
       <div style={{
         marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.divider}`,
-        display: 'flex', alignItems: 'center',
-        justifyContent: envoyee ? 'space-between' : 'flex-end',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        {envoyee && <Mono color={C.ink}>CANDIDATURE ENVOYÉE ✓</Mono>}
+        {envoyee
+          ? <Mono color={C.ink}>CANDIDATURE ENVOYÉE ✓</Mono>
+          : <div style={{ font: `400 12px ${F.ui}`, color: C.muted }}>
+              {o.clotureeLe ? `Clôture le ${dateCourte(o.clotureeLe)}` : ''}
+            </div>}
         <Stk size={13} pad="9px 16px"
           onClick={envoyee ? undefined : onPostuler}
           style={envoyee ? { opacity: .4, cursor: 'default' } : undefined}>

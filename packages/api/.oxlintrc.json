@@ -1,0 +1,5 @@
+// Étend le socle racine (../../.oxlintrc.json), comme packages/core.
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../../.oxlintrc.json"]
+}

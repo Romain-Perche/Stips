@@ -340,11 +340,12 @@ export function TabBar({ screens, active, onChange }: {
 }
 
 /** Coquille d'un écran : barre d'état + contenu + onglets (ou CTA fixe).
-    Le conteneur est positionné : c'est lui qui sert de repère aux éléments
-    collés en bas (barre d'onglets, bouton flottant, CTA fixe). */
+    Le conteneur n'est PAS positionné : les éléments collés en bas (barre
+    d'onglets, bouton flottant, CTA fixe) prennent .ph pour repère, et ne
+    défilent donc pas avec le reste (voir .defile dans styles.css). */
 export function Screen({ children, nav }: { children: ReactNode; nav?: ReactNode }) {
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       <StatusBar />
       {children}
       {nav}

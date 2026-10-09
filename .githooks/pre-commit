@@ -39,7 +39,9 @@ touche() { echo "$staged" | grep -q "^$1/"; }
 
 # core est consommé par les deux : le toucher impose de revérifier les dépendants.
 if touche packages/core; then ajoute packages/core; ajoute mobile; ajoute frontend; fi
+if touche packages/api;  then ajoute packages/api; fi
 if touche mobile;        then ajoute mobile; fi
+if touche backend;       then ajoute backend; fi
 if touche frontend;      then ajoute frontend; fi
 
 for composant in $a_verifier; do verifie "$composant"; done

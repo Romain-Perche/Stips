@@ -20,7 +20,7 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { useState, type ReactNode } from 'react';
-import { C, DATA } from '@stips/core';
+import { C, DATA, dateCourte } from '@stips/core';
 import type { Candidature, Offre } from '@stips/core';
 import { F } from '../tokens';
 import { Mono, Card, Stk, Avatar, Segmented, Screen, ScreenHead, CarteAction } from '../atoms';
@@ -53,10 +53,10 @@ function ScreenOffres({ nav }: { nav: ReactNode }) {
           <div style={{ font: `400 26px/1.15 ${F.serif}`, color: C.ink, marginTop: 10 }}>
             {offre.titre}
           </div>
-          <Mono style={{ marginTop: 7 }}>{offre.meta}</Mono>
+          <Mono style={{ marginTop: 7 }}>{`${offre.lieu} · ${offre.dureeMois} mois`.toUpperCase()}</Mono>
         </div>
 
-        <div className="body">
+        <div>
           <div style={{ padding: '16px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <Mono>{recues.length} CANDIDATURE{recues.length > 1 ? 'S' : ''}</Mono>
             {recues.map(c => <CandidatureCard key={c.talent} c={c} />)}
@@ -85,7 +85,7 @@ function ScreenOffres({ nav }: { nav: ReactNode }) {
       </ScreenHead>
 
       {section === 'Talents' ? <TalentDeck /> : (
-        <div className="body">
+        <div>
           <div style={{ padding: '16px 22px 96px', display: 'flex', flexDirection: 'column', gap: 12 }}>
             {DATA.offres.map(o => (
               <OffreCard key={o.titre} o={o} onVoir={() => setOuverte(o.titre)} />
@@ -110,7 +110,7 @@ function OffreCard({ o, onVoir }: { o: Offre; onVoir: () => void }) {
     <Card>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <div style={{ flex: 1 }}>
-          <Mono>{o.meta}</Mono>
+          <Mono>{`${o.lieu} · ${o.dureeMois} mois`.toUpperCase()}</Mono>
           <div style={{ font: `600 18px/1.25 ${F.ui}`, color: C.ink, marginTop: 6 }}>{o.titre}</div>
         </div>
         <div style={{ textAlign: 'right', flex: 'none' }}>
@@ -124,7 +124,7 @@ function OffreCard({ o, onVoir }: { o: Offre; onVoir: () => void }) {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ font: `400 12px ${F.ui}`, color: C.muted }}>
-          {nonLues > 0 ? `${nonLues} non lue${nonLues > 1 ? 's' : ''}` : 'Tout est lu'}
+          Publiée le {dateCourte(o.publieeLe)} · {nonLues > 0 ? `${nonLues} non lue${nonLues > 1 ? 's' : ''}` : 'tout est lu'}
         </div>
         <Stk size={13} pad="9px 16px" onClick={onVoir}>Voir</Stk>
       </div>

@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/api/:chemin*", "destination": "https://api.stips.club/:chemin*" },
+    { "source": "/demande", "destination": "/index.html" },
+    { "source": "/connexion", "destination": "/index.html" },
+    { "source": "/invitation", "destination": "/index.html" },
+    { "source": "/parrainage/:reste*", "destination": "/index.html" }
+  ]
+}

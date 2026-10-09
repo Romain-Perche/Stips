@@ -14,11 +14,10 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 type Variante = 'development' | 'preview' | 'production';
 const variante = (process.env.APP_VARIANT ?? 'development') as Variante;
 
-// TODO(bundle-id) : "com.stips.app" est un placeholder — aucun domaine
-// n'est encore choisi. Change-le librement tant qu'aucune app n'a été
-// soumise à TestFlight (externe) ou Play Console : c'est CE moment-là,
-// pas eas init ni un build interne, qui le fige pour de vrai.
-const BASE_ID = 'com.stips.app';
+// Le domaine stips.club, à l'envers. Figé pour de vrai à la première
+// soumission à TestFlight (externe) ou Play Console — pas par eas init
+// ni un build interne. Voir mobile/RELEASE.md § 2.
+const BASE_ID = 'club.stips.app';
 
 // Les trois teintes du logo (section 6 du document de design) : taupe en
 // production, bleu en preview, rouge en dev. C'est le seul écart de dessin
