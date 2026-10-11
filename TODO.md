@@ -23,8 +23,9 @@ Dans l'ordre où les prendre. Claude : une discussion par tâche (voir `AGENTS.m
 
 | # | Tâche | Qui | Attend | Quand |
 |---|---|---|---|---|
-| 21 | Brancher le flux d'inscription : Supabase, Scaleway, Railway (`scripts/brancher-inscription.sh`) | Romain | — | 🟠 maintenant |
-| 12 | Brancher les écrans sur l'API (retirer `DATA`) — `frontend/` d'abord, `mobile/` quand il reprendra | Claude | 21 | ⚪ ensuite |
+| 22 | Ajouter un code à 6 chiffres au lien de connexion | Claude | — | 🟠 maintenant |
+| 23 | Rassembler les textes des e-mails et des écrans dans un seul fichier | Claude | — | ⚪ ensuite |
+| 12 | Brancher les écrans sur l'API (retirer `DATA`) — `frontend/` d'abord, `mobile/` quand il reprendra | Claude | — | ⚪ ensuite |
 | 13 | Trancher : in-app purchase ou paiement web | Romain | — | ⏸ fin de la bêta |
 | 14 | Créer le compte Stripe (mode test d'abord) | Romain | 13 | ⏸ fin de la bêta |
 | 15 | Brancher Stripe : Checkout + webhook `invoice.paid` | Claude | 13, 14 | ⏸ fin de la bêta |
@@ -47,12 +48,43 @@ Chaque bloc dit l'enjeu, ce qu'il faut lire avant, et le piège.
 ### 12. Brancher les écrans sur l'API
 
 **Enjeu.** Remplacer `DATA` par de vrais appels. C'est le moment où `packages/core/src/data.ts`
-disparaît. Le site en ligne a besoin du serveur déployé sur Railway (voir § Restes).
+disparaît. Le serveur tourne sur Railway (`https://api.stips.club`) ; il n'a encore que les
+routes d'auth et de parrainage : celles des offres, de l'annuaire et du deck sont à écrire.
 
 **Le piège.** **Valider toute donnée qui entre**, aux deux frontières. Un type TypeScript
 décrit ce que le backend a promis, pas ce qu'il a envoyé. `creerClient` (`packages/api`) le
 fait déjà ; côté mobile, `mobile/src/config/miseAJour.ts` montre le geste en miniature : une
 réponse malformée dégrade vers `null` au lieu de lever.
+
+### 22. Un code à 6 chiffres dans l'e-mail de connexion
+
+**Enjeu.** Le lien magique connecte le navigateur qui l'ouvre, pas celui qui l'a demandé : lien
+ouvert sur le téléphone alors qu'on attendait sur l'ordinateur, ou dans le navigateur intégré de
+l'app Gmail sur iPhone — la session y reste, Safari n'en sait rien. Un code tapé sur la page de
+`/connexion` règle les deux (comme Slack ou Notion). Les invitations restent en lien seul : on y
+arrive depuis l'e-mail de toute façon.
+
+**À lire d'abord.** `backend/src/routes/auth.ts` (`/v1/auth/verifier`), `frontend/src/pages/PageConnexion.tsx`.
+Côté Supabase, `{{ .Token }}` dans le gabarit « Magic Link », et
+`verifyOtp({ email, token, type: 'email' })`.
+
+**Les pièges.**
+- **Six chiffres valables 24 h se devinent** s'il n'y a pas de plafond d'essais. Limiter les
+  essais par e-mail côté serveur.
+- **Tous les appels à Supabase partent de l'IP de Railway** : la limite de Supabase sur les
+  vérifications de jeton (par IP) vaut donc pour tous les membres à la fois, liens compris.
+  À regarder dans Authentication → Rate Limits avant d'en dépendre.
+- Le code et le lien sont le même jeton : utiliser l'un consomme l'autre.
+- Mettre à jour le gabarit « Magic Link » dans Supabase en même temps que le déploiement.
+
+### 23. Les textes dans un seul fichier
+
+**Enjeu.** Romain veut voir et changer les textes sans fouiller le code. Un seul fichier (lu par
+`backend/` et `frontend/`) qu'il modifie depuis GitHub ; en ligne deux minutes après le merge.
+Une page d'admin avec les textes en base viendra peut-être après 12, si un fichier ne suffit plus.
+
+**Le piège.** Les deux e-mails d'auth (« Invite user », « Magic Link ») ne peuvent pas y entrer :
+Supabase les envoie, leur texte vit dans son dashboard (Authentication → Email Templates).
 
 ### 15. Brancher Stripe
 
@@ -90,7 +122,6 @@ répartition des secrets dans [`AGENTS.md`](AGENTS.md).
 |---|---|---|
 | 13 | Trancher IAP ou paiement web | décision business, 15 à 30 % de commission en jeu — et elle bloque 15, pas l'inverse |
 | 14 | Créer le compte Stripe, en mode test | il faut un compte, un IBAN et une vérification d'identité ; le mode test suffit pour construire le flux |
-| 21 | Brancher le flux d'inscription | tout est dans [`backend/README.md`](backend/README.md) § configurer Supabase Auth, et le script `scripts/brancher-inscription.sh` ouvre chaque page et écrit `backend/.env`. En bref : Site URL + Redirect URLs, deux gabarits d'e-mail en français, OTP à 24 h ; une application IAM Scaleway pour le backend ; le serveur sur Railway (EU West, `npm ci` à la racine, `npm start -w backend`, les variables de `backend/.env.example`) sous `api.stips.club` ; vérifier que la racine du projet Vercel est `frontend/`, sinon `vercel.json` n'est pas lu |
 | 17 | Valider les boîtes de remplissage | Deloitte, BNP et Sia Partners sont inventées |
 | 18 | Trancher « Stipeur » ou « Stiper » | c'est un nom de marque. « Stipeur » en attendant : une ligne de `ROLES` dans `packages/core/src/tokens.ts`, rien d'autre |
 
@@ -102,9 +133,11 @@ Petites choses laissées ouvertes par des tâches finies (numéro d'origine entr
 
 - [ ] Vérifier sur un vrai iPhone que la barre d'onglets ne passe pas sous la barre d'adresse
   de Safari (19).
-- [ ] Déployer le serveur sur Railway : le projet `Stips` est vide, l'URL se génère dans
-  Settings → Networking (9). Puis pointer `api.stips.club` dessus (`mobile/RELEASE.md`).
-- [ ] Brancher le mobile sur `GET /config` une fois l'URL connue (4) — quand `mobile/` reprendra.
+- [ ] Brancher le mobile sur `GET /config`, servi par `https://api.stips.club/config` (4) —
+  quand `mobile/` reprendra.
+- [ ] Renouveler la clé API de l'application IAM Scaleway `stips-backend` avant le
+  **10 oct. 2027** au plus tard (un an, plafond de l'organisation) : sans elle, la demande au
+  pro, la demande à valider et la notification ne partent plus (21).
 - [ ] Renouveler la clé SMTP de `supabase-auth` avant le **8 oct. 2027** : elle expire au bout
   d'un an (plafond de l'organisation Scaleway), et Supabase cesse alors d'envoyer les liens
   magiques sans prévenir (10).
@@ -132,3 +165,4 @@ Petites choses laissées ouvertes par des tâches finies (numéro d'origine entr
 | 16 | Cocher la CI comme check requis sur `main` | 21 août 2026 | un push direct sur `main` est refusé : tout passe par une PR dont `verifications` est vert |
 | 19 | Retirer le cadre téléphone du site | 27 sept. 2026 | `.ph` vaut `min(100vw, 480px)` × `100dvh` ; un seul conteneur défile par écran (`.defile`) ; écrans non élargis |
 | 20 | Mettre le site en ligne | 8 oct. 2026 | `https://www.stips.club`, servi par le projet Vercel `le-club` ; `stips.club` redirige vers `www`. Chaque merge dans `main` part en production tout seul. Données factices : une démo, pas encore un vrai service |
+| 21 | Brancher le flux d'inscription | 11 oct. 2026 | Testé de bout en bout sur `www.stips.club`, depuis un téléphone. Serveur sur Railway (service du projet `Stips`, EU West), branche `main`, Auto deploy + « Wait for CI », Healthcheck Path `/config`, build vide, start `npm start -w backend` ; variables = `backend/.env` avec `SITE_URL=https://stips.club`, `NODE_ENV=production`, sans `PORT`. `api.stips.club` en CNAME dans le DNS Vercel, certificat Let's Encrypt renouvelé par Railway. Supabase : Site URL + Redirect URLs, deux gabarits en français, OTP à 24 h. Scaleway : application `stips-backend`, permission `TransactionalEmailEmailApiCreate` seule. La session se renouvelle à chaque ouverture du site |
