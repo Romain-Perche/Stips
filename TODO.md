@@ -31,6 +31,7 @@ Dans l'ordre où les prendre. Claude : une discussion par tâche (voir `AGENTS.m
 | 15 | Brancher Stripe : Checkout + webhook `invoice.paid` | Claude | 13, 14 | ⏸ fin de la bêta |
 | 17 | Valider les données de remplissage des boîtes | Romain | — | ⚪ quand tu veux |
 | 18 | Trancher le nom d'un membre : « Stipeur » ou « Stiper » | Romain | — | ⚪ quand tu veux |
+| 24 | Empêcher Supabase de mettre le projet en pause | Romain | — | 💭 peut-être |
 
 **Ce qui se recouvre.** 15 n'attend pas du code mais une décision (13) : l'écrire avant,
 c'est peut-être l'écrire pour rien.
@@ -124,6 +125,7 @@ répartition des secrets dans [`AGENTS.md`](AGENTS.md).
 | 14 | Créer le compte Stripe, en mode test | il faut un compte, un IBAN et une vérification d'identité ; le mode test suffit pour construire le flux |
 | 17 | Valider les boîtes de remplissage | Deloitte, BNP et Sia Partners sont inventées |
 | 18 | Trancher « Stipeur » ou « Stiper » | c'est un nom de marque. « Stipeur » en attendant : une ligne de `ROLES` dans `packages/core/src/tokens.ts`, rien d'autre |
+| 24 | Empêcher la mise en pause de Supabase | le plan gratuit met le projet en pause après ~7 jours de faible activité en base : plus de base ni de connexion, le site répond 500 (arrivé le 17 oct. 2026, restauré à la main). Deux voies : une tâche GitHub quotidienne qui **écrit** une ligne (une lecture ne compterait pas), gratuite ; ou le plan Pro, ~25 $/mois, sans pause et avec sauvegardes quotidiennes — à prendre au plus tard avec les premiers vrais membres |
 
 ---
 
